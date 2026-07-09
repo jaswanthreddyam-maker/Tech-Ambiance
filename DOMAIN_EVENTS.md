@@ -1,24 +1,29 @@
 # StudioHQ & Client Portal: Event-Driven Domain Architecture & Event Catalog
 
-> **Status:** ARCHITECTURE FROZEN  
+> **Status:** ARCHITECTURE v1.0 FROZEN  
 > **Approach:** CQRS / Event-Driven Agency Operating System (`Command → Handler → Business Rule Verification → DB Transaction → Domain Event → Projection & Subscriber Updates`)
 
 ---
 
-## 1. Architectural Bounded Contexts (`backend/app/`)
+## 1. Architectural Bounded Contexts & Core Architecture
 
 ```text
-backend/app/
-├── auth/            # Identity & Security (Users, Organizations, Workspaces, Roles, PKCE)
-├── crm/             # Commercial Pipeline (Leads, Deals, Consultations, Proposals)
-├── delivery/        # Production & Execution (Projects, Milestones, Project Templates)
-├── finance/         # Financial Gatekeeper (Invoices, Payment Verification, Contracts)
-├── communication/   # Client Engagement (Executive Timelines, Notifications, Announcements)
-├── assets/          # Digital Vault (Storage Buckets, Deliverable Versioning v1/v2/Final)
-├── audit/           # Compliance (Immutable Admin Audit Logs)
-├── automation/      # Autonomous Workers (Celery/Cron Jobs, Auto Follow-ups, ScoutAI Scans)
-├── rules/           # Centralized Business Rules Engine
-└── events/          # First-Class Domain Event Schemas & Event Bus
+backend/
+├── app/
+│   ├── auth/            # Identity & Security (Users, Organizations, Workspaces, Roles)
+│   ├── crm/             # Commercial Pipeline (Leads, Deals, Consultations, Proposals)
+│   ├── delivery/        # Production & Execution (Projects, Milestones, Templates)
+│   ├── finance/         # Financial Gatekeeper (Invoices, Payment Verification, Contracts)
+│   ├── communication/   # Client Engagement (Executive Timelines, Notifications)
+│   ├── assets/          # Digital Vault (Storage Buckets, Deliverable Versioning v1/v2/Final)
+│   ├── audit/           # Compliance (Immutable Admin Audit Logs)
+│   └── automation/      # Autonomous Workers (Celery/Cron Jobs, Auto Follow-ups, ScoutAI Scans)
+└── core/                # Cross-Cutting Core Platform Concerns
+    ├── events/          # First-Class Domain Event Schemas & Event Bus
+    ├── rules/           # Centralized Business Rules Engine
+    ├── security/        # Auth Tokens, RLS Middleware, Cryptography
+    ├── database/        # Connection Pools, Transactions, Migrations
+    └── observability/   # Metrics, Logging, Tracing
 ```
 
 ---
@@ -26,17 +31,23 @@ backend/app/
 ## 2. Strict Sequential Implementation Protocol
 
 ```text
-1. Business Rules Registry (backend/app/rules/)
+1. Ubiquitous Language (Entities & Terminology)
         ↓
-2. PostgreSQL Database Schema & RLS Policies
+2. Business Rules (backend/core/rules/)
         ↓
-3. ORM Domain Models & Aggregates
+3. State Machines (Lead, Project, Invoice lifecycles)
         ↓
-4. Domain Event Catalog & Event Bus
+4. Database Schema & RLS Policies
         ↓
-5. RESTful & RPC API Contracts
+5. ORM Domain Models & Aggregates
         ↓
-6. Frontend React Query & Realtime Binding
+6. Domain Events (backend/core/events/)
+        ↓
+7. Commands & Handlers
+        ↓
+8. REST API Contracts
+        ↓
+9. Frontend Integration
 ```
 
 ---
