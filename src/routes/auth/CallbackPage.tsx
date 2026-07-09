@@ -16,6 +16,18 @@ export const CallbackPage: React.FC = () => {
       }
 
       try {
+        const searchParams = new URLSearchParams(window.location.search);
+        const code = searchParams.get("code");
+
+        if (code) {
+          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+          if (exchangeError) {
+            console.error("[Callback] Error exchanging OAuth code:", exchangeError);
+            if (active) navigate("/auth?error=oauth_exchange_failed", { replace: true });
+            return;
+          }
+        }
+
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
           console.error("[Callback] Error reading session:", error);
@@ -49,7 +61,7 @@ export const CallbackPage: React.FC = () => {
         </div>
         <div className="text-center">
           <h3 className="font-heading font-bold text-sm uppercase tracking-[0.24em] text-forest">
-            Finalizing Authentication...
+            Finalizing Google Authentication...
           </h3>
           <p className="text-[10px] uppercase tracking-[0.18em] text-forest/60 mt-1 font-medium">
             Entering Curated Studio Workspace
