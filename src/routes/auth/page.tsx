@@ -6,6 +6,7 @@ import * as z from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { Lock, Mail, Eye, EyeOff, Loader2, ArrowRight, X, CheckCircle2 } from "lucide-react";
 import { useAuth } from "../../providers/AuthProvider";
+import { authService } from "../../auth/authService";
 import { useToast } from "../../providers/ToastProvider";
 import { useCursorHover } from "../../hooks/useCursorHover";
 import { useSEO } from "../../providers/SEOProvider";
@@ -219,6 +220,20 @@ export const AuthPage: React.FC = () => {
                 className="w-full mt-6 py-3.5 rounded-full bg-forest text-gold font-heading font-bold uppercase tracking-[0.2em] text-xs shadow-lg hover:shadow-xl transition-all"
               >
                 Return to Sign In
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await authService.resendVerificationEmail(verificationSentEmail);
+                    toast("Confirmation link resent successfully.", "success");
+                  } catch (err: any) {
+                    toast(err?.message || "Could not resend email. Check Supabase rate limits.", "error");
+                  }
+                }}
+                className="w-full mt-2.5 py-2 rounded-full bg-transparent text-forest/70 hover:text-forest font-heading font-bold uppercase tracking-[0.18em] text-[10px] transition-all"
+              >
+                Resend Confirmation Email
               </button>
             </motion.div>
           </motion.div>

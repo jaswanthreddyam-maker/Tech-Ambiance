@@ -103,6 +103,19 @@ export const authService = {
     await supabase.auth.signOut();
   },
 
+  async resendVerificationEmail(email: string) {
+    if (!isSupabaseConfigured) return true;
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    if (error) throw error;
+    return true;
+  },
+
   async resetPasswordForEmail(email: string) {
     if (!isSupabaseConfigured) {
       return true;
