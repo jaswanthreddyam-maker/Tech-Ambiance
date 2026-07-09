@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -41,10 +41,19 @@ export const AuthPage: React.FC = () => {
   const hoverProps = useCursorHover("pointer");
   const inputHoverProps = useCursorHover("hide");
 
-  const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
+  const [searchParams] = useSearchParams();
+  const initialMode = searchParams.get("mode") === "signup" ? "signup" : "login";
+  const [activeTab, setActiveTab] = useState<"login" | "signup">(initialMode);
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+
+  React.useEffect(() => {
+    const mode = searchParams.get("mode");
+    if (mode === "signup" || mode === "login") {
+      setActiveTab(mode);
+    }
+  }, [searchParams]);
 
   React.useEffect(() => {
     setSEO({

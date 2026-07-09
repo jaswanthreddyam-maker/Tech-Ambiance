@@ -8,7 +8,6 @@ import { Magnetic } from "../atoms/Magnetic";
 import { useAuth } from "../../providers/AuthProvider";
 import { ROUTES } from "../../routes/routes";
 import logoImg from "../../assets/logo.png";
-import { useConsultationModal } from "../../providers/ConsultationModalProvider";
 
 export const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -24,7 +23,6 @@ export const Navbar: React.FC = () => {
   const hoverProps = useCursorHover("pointer");
   const buttonHoverProps = useCursorHover("magnetic");
   const { isAuthenticated } = useAuth();
-  const { openConsultationModal } = useConsultationModal();
 
   // Track window resizing for JS responsive calculations
   useEffect(() => {
@@ -153,8 +151,6 @@ export const Navbar: React.FC = () => {
   let navGap = isScrolled ? 16 : 24;
   if (isHovered && !isMobile) navGap += 4;
 
-  const buttonText = activeSection === "contact" ? "Let's Talk" : "Book a Call";
-
   return (
     <>
       {/* =========================================================
@@ -271,15 +267,29 @@ export const Navbar: React.FC = () => {
               })}
             </motion.div>
 
-            {/* Desktop Book a Call CTA */}
+            {/* Desktop Authentication Actions (Login & Sign Up) */}
             <motion.div
-              animate={{ scale: isScrolled ? 0.95 : 1 }}
-              transition={{ duration: 0.4 }}
-              className="shrink-0"
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0, scale: isScrolled ? 0.95 : 1 }}
+              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+              className="shrink-0 flex items-center gap-3.5 md:gap-4 ml-2"
             >
+              {/* Login Action (Subtle Text Button) */}
+              <Magnetic>
+                <button
+                  onClick={() => navigate("/auth?mode=login")}
+                  onMouseEnter={hoverProps.onMouseEnter}
+                  onMouseLeave={hoverProps.onMouseLeave}
+                  className="bg-transparent text-[#0B3027] hover:text-[#C9A56A] hover:opacity-90 font-medium text-[9.5px] uppercase tracking-[0.18em] px-4 py-1.5 transition-all duration-300 no-underline rounded-full select-none"
+                >
+                  Login
+                </button>
+              </Magnetic>
+
+              {/* Sign Up Action (Primary Luxury CTA) */}
               <Magnetic>
                 <motion.button
-                  onClick={openConsultationModal}
+                  onClick={() => navigate("/auth?mode=signup")}
                   className="btn-emerald-stone !text-[#C5A572] uppercase tracking-widest font-semibold flex items-center justify-center gap-2 rounded-full border border-forest hover:shadow-[0_4px_16px_rgba(6,41,30,0.12)] select-none relative group overflow-hidden"
                   style={{ color: "#C5A572" }}
                   animate={{
@@ -294,7 +304,7 @@ export const Navbar: React.FC = () => {
                   {...buttonHoverProps}
                 >
                   <span className="whitespace-nowrap relative z-10 !text-[#C5A572] font-bold">
-                    {buttonText}
+                    Sign Up
                   </span>
                   <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform duration-300 mt-0.5 !text-[#C5A572] relative z-10" />
                 </motion.button>
@@ -325,8 +335,17 @@ export const Navbar: React.FC = () => {
             </Link>
           </div>
 
-          {/* Top-Right Standalone Hamburger Icon Button */}
-          <div className="fixed top-5 right-5 z-[9990]">
+          {/* Top-Right Standalone Mobile Controls (Sign Up & Hamburger) */}
+          <div className="fixed top-4 right-4 sm:top-5 sm:right-5 z-[9990] flex items-center gap-2.5">
+            <button
+              onClick={() => navigate("/auth?mode=signup")}
+              className="btn-emerald-stone !text-[#C5A572] uppercase tracking-widest font-semibold flex items-center justify-center gap-1.5 rounded-full border border-forest px-4 py-2.5 text-[9px] shadow-md active:scale-95 transition-all"
+              style={{ color: "#C5A572" }}
+            >
+              <span>Sign Up</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
+
             <button
               onClick={() => setIsMobileMenuOpen(true)}
               className="w-11 h-11 rounded-full bg-forest text-gold flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-transform"
@@ -382,20 +401,30 @@ export const Navbar: React.FC = () => {
                   ))}
                 </div>
 
-                {/* Bottom Row: CTA Button & Coordinates */}
-                <div className="flex flex-col items-center gap-5 pb-4">
+                {/* Bottom Row: Authentication Controls & Coordinates */}
+                <div className="flex flex-col items-center gap-4 pb-4">
                   <button
                     onClick={() => {
-                      openConsultationModal();
+                      navigate("/auth?mode=signup");
                       setIsMobileMenuOpen(false);
                     }}
                     className="w-full max-w-xs py-4 rounded-full bg-forest text-gold font-heading font-bold uppercase tracking-[0.22em] text-xs shadow-md flex items-center justify-center gap-2"
                   >
-                    <span>{buttonText}</span>
+                    <span>Sign Up</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
 
-                  <div className="text-[10px] uppercase tracking-[0.24em] font-semibold text-forest/50">
+                  <button
+                    onClick={() => {
+                      navigate("/auth?mode=login");
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="text-xs uppercase tracking-[0.2em] font-semibold text-forest/80 hover:text-gold py-2 px-6 transition-colors"
+                  >
+                    Login
+                  </button>
+
+                  <div className="text-[10px] uppercase tracking-[0.24em] font-semibold text-forest/50 mt-2">
                     B2B Digital Flagships • MMXXVI
                   </div>
                 </div>
