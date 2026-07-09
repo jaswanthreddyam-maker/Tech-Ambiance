@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { useAuth } from "../../providers/AuthProvider";
 import { useToast } from "../../providers/ToastProvider";
 import { useCursorHover } from "../../hooks/useCursorHover";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  Activity,
   Calendar,
   DollarSign,
   Download,
@@ -12,24 +12,171 @@ import {
   Info,
   Send,
   Ticket,
+  ChevronDown,
+  Check,
+  FolderGit2,
+  Layers,
+  Lock,
+  Building2,
+  Sparkles,
+  CheckCircle2,
 } from "lucide-react";
 
+interface PortalProjectData {
+  id: string;
+  name: string;
+  status: string;
+  progress: number;
+  activeSprint: string;
+  budget: string;
+  deliveryDate: string;
+  sourceCode?: string;
+  stagingUrl?: string;
+  milestones: {
+    id: string;
+    name: string;
+    date: string;
+    status: "completed" | "active" | "pending";
+  }[];
+  files: {
+    name: string;
+    size: string;
+    date: string;
+    type: string;
+  }[];
+  invoices: {
+    id: string;
+    amount: string;
+    date: string;
+    status: "PAID" | "PENDING";
+  }[];
+}
+
+const WORKSPACE_PROJECTS: PortalProjectData[] = [
+  {
+    id: "cafe-vistaara-web",
+    name: "Cafe Vistaara Premium Website",
+    status: "Development",
+    progress: 68,
+    activeSprint: "Animations & Performance SLAs",
+    budget: "$42,000",
+    deliveryDate: "Aug 15, 2026",
+    sourceCode: "https://github.com/jaswanthreddyam-maker/Tech-Ambiance",
+    stagingUrl: "https://cafevistaara.techambiance.studio",
+    milestones: [
+      { id: "m1", name: "Architecture & Wireframe Sign-Off", date: "Jun 10, 2026", status: "completed" },
+      { id: "m2", name: "High-Fidelity Editorial Design System", date: "Jun 24, 2026", status: "completed" },
+      { id: "m3", name: "Interactive WebGL & Framer Motion Sprint", date: "Jul 15, 2026", status: "active" },
+      { id: "m4", name: "Edge Telemetry & Production Deployment", date: "Aug 10, 2026", status: "pending" },
+    ],
+    files: [
+      { name: "Brand Guidelines & Color Tokens (PDF)", size: "4.2 MB", date: "2026-06-12", type: "PDF" },
+      { name: "UI/UX Layout Prototypes (ZIP)", size: "18.5 MB", date: "2026-06-26", type: "ZIP" },
+      { name: "Lighthouse Performance Audit (PDF)", size: "1.8 MB", date: "2026-07-04", type: "PDF" },
+    ],
+    invoices: [
+      { id: "INV-2026-081", amount: "$14,000", date: "Jun 01, 2026", status: "PAID" },
+      { id: "INV-2026-094", amount: "$14,000", date: "Jul 01, 2026", status: "PAID" },
+      { id: "INV-2026-112", amount: "$14,000", date: "Aug 01, 2026", status: "PENDING" },
+    ],
+  },
+  {
+    id: "vistaara-qr-ordering",
+    name: "QR Table Ordering & Realtime POS",
+    status: "Backend Sprint",
+    progress: 24,
+    activeSprint: "PostgreSQL Realtime Queue & WebSocket Engine",
+    budget: "$28,500",
+    deliveryDate: "Sep 30, 2026",
+    sourceCode: "https://github.com/jaswanthreddyam-maker/Tech-Ambiance",
+    milestones: [
+      { id: "qm1", name: "POS & Stripe Terminal Specification", date: "Jun 28, 2026", status: "completed" },
+      { id: "qm2", name: "Supabase Realtime Order Queue API", date: "Jul 20, 2026", status: "active" },
+      { id: "qm3", name: "Customer QR Scan Mobile Interface", date: "Aug 18, 2026", status: "pending" },
+      { id: "qm4", name: "Kitchen Display System (KDS) Tablet App", date: "Sep 15, 2026", status: "pending" },
+    ],
+    files: [
+      { name: "POS Integration API Schema (YAML)", size: "480 KB", date: "2026-06-28", type: "YAML" },
+      { name: "Table QR Vector Assets (EPS/SVG)", size: "12.4 MB", date: "2026-07-02", type: "ZIP" },
+      { name: "Menu Database CSV Template (XLSX)", size: "640 KB", date: "2026-07-05", type: "XLSX" },
+    ],
+    invoices: [
+      { id: "INV-2026-088", amount: "$9,500", date: "Jun 28, 2026", status: "PAID" },
+      { id: "INV-2026-105", amount: "$9,500", date: "Jul 28, 2026", status: "PENDING" },
+    ],
+  },
+  {
+    id: "vistaara-marketing-ai",
+    name: "Marketing & AI Telemetry Dashboard",
+    status: "QA & Polish",
+    progress: 88,
+    activeSprint: "Executive Telemetry Metrics Pipeline",
+    budget: "$35,000",
+    deliveryDate: "Jul 25, 2026",
+    stagingUrl: "https://telemetry.techambiance.studio",
+    milestones: [
+      { id: "am1", name: "Data Ingestion Pipeline Architecture", date: "May 15, 2026", status: "completed" },
+      { id: "am2", name: "ScoutAI Telemetry Analytics Engine", date: "Jun 10, 2026", status: "completed" },
+      { id: "am3", name: "Executive Dark Mode Visual Dashboard", date: "Jul 05, 2026", status: "completed" },
+      { id: "am4", name: "Penetration Testing & SOC-2 Compliance Prep", date: "Jul 22, 2026", status: "active" },
+    ],
+    files: [
+      { name: "ScoutAI Telemetry Playbook (PDF)", size: "5.6 MB", date: "2026-06-15", type: "PDF" },
+      { name: "Executive Metric Definitions (DOCX)", size: "920 KB", date: "2026-06-22", type: "DOCX" },
+    ],
+    invoices: [
+      { id: "INV-2026-062", amount: "$17,500", date: "May 15, 2026", status: "PAID" },
+      { id: "INV-2026-099", amount: "$17,500", date: "Jul 01, 2026", status: "PAID" },
+    ],
+  },
+  {
+    id: "vistaara-loyalty-app",
+    name: "Vistaara Club iOS & Android Loyalty App",
+    status: "UI/UX Design",
+    progress: 45,
+    activeSprint: "Figma Interactive Prototypes & Token Mechanics",
+    budget: "$54,000",
+    deliveryDate: "Nov 15, 2026",
+    milestones: [
+      { id: "lm1", name: "Club Tier & Loyalty Point Mechanics", date: "Jun 20, 2026", status: "completed" },
+      { id: "lm2", name: "Figma Interactive Design Prototype", date: "Jul 18, 2026", status: "active" },
+      { id: "lm3", name: "React Native Bridge & Biometric Auth", date: "Sep 10, 2026", status: "pending" },
+      { id: "lm4", name: "App Store & Google Play Submission", date: "Nov 01, 2026", status: "pending" },
+    ],
+    files: [
+      { name: "Vistaara Club App Storyboard (PDF)", size: "8.4 MB", date: "2026-06-20", type: "PDF" },
+      { name: "Apple Wallet & Passkit Certificate (ZIP)", size: "2.1 MB", date: "2026-07-03", type: "ZIP" },
+    ],
+    invoices: [
+      { id: "INV-2026-079", amount: "$18,000", date: "Jun 20, 2026", status: "PAID" },
+    ],
+  },
+];
+
 export const ClientPortal: React.FC = () => {
-  const { project } = useAuth();
+  const { organization, workspace } = useAuth();
   const { toast } = useToast();
   const hoverProps = useCursorHover("pointer");
-  const inputHoverProps = useCursorHover("hide");
 
+  const [activeProjectIdx, setActiveProjectIdx] = useState(0);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [ticketSubject, setTicketSubject] = useState("");
-  const [tickets, setTickets] = useState(project?.supportTickets || []);
+  const [tickets, setTickets] = useState([
+    {
+      id: "t-104",
+      subject: "Staging DNS Custom Domain Request",
+      status: "Open" as const,
+      date: "2026-07-08",
+    },
+    {
+      id: "t-098",
+      subject: "Updated Brand Asset Package Uploaded",
+      status: "Closed" as const,
+      date: "2026-06-29",
+    },
+  ]);
 
-  if (!project) {
-    return (
-      <div className="flex items-center justify-center h-[50vh] text-text-secondary">
-        No active project configuration found.
-      </div>
-    );
-  }
+  const activeProject = WORKSPACE_PROJECTS[activeProjectIdx];
 
   const handleCreateTicket = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,303 +191,392 @@ export const ClientPortal: React.FC = () => {
 
     setTickets((prev) => [newTicket, ...prev]);
     setTicketSubject("");
-    toast("Support ticket submitted successfully.", "success");
+    toast("Support ticket submitted to Tech Ambiance StudioHQ.", "success");
   };
 
-  const mockFiles = [
-    { name: "Brand Guidelines (PDF)", size: "4.2 MB", date: "2026-06-12" },
-    { name: "UI/UX Layout Prototypes (ZIP)", size: "18.5 MB", date: "2026-06-26" },
-    { name: "SEO Keyword Strategy (XLSX)", size: "1.1 MB", date: "2026-07-02" },
-  ];
+  const orgName = organization?.name || "Vistaara Hospitality Pvt Ltd";
+  const wsName = workspace?.name || "Vistaara Corporate Workspace";
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-left">
-      {/* LEFT COLUMN: Project Overview, Milestones, Files */}
-      <div className="lg:col-span-8 flex flex-col gap-8">
-        
-        {/* Project Card Progress */}
-        <div className="bg-white border border-border-custom shadow-sm p-8 rounded-2xl relative overflow-hidden">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-            <div>
-              <span className="text-[9px] uppercase tracking-widest text-gold font-bold">
-                Project Name
+    <div className="flex flex-col gap-8 text-left select-none pb-12">
+      {/* =========================================================
+          WORKSPACE BAR: ORGANIZATION -> WORKSPACE HEADER
+      ========================================================= */}
+      <div className="bg-forest text-ivory border border-gold/25 rounded-3xl p-6 md:p-8 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-gold/5 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="flex items-center gap-4 relative z-10">
+          <div className="w-12 h-12 rounded-2xl bg-gold/15 border border-gold/30 flex items-center justify-center shrink-0">
+            <Building2 className="w-6 h-6 text-gold" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.24em] font-bold text-gold">
+              <span>Client Workspace</span>
+              <span className="text-ivory/30">•</span>
+              <span className="flex items-center gap-1 text-ivory/80">
+                <Lock className="w-3 h-3 text-gold" />
+                Read-Only Portal
               </span>
-              <h2 className="font-heading text-2xl font-bold text-text-primary mt-1">
-                {project.name}
-              </h2>
             </div>
-            <div className="px-4 py-2 bg-gold/10 border border-gold/20 rounded-lg text-xs font-bold text-gold">
-              Status: {project.status}
-            </div>
-          </div>
-
-          {/* Progress Bar */}
-          <div className="flex flex-col gap-2 mb-4">
-            <div className="flex justify-between items-center text-xs font-semibold text-text-secondary">
-              <span>Overall Build Progress</span>
-              <span className="text-gold font-bold">{project.progress}%</span>
-            </div>
-            <div className="w-full h-2 bg-bg-primary border border-border-custom rounded-full overflow-hidden">
-              <div
-                style={{ width: `${project.progress}%` }}
-                className="h-full bg-gold rounded-full transition-all duration-1000"
-              />
-            </div>
-          </div>
-
-          <p className="text-xs text-text-secondary flex items-start gap-2 mt-4 font-light">
-            <Info className="w-4 h-4 text-gold shrink-0 mt-0.5" />
-            <span>
-              Currently working on: <strong className="font-semibold text-text-primary">{project.activeMilestone}</strong>.
-            </span>
-          </p>
-        </div>
-
-        {/* Timeline & Milestones checklist */}
-        <div className="bg-white border border-border-custom shadow-sm p-8 rounded-2xl">
-          <h3 className="font-heading text-lg font-bold text-text-primary mb-6 flex items-center gap-3">
-            <Calendar className="w-5 h-5 text-gold shrink-0" />
-            Project Milestones
-          </h3>
-
-          <div className="flex flex-col gap-4">
-            {project.milestones.map((milestone) => (
-              <div
-                key={milestone.id}
-                className="flex items-center justify-between gap-4 p-4 border border-border-custom/50 rounded-xl bg-bg-primary/20 hover:bg-bg-primary/40 transition-all"
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${
-                      milestone.status === "completed"
-                        ? "bg-gold border-gold text-white"
-                        : milestone.status === "active"
-                        ? "border-gold bg-gold/5"
-                        : "border-border-custom"
-                    }`}
-                  >
-                    {milestone.status === "completed" && <span className="text-[10px]">&bull;</span>}
-                  </div>
-                  <span
-                    className={`text-xs font-semibold ${
-                      milestone.status === "completed"
-                        ? "text-text-secondary line-through font-light"
-                        : "text-text-primary"
-                    }`}
-                  >
-                    {milestone.name}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <span className="text-[9px] uppercase tracking-wider text-text-secondary font-bold">
-                    {milestone.date}
-                  </span>
-                  <span
-                    className={`text-[9px] uppercase font-bold px-2 py-1 rounded ${
-                      milestone.status === "completed"
-                        ? "bg-zinc-100 text-zinc-500"
-                        : milestone.status === "active"
-                        ? "bg-gold/10 text-gold border border-gold/20"
-                        : "bg-zinc-50 text-zinc-400"
-                    }`}
-                  >
-                    {milestone.status}
-                  </span>
-                </div>
-              </div>
-            ))}
+            <h1 className="font-heading text-2xl md:text-3xl font-bold text-ivory mt-1">
+              {orgName}
+            </h1>
+            <p className="text-xs text-ivory/60 mt-0.5">
+              Workspace: <strong className="text-ivory/90">{wsName}</strong> • Managed by Tech Ambiance StudioHQ
+            </p>
           </div>
         </div>
 
-        {/* File Downloads section */}
-        <div className="bg-white border border-border-custom shadow-sm p-8 rounded-2xl">
-          <h3 className="font-heading text-lg font-bold text-text-primary mb-6 flex items-center gap-3">
-            <Download className="w-5 h-5 text-gold shrink-0" />
-            Document Downloads
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {mockFiles.map((file, idx) => (
-              <div
-                key={idx}
-                className="border border-border-custom hover:border-gold hover:shadow-premium p-5 rounded-xl text-left flex flex-col justify-between aspect-video transition-all duration-300 relative group"
-              >
-                <div className="p-2.5 bg-bg-primary rounded-lg border border-border-custom/50 text-gold self-start mb-4 group-hover:border-gold/30">
-                  <FileText className="w-4 h-4" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-text-primary truncate">{file.name}</h4>
-                  <div className="flex justify-between items-center mt-3 text-[10px] text-text-secondary font-light">
-                    <span>{file.size}</span>
-                    <button
-                      onClick={() => toast(`Simulating file download: ${file.name}`, "success")}
-                      className="text-gold font-bold uppercase tracking-widest flex items-center gap-0.5 hover:underline"
-                      {...hoverProps}
-                    >
-                      Get
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+        <div className="flex items-center gap-3 relative z-10">
+          <div className="px-4 py-2.5 rounded-full bg-ivory/10 border border-ivory/15 text-ivory text-xs font-semibold flex items-center gap-2">
+            <Layers className="w-3.5 h-3.5 text-gold" />
+            <span>{WORKSPACE_PROJECTS.length} Active Projects</span>
           </div>
         </div>
-
       </div>
 
-      {/* RIGHT COLUMN: Project Details, Invoices, Support Tickets */}
-      <div className="lg:col-span-4 flex flex-col gap-8">
-        
-        {/* Project Details Panel */}
-        <div className="bg-white border border-border-custom shadow-sm p-6 rounded-2xl flex flex-col gap-5">
-          <h3 className="font-heading text-base font-bold text-text-primary border-b border-border-custom pb-3">
-            Active Parameters
-          </h3>
+      {/* =========================================================
+          MAIN GRID: LEFT COLUMN (PROJECT PROGRESS, SWITCHER, MILESTONES) & RIGHT COLUMN
+      ========================================================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* LEFT COLUMN: PROJECT SWITCHER CARD, PROGRESS & MILESTONES */}
+        <div className="lg:col-span-8 flex flex-col gap-8">
+          
+          {/* HERO PROJECT CARD WITH INTERACTIVE PROJECT SWITCHER */}
+          <div className="bg-white border border-border-custom shadow-sm p-8 rounded-2xl relative overflow-visible">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+              <div>
+                <span className="text-[10px] uppercase tracking-[0.24em] text-gold font-bold flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-gold" />
+                  Current Project
+                </span>
 
-          <div className="flex flex-col gap-1">
-            <span className="text-[9px] uppercase tracking-wider font-bold text-text-secondary">
-              Budget Terms
-            </span>
-            <span className="text-xs font-bold text-text-primary">{project.budget}</span>
+                {/* PROJECT SWITCHER DROPDOWN */}
+                <div className="relative mt-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    className="flex items-center justify-between gap-3 bg-bg-primary hover:bg-gold/10 border border-border-custom hover:border-gold px-5 py-3 rounded-xl transition-all shadow-sm font-heading text-xl md:text-2xl font-bold text-text-primary"
+                    {...hoverProps}
+                  >
+                    <span>{activeProject.name}</span>
+                    <ChevronDown
+                      className={`w-5 h-5 text-gold transition-transform duration-300 ${
+                        isDropdownOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  <AnimatePresence>
+                    {isDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute top-full left-0 mt-2 w-full min-w-[320px] bg-white border border-border-custom rounded-2xl shadow-2xl z-50 p-2 overflow-hidden"
+                      >
+                        <div className="px-3 py-2 text-[9px] uppercase tracking-widest font-bold text-text-secondary border-b border-border-custom/50">
+                          Switch Active Project
+                        </div>
+                        {WORKSPACE_PROJECTS.map((proj, idx) => {
+                          const isSelected = idx === activeProjectIdx;
+                          return (
+                            <button
+                              key={proj.id}
+                              type="button"
+                              onClick={() => {
+                                setActiveProjectIdx(idx);
+                                setIsDropdownOpen(false);
+                                toast(`Switched to ${proj.name}`, "info");
+                              }}
+                              className={`w-full text-left px-4 py-3 rounded-xl flex items-center justify-between transition-colors ${
+                                isSelected
+                                  ? "bg-forest text-ivory"
+                                  : "hover:bg-bg-primary text-text-primary"
+                              }`}
+                            >
+                              <div>
+                                <div className="font-heading font-bold text-sm">
+                                  {proj.name}
+                                </div>
+                                <div
+                                  className={`text-[10px] mt-0.5 ${
+                                    isSelected ? "text-gold" : "text-text-secondary"
+                                  }`}
+                                >
+                                  {proj.status} • {proj.progress}% Complete
+                                </div>
+                              </div>
+                              {isSelected && <Check className="w-4 h-4 text-gold shrink-0" />}
+                            </button>
+                          );
+                        })}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+
+              <div className="px-4 py-2 bg-gold/10 border border-gold/30 rounded-lg text-xs font-bold text-gold">
+                Status: {activeProject.status}
+              </div>
+            </div>
+
+            {/* PROGRESS BAR */}
+            <div className="flex flex-col gap-2 mb-4">
+              <div className="flex justify-between items-center text-xs font-semibold text-text-secondary">
+                <span>Overall Build Progress</span>
+                <span className="text-gold font-bold">{activeProject.progress}%</span>
+              </div>
+              <div className="w-full h-2.5 bg-bg-primary border border-border-custom rounded-full overflow-hidden">
+                <motion.div
+                  key={activeProject.id}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${activeProject.progress}%` }}
+                  transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                  className="h-full bg-gold rounded-full"
+                />
+              </div>
+            </div>
+
+            <p className="text-xs text-text-secondary flex items-start gap-2 mt-4 font-light">
+              <Info className="w-4 h-4 text-gold shrink-0 mt-0.5" />
+              <span>
+                Current Sprint: <strong className="font-semibold text-text-primary">{activeProject.activeSprint}</strong>
+              </span>
+            </p>
           </div>
 
-          <div className="flex flex-col gap-1">
-            <span className="text-[9px] uppercase tracking-wider font-bold text-text-secondary">
-              Estimated Delivery
-            </span>
-            <span className="text-xs font-bold text-text-primary">{project.deliveryDate}</span>
+          {/* PROJECT MILESTONES SECTION */}
+          <div className="bg-white border border-border-custom shadow-sm p-8 rounded-2xl">
+            <h3 className="font-heading text-lg font-bold text-text-primary mb-6 flex items-center gap-3">
+              <Calendar className="w-5 h-5 text-gold shrink-0" />
+              <span>Project Milestones ({activeProject.name})</span>
+            </h3>
+
+            <div className="flex flex-col gap-4">
+              {activeProject.milestones.map((milestone) => (
+                <div
+                  key={milestone.id}
+                  className="flex items-center justify-between gap-4 p-4 border border-border-custom/50 rounded-xl bg-bg-primary/20 hover:bg-bg-primary/50 transition-all"
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${
+                        milestone.status === "completed"
+                          ? "bg-gold border-gold text-white"
+                          : milestone.status === "active"
+                          ? "border-gold bg-gold/10"
+                          : "border-border-custom"
+                      }`}
+                    >
+                      {milestone.status === "completed" && (
+                        <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+                      )}
+                    </div>
+                    <span
+                      className={`text-xs font-semibold ${
+                        milestone.status === "completed"
+                          ? "text-text-secondary line-through font-light"
+                          : "text-text-primary"
+                      }`}
+                    >
+                      {milestone.name}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <span className="text-[9px] uppercase tracking-wider text-text-secondary font-bold">
+                      {milestone.date}
+                    </span>
+                    <span
+                      className={`text-[9px] uppercase font-bold px-2 py-1 rounded ${
+                        milestone.status === "completed"
+                          ? "bg-zinc-100 text-zinc-500"
+                          : milestone.status === "active"
+                          ? "bg-gold/10 text-gold border border-gold/20"
+                          : "bg-zinc-50 text-zinc-400"
+                      }`}
+                    >
+                      {milestone.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <span className="text-[9px] uppercase tracking-wider font-bold text-text-secondary">
-              Environments
-            </span>
-            <div className="flex flex-col gap-2">
-              {project.sourceCode && (
-                <a
-                  href={project.sourceCode}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-xs font-semibold text-text-secondary hover:text-gold transition-colors"
-                  {...hoverProps}
+          {/* DOCUMENT DOWNLOADS FOR ACTIVE PROJECT */}
+          <div className="bg-white border border-border-custom shadow-sm p-8 rounded-2xl">
+            <h3 className="font-heading text-lg font-bold text-text-primary mb-6 flex items-center gap-3">
+              <Download className="w-5 h-5 text-gold shrink-0" />
+              <span>Document Downloads ({activeProject.name})</span>
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {activeProject.files.map((file, idx) => (
+                <div
+                  key={idx}
+                  className="border border-border-custom hover:border-gold hover:shadow-premium p-5 rounded-xl text-left flex flex-col justify-between transition-all duration-300 relative group"
                 >
-                  <svg className="w-4 h-4 shrink-0 text-text-secondary group-hover:text-gold transition-colors" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                    <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.577.688.479C19.138 20.162 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
-                  </svg>
-                  GitHub Repository
-                  <ExternalLink className="w-3 h-3 mt-0.5" />
-                </a>
-              )}
-              {project.demoUrl && (
-                <a
-                  href={project.demoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-xs font-semibold text-text-secondary hover:text-gold transition-colors"
-                  {...hoverProps}
-                >
-                  <Activity className="w-4 h-4 shrink-0" />
-                  Active Staging Build
-                  <ExternalLink className="w-3 h-3 mt-0.5" />
-                </a>
-              )}
+                  <div className="p-2.5 bg-bg-primary rounded-lg border border-border-custom/50 text-gold self-start mb-4 group-hover:border-gold/30">
+                    <FileText className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-text-primary truncate">{file.name}</h4>
+                    <div className="flex justify-between items-center mt-3 text-[10px] text-text-secondary font-light">
+                      <span>{file.size}</span>
+                      <button
+                        type="button"
+                        onClick={() => toast(`Downloading ${file.name}...`, "success")}
+                        className="text-gold font-bold uppercase tracking-widest flex items-center gap-0.5 hover:underline"
+                        {...hoverProps}
+                      >
+                        Download
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Invoices List */}
-        <div className="bg-white border border-border-custom shadow-sm p-6 rounded-2xl flex flex-col gap-5">
-          <h3 className="font-heading text-base font-bold text-text-primary border-b border-border-custom pb-3 flex items-center gap-2">
-            <DollarSign className="w-4.5 h-4.5 text-gold shrink-0" />
-            Billing Invoices
-          </h3>
+        {/* RIGHT COLUMN: ACTIVE PARAMETERS, INVOICES & TICKETS */}
+        <div className="lg:col-span-4 flex flex-col gap-8">
+          
+          {/* ACTIVE PARAMETERS PANEL */}
+          <div className="bg-white border border-border-custom shadow-sm p-6 rounded-2xl flex flex-col gap-5">
+            <h3 className="font-heading text-base font-bold text-text-primary border-b border-border-custom pb-3">
+              Active Parameters
+            </h3>
 
-          <div className="flex flex-col gap-3">
-            {project.invoices.map((inv) => (
-              <div
-                key={inv.id}
-                className="flex items-center justify-between gap-3 p-3 border border-border-custom/40 rounded-xl hover:bg-bg-primary/20 transition-all"
-              >
-                <div>
-                  <div className="text-xs font-bold text-text-primary">{inv.amount}</div>
-                  <div className="text-[9px] text-text-secondary uppercase mt-0.5 font-light">
-                    {inv.id} &bull; {inv.date}
+            <div className="flex flex-col gap-1">
+              <span className="text-[9px] uppercase tracking-wider font-bold text-text-secondary">
+                Budget Terms
+              </span>
+              <span className="text-xs font-bold text-text-primary">{activeProject.budget}</span>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <span className="text-[9px] uppercase tracking-wider font-bold text-text-secondary">
+                Estimated Delivery
+              </span>
+              <span className="text-xs font-bold text-text-primary">{activeProject.deliveryDate}</span>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <span className="text-[9px] uppercase tracking-wider font-bold text-text-secondary">
+                Environments
+              </span>
+              <div className="flex flex-col gap-2">
+                {activeProject.sourceCode && (
+                  <a
+                    href={activeProject.sourceCode}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-xs font-semibold text-text-secondary hover:text-gold transition-colors"
+                  >
+                    <FolderGit2 className="w-4 h-4 text-gold" />
+                    GitHub Repository
+                    <ExternalLink className="w-3 h-3 ml-auto text-text-secondary" />
+                  </a>
+                )}
+                {activeProject.stagingUrl && (
+                  <a
+                    href={activeProject.stagingUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-xs font-semibold text-text-secondary hover:text-gold transition-colors"
+                  >
+                    <ExternalLink className="w-4 h-4 text-gold" />
+                    Live Staging Environment
+                    <ExternalLink className="w-3 h-3 ml-auto text-text-secondary" />
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* INVOICE & PAYMENT STATUS */}
+          <div className="bg-white border border-border-custom shadow-sm p-6 rounded-2xl flex flex-col gap-4">
+            <h3 className="font-heading text-base font-bold text-text-primary flex items-center gap-2 border-b border-border-custom pb-3">
+              <DollarSign className="w-4 h-4 text-gold" />
+              Billing & Invoices
+            </h3>
+
+            <div className="flex flex-col gap-3">
+              {activeProject.invoices.map((inv) => (
+                <div
+                  key={inv.id}
+                  className="flex items-center justify-between p-3 rounded-xl border border-border-custom/60 bg-bg-primary/20"
+                >
+                  <div>
+                    <div className="text-xs font-bold text-text-primary">{inv.id}</div>
+                    <div className="text-[10px] text-text-secondary">{inv.date}</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-text-primary">{inv.amount}</span>
+                    <span
+                      className={`text-[9px] uppercase font-bold px-2 py-0.5 rounded ${
+                        inv.status === "PAID"
+                          ? "bg-emerald-100 text-emerald-800"
+                          : "bg-amber-100 text-amber-800"
+                      }`}
+                    >
+                      {inv.status}
+                    </span>
                   </div>
                 </div>
-
-                <span
-                  className={`text-[9px] uppercase font-bold px-2.5 py-1 rounded-md ${
-                    inv.status === "Paid"
-                      ? "bg-green-500/10 text-green-600"
-                      : inv.status === "Pending"
-                      ? "bg-gold/10 text-gold border border-gold/20"
-                      : "bg-red-500/10 text-red-500"
-                  }`}
-                >
-                  {inv.status}
-                </span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Support Tickets */}
-        <div className="bg-white border border-border-custom shadow-sm p-6 rounded-2xl flex flex-col gap-5">
-          <h3 className="font-heading text-base font-bold text-text-primary border-b border-border-custom pb-3 flex items-center gap-2">
-            <Ticket className="w-4.5 h-4.5 text-gold shrink-0" />
-            Support Tickets
-          </h3>
+          {/* SUPPORT TICKETS & MESSAGES */}
+          <div className="bg-white border border-border-custom shadow-sm p-6 rounded-2xl flex flex-col gap-4">
+            <h3 className="font-heading text-base font-bold text-text-primary flex items-center gap-2 border-b border-border-custom pb-3">
+              <Ticket className="w-4 h-4 text-gold" />
+              StudioHQ Communication
+            </h3>
 
-          {/* Create ticket form */}
-          <form onSubmit={handleCreateTicket} className="flex gap-2">
-            <input
-              type="text"
-              placeholder="Ask a question..."
-              value={ticketSubject}
-              onChange={(e) => setTicketSubject(e.target.value)}
-              className="flex-grow bg-bg-primary/30 border border-border-custom focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold rounded-xl py-2 px-3 text-xs font-medium transition-all"
-              {...inputHoverProps}
-            />
-            <button
-              type="submit"
-              className="p-2.5 bg-gold text-white rounded-xl hover:bg-gold/90 transition-colors shrink-0 shadow-sm"
-              {...hoverProps}
-            >
-              <Send className="w-4 h-4" />
-            </button>
-          </form>
-
-          {/* Tickets lists */}
-          <div className="flex flex-col gap-3">
-            {tickets.map((t) => (
-              <div
-                key={t.id}
-                className="flex items-center justify-between gap-3 p-3 border border-border-custom/40 rounded-xl hover:bg-bg-primary/20 transition-all text-left"
+            <form onSubmit={handleCreateTicket} className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Request feature or update..."
+                value={ticketSubject}
+                onChange={(e) => setTicketSubject(e.target.value)}
+                className="flex-1 bg-bg-primary border border-border-custom rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-gold transition-colors"
+              />
+              <button
+                type="submit"
+                className="bg-forest text-gold px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center hover:bg-forest/90 transition-colors"
               >
-                <div className="overflow-hidden">
-                  <div className="text-xs font-bold text-text-primary truncate">{t.subject}</div>
-                  <div className="text-[9px] text-text-secondary uppercase mt-0.5 font-light">
-                    {t.id} &bull; {t.date}
-                  </div>
-                </div>
+                <Send className="w-3.5 h-3.5" />
+              </button>
+            </form>
 
-                <span
-                  className={`text-[9px] uppercase font-bold px-2 py-0.5 rounded shrink-0 ${
-                    t.status === "Resolved"
-                      ? "bg-zinc-100 text-zinc-500"
-                      : "bg-gold/10 text-gold border border-gold/20"
-                  }`}
+            <div className="flex flex-col gap-2.5 max-h-52 overflow-y-auto pr-1">
+              {tickets.map((t) => (
+                <div
+                  key={t.id}
+                  className="p-3 rounded-xl border border-border-custom/50 bg-bg-primary/30 flex items-center justify-between text-xs"
                 >
-                  {t.status}
-                </span>
-              </div>
-            ))}
+                  <span className="font-medium text-text-primary truncate max-w-[180px]">
+                    {t.subject}
+                  </span>
+                  <span className="text-[9px] uppercase tracking-wider font-bold text-gold shrink-0">
+                    {t.status}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
 
+        </div>
       </div>
     </div>
   );
 };
+
 export default ClientPortal;
