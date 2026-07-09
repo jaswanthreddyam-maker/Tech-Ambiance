@@ -58,6 +58,12 @@ interface PortalProjectData {
     description: string;
     category: "Deployment" | "Milestone" | "Finance" | "Design";
   }[];
+  health?: {
+    budget: string;
+    timeline: string;
+    scope: string;
+    clientResponse: string;
+  };
 }
 
 const WORKSPACE_PROJECTS: PortalProjectData[] = [
@@ -70,6 +76,12 @@ const WORKSPACE_PROJECTS: PortalProjectData[] = [
     activeSprint: "Animations & Performance SLAs",
     budget: "$42,000",
     deliveryDate: "Aug 15, 2026",
+    health: {
+      budget: "Healthy",
+      timeline: "On Track",
+      scope: "1 Pending Change",
+      clientResponse: "Excellent",
+    },
     sourceCode: "https://github.com/jaswanthreddyam-maker/Tech-Ambiance",
     stagingUrl: "https://cafevistaara.techambiance.studio",
     milestones: [
@@ -481,6 +493,40 @@ export const ClientPortal: React.FC = () => {
                 Active Sprint Deliverable: <strong className="font-semibold text-text-primary">{activeProject.activeSprint}</strong>
               </span>
             </p>
+
+            {/* PROJECT HEALTH INDICATORS */}
+            {activeProject.health && (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-6 border-t border-border-custom">
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-bg-primary/50 border border-border-custom/80">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                  <div>
+                    <div className="text-[9px] uppercase tracking-wider text-text-secondary font-bold">Budget</div>
+                    <div className="text-xs font-bold text-text-primary">{activeProject.health.budget}</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-bg-primary/50 border border-border-custom/80">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                  <div>
+                    <div className="text-[9px] uppercase tracking-wider text-text-secondary font-bold">Timeline</div>
+                    <div className="text-xs font-bold text-text-primary">{activeProject.health.timeline}</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-bg-primary/50 border border-border-custom/80">
+                  <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
+                  <div>
+                    <div className="text-[9px] uppercase tracking-wider text-text-secondary font-bold">Scope</div>
+                    <div className="text-xs font-bold text-text-primary">{activeProject.health.scope}</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-bg-primary/50 border border-border-custom/80">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                  <div>
+                    <div className="text-[9px] uppercase tracking-wider text-text-secondary font-bold">Client Response</div>
+                    <div className="text-xs font-bold text-text-primary">{activeProject.health.clientResponse}</div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* PROJECT MILESTONES SECTION */}
