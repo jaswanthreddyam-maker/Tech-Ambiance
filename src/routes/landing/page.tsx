@@ -115,14 +115,24 @@ export const LandingPage: React.FC = () => {
           <button onClick={() => navigate("/auth")} className="hover:text-gold transition-colors">Portal</button>
         </nav>
 
-        {/* Right Action: Desktop Let's Talk Button OR Mobile Hamburger Button */}
-        <div className="flex items-center gap-4">
+        {/* Right Action: Desktop Authentication Actions OR Mobile Sign Up + Hamburger */}
+        <div className="flex items-center gap-3.5 md:gap-4">
+          {/* Desktop Login Button */}
           <button
-            onClick={openConsultationModal}
-            className="hidden md:inline-flex px-6 py-2.5 rounded-full bg-forest text-[#C5A572] border border-gold/30 hover:border-gold text-[11px] uppercase tracking-[0.22em] font-bold transition-all shadow-sm"
+            onClick={() => navigate("/auth?mode=login")}
+            className="hidden md:inline-flex bg-transparent text-[#0B3027] hover:text-[#C9A56A] hover:opacity-90 font-medium text-[10px] uppercase tracking-[0.18em] px-3.5 py-1.5 transition-all duration-300 no-underline rounded-full select-none"
+          >
+            Login
+          </button>
+
+          {/* Sign Up Primary Luxury CTA (Desktop + Mobile) */}
+          <button
+            onClick={() => navigate("/auth?mode=signup")}
+            className="inline-flex px-5 py-2.5 rounded-full bg-forest text-[#C5A572] border border-gold/30 hover:border-gold text-[10px] uppercase tracking-[0.22em] font-bold transition-all shadow-sm items-center gap-2 group"
             {...buttonHoverProps}
           >
-            Book Free Consultation
+            <span>Sign Up</span>
+            <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform duration-300" />
           </button>
 
           {/* Mobile Hamburger Button */}
@@ -194,11 +204,22 @@ export const LandingPage: React.FC = () => {
               <button
                 onClick={() => {
                   setIsMobileMenuOpen(false);
-                  navigate("/auth");
+                  navigate("/auth?mode=signup");
                 }}
-                className="w-full max-w-xs py-4 rounded-full bg-forest text-gold font-heading font-bold uppercase tracking-[0.22em] text-xs shadow-md"
+                className="w-full max-w-xs py-4 rounded-full bg-forest text-gold font-heading font-bold uppercase tracking-[0.22em] text-xs shadow-md flex items-center justify-center gap-2"
               >
-                Let&apos;s Talk
+                <span>Sign Up</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  navigate("/auth?mode=login");
+                }}
+                className="text-xs uppercase tracking-[0.2em] font-semibold text-forest/80 hover:text-gold py-2 px-6 transition-colors"
+              >
+                Login
               </button>
             </div>
           </motion.div>
