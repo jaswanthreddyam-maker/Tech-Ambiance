@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { motion, AnimatePresence } from "framer-motion";
-import { Lock, Mail, Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
+import { Lock, Mail, Eye, EyeOff, Loader2, ArrowRight, X, CheckCircle2 } from "lucide-react";
 import { useAuth } from "../../providers/AuthProvider";
 import { useToast } from "../../providers/ToastProvider";
 import { useCursorHover } from "../../hooks/useCursorHover";
@@ -35,7 +35,7 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 
 export const AuthPage: React.FC = () => {
   const navigate = useNavigate();
-  const { login, signup } = useAuth();
+  const { login, signup, loginWithGoogle, resetPasswordForEmail } = useAuth();
   const { toast } = useToast();
   const { setSEO } = React.useRef(useSEO()).current;
   const hoverProps = useCursorHover("pointer");
@@ -47,6 +47,12 @@ export const AuthPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [verificationSentEmail, setVerificationSentEmail] = useState<string | null>(null);
+
+  // Forgot password modal state
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [isForgotSubmitting, setIsForgotSubmitting] = useState(false);
 
   React.useEffect(() => {
     const mode = searchParams.get("mode");
@@ -79,46 +85,78 @@ export const AuthPage: React.FC = () => {
     resolver: zodResolver(signupSchema),
   });
 
-  // Handlers
+  // Enterprise Handlers
   const onLogin = async (data: LoginFormValues) => {
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      await login(data.email, data.password, data.rememberMe);
       setIsSuccess(true);
       toast("Welcome Back to Tech Ambiance Portal", "success");
 
       setTimeout(() => {
-        login(data.email, "mock-token");
-        navigate("/intro");
+        navigate("/portal");
       }, 1000);
-    }, 1200);
+    } catch (err: any) {
+      toast(
+        err?.message || "Invalid credentials. Please verify your email and password.",
+        "error"
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const onSignup = async (data: SignupFormValues) => {
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSuccess(true);
-      toast("Portal Environment Created Successfully", "success");
+    try {
+      const res = await signup(data.email, data.name, data.password);
 
-      setTimeout(() => {
-        signup(data.email, data.name, "mock-token");
-        navigate("/intro");
-      }, 1000);
-    }, 1200);
+      if (res.requiresVerification) {
+        setVerificationSentEmail(data.email);
+        toast("Verification email dispatched.", "success");
+      } else {
+        setIsSuccess(true);
+        toast("Portal Environment Created Successfully", "success");
+        setTimeout(() => {
+          navigate("/portal");
+        }, 1000);
+      }
+    } catch (err: any) {
+      toast(
+        err?.message || "Account creation failed. An account with this email may already exist.",
+        "error"
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleGoogleAuth = () => {
+  const handleGoogleAuth = async () => {
     setIsSubmitting(true);
-    setTimeout(() => {
+    try {
+      await loginWithGoogle();
+      toast("Redirecting to Google SSO...", "info");
+    } catch (err: any) {
+      toast(err?.message || "Google Single Sign-On cancelled or failed.", "error");
       setIsSubmitting(false);
-      setIsSuccess(true);
-      toast("Authenticated via Google SSO", "success");
-      setTimeout(() => {
-        login("client@techambiance.com", "mock-token");
-        navigate("/intro");
-      }, 1000);
-    }, 1200);
+    }
+  };
+
+  const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!forgotEmail) return;
+
+    setIsForgotSubmitting(true);
+    try {
+      await resetPasswordForEmail(forgotEmail);
+      toast("Password reset link sent to your inbox.", "success");
+      setShowForgotModal(false);
+      setForgotEmail("");
+    } catch (err: any) {
+      toast(err?.message || "Could not dispatch reset email.", "error");
+    } finally {
+      setIsForgotSubmitting(false);
+    }
   };
 
   return (
@@ -133,136 +171,218 @@ export const AuthPage: React.FC = () => {
             transition={{ duration: 0.8 }}
             className="fixed inset-0 bg-forest z-[9999] pointer-events-auto flex items-center justify-center"
           >
-            <div className="text-center">
-              <span className="font-heading font-black text-6xl tracking-wider text-gold block mb-2">TA</span>
-              <p className="text-ivory/70 text-xs uppercase tracking-[0.3em]">Entering Client Portal</p>
-            </div>
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+              className="text-center"
+            >
+              <Logo size="lg" />
+              <p className="text-gold uppercase font-heading font-bold text-xs tracking-[0.3em] mt-4">
+                Initializing Studio Environment...
+              </p>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* LEFT COLUMN: Emerald Architectural Canvas (50% split) */}
-      <div className="relative bg-forest text-ivory flex flex-col justify-between p-8 md:p-14 lg:p-16 overflow-hidden select-none min-h-[440px] lg:min-h-screen">
-        {/* Subtle Marble Veins inside Emerald Stone */}
-        <div className="absolute inset-0 opacity-20 pointer-events-none">
+      {/* VERIFICATION REQUIRED SCREEN MODAL */}
+      <AnimatePresence>
+        {verificationSentEmail && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-forest/80 backdrop-blur-xl z-[9999] flex items-center justify-center p-6"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="bg-[#FAF7F0] border border-forest/20 rounded-3xl p-8 max-w-md w-full text-center shadow-2xl relative"
+            >
+              <div className="w-14 h-14 rounded-full bg-forest/10 flex items-center justify-center mx-auto mb-4">
+                <CheckCircle2 className="w-7 h-7 text-forest" />
+              </div>
+              <h3 className="font-heading font-bold text-xl text-forest uppercase tracking-wider">
+                Verification Email Sent
+              </h3>
+              <p className="text-xs text-text-secondary mt-2 leading-relaxed">
+                We dispatched an executive confirmation link to{" "}
+                <span className="font-bold text-forest">{verificationSentEmail}</span>. Please verify your email before accessing StudioHQ.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setVerificationSentEmail(null);
+                  setActiveTab("login");
+                }}
+                className="w-full mt-6 py-3.5 rounded-full bg-forest text-gold font-heading font-bold uppercase tracking-[0.2em] text-xs shadow-lg hover:shadow-xl transition-all"
+              >
+                Return to Sign In
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* FORGOT PASSWORD MODAL */}
+      <AnimatePresence>
+        {showForgotModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-forest/70 backdrop-blur-md z-[9999] flex items-center justify-center p-6"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-[#FAF7F0] border border-forest/20 rounded-3xl p-8 max-w-md w-full shadow-2xl relative"
+            >
+              <button
+                type="button"
+                onClick={() => setShowForgotModal(false)}
+                className="absolute right-5 top-5 text-forest/40 hover:text-forest"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <h3 className="font-heading font-bold text-lg text-forest uppercase tracking-wider">
+                Reset Password
+              </h3>
+              <p className="text-xs text-text-secondary mt-1">
+                Enter your registered studio email to receive an enterprise recovery link.
+              </p>
+              <form onSubmit={handleForgotPasswordSubmit} className="mt-5 space-y-4">
+                <div>
+                  <label className="block text-[10px] font-heading font-bold uppercase tracking-[0.2em] text-forest/80 mb-1.5">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    placeholder="client@company.com"
+                    className="w-full bg-white border border-forest/20 rounded-xl px-4 py-2.5 text-xs text-forest focus:outline-none focus:border-gold"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isForgotSubmitting}
+                  className="w-full py-3 rounded-full bg-forest text-gold font-heading font-bold uppercase tracking-[0.2em] text-xs shadow-md hover:shadow-lg disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                >
+                  {isForgotSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin text-gold" />
+                      <span>Sending...</span>
+                    </>
+                  ) : (
+                    <span>Send Reset Link</span>
+                  )}
+                </button>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* LEFT COLUMN: BRAND VISUAL & IDENTITY */}
+      <div className="hidden lg:flex flex-col justify-between bg-forest p-12 lg:p-16 relative overflow-hidden text-gold">
+        {/* Subtle Luxury Marble Layer */}
+        <div className="absolute inset-0 opacity-15 pointer-events-none mix-blend-overlay">
           <MarbleVeins />
         </div>
 
-        {/* Radial Warm Ambient Light Reflection */}
-        <div 
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: "radial-gradient(circle at 35% 50%, rgba(197, 165, 114, 0.12) 0%, transparent 70%)"
-          }}
-        />
+        {/* Ambient Gold Glows */}
+        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-gold/15 blur-[120px] pointer-events-none" />
+        <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-gold/10 blur-[120px] pointer-events-none" />
 
-        {/* Large Faded Architectural Watermark */}
-        <div className="absolute right-0 bottom-16 translate-x-12 opacity-5 pointer-events-none font-heading font-black text-8xl lg:text-[11rem] leading-none uppercase tracking-tighter text-gold">
-          TECH<br />AMBIANCE
-        </div>
-
-        {/* Top Studio Brand Bar */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.0, ease: [0.19, 1, 0.22, 1] }}
-          className="relative z-10 flex items-center justify-between"
-        >
-          <div className="flex items-center gap-3">
+        {/* Top bar */}
+        <div className="flex items-center justify-between relative z-10">
+          <div onClick={() => navigate("/landing")} className="cursor-pointer">
             <Logo size="md" />
           </div>
-          <span className="text-[10px] uppercase tracking-[0.28em] text-gold/80 font-semibold">
-            Client Portal Environment
+          <span className="text-[10px] uppercase tracking-[0.3em] font-medium opacity-60">
+            Client Portal v2.4
           </span>
-        </motion.div>
+        </div>
 
-        {/* Middle Editorial Storytelling */}
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.1, ease: [0.19, 1, 0.22, 1], delay: 0.15 }}
-          className="relative z-10 max-w-lg my-12 lg:my-auto"
-        >
-          {/* Animated Gold Editorial Line */}
-          <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 0.9, ease: [0.19, 1, 0.22, 1] }}
-            className="h-px w-16 bg-gold/50 mb-8 origin-left"
-          />
+        {/* Center editorial content */}
+        <div className="my-auto max-w-xl relative z-10 py-12">
+          <div className="inline-block border border-gold/30 rounded-full px-3.5 py-1 text-[10px] uppercase tracking-widest mb-6 bg-gold/5">
+            Restricted Studio Access
+          </div>
 
-          {activeTab === "login" ? (
-            <>
-              <h1 className="font-heading font-bold text-4xl sm:text-5xl lg:text-6xl text-ivory leading-[1.12] mb-6 tracking-tight">
-                Great work <br />
-                begins with <br />
-                <span className="font-serif italic text-gold font-normal">great clients.</span>
-              </h1>
-              <p className="text-ivory/70 text-xs sm:text-sm leading-relaxed max-w-md font-light tracking-wide">
-                Welcome to your private studio workspace. Review live project builds, inspect architectural blueprints, sign off milestones, and download production assets in real-time.
-              </p>
-            </>
-          ) : (
-            <>
-              <h1 className="font-heading font-bold text-4xl sm:text-5xl lg:text-6xl text-ivory leading-[1.12] mb-6 tracking-tight">
-                Crafting Digital <br />
-                <span className="font-serif italic text-gold font-normal">Experiences.</span>
-              </h1>
-              <p className="text-ivory/70 text-xs sm:text-sm leading-relaxed max-w-md font-light tracking-wide mb-3">
-                Built in India. Designed for the World.
-              </p>
-              <p className="text-ivory/60 text-xs leading-relaxed max-w-md font-light">
-                Initialize your dedicated client portal environment and partner with our engineering & design team.
-              </p>
-            </>
-          )}
-        </motion.div>
+          <h1 className="font-heading font-bold text-4xl xl:text-5xl tracking-tight leading-[1.1] text-white">
+            Where vision meets <br />
+            <span className="italic font-serif font-normal text-gold">
+              uncompromising execution.
+            </span>
+          </h1>
 
-        {/* Bottom Architectural Studio Coordinates */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.6 }}
-          transition={{ duration: 1.2, delay: 0.3 }}
-          className="relative z-10 flex items-center justify-between text-[9px] uppercase tracking-[0.28em] text-ivory/60 font-medium"
-        >
-          <span>Crafted in India</span>
-          <span className="text-gold">•</span>
-          <span>MMXXVI</span>
-          <span className="text-gold">•</span>
-          <span>Studio Portal</span>
-        </motion.div>
+          <p className="mt-6 text-sm text-white/70 leading-relaxed font-light max-w-md">
+            Review active milestones, inspect staging environments, and manage architectural deliverables directly within your curated workspace.
+          </p>
+
+          <div className="mt-10 pt-8 border-t border-gold/20 grid grid-cols-3 gap-6">
+            <div>
+              <span className="block font-heading font-bold text-xl text-gold">100%</span>
+              <span className="text-[11px] text-white/60 uppercase tracking-wider">
+                Bespoke Design
+              </span>
+            </div>
+            <div>
+              <span className="block font-heading font-bold text-xl text-gold">&lt; 0.4s</span>
+              <span className="text-[11px] text-white/60 uppercase tracking-wider">
+                Lighthouse TTFB
+              </span>
+            </div>
+            <div>
+              <span className="block font-heading font-bold text-xl text-gold">24/7</span>
+              <span className="text-[11px] text-white/60 uppercase tracking-wider">
+                Concierge Sync
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom copyright */}
+        <div className="flex items-center justify-between text-xs text-white/40 relative z-10">
+          <span>© {new Date().getFullYear()} Tech Ambiance. All rights reserved.</span>
+          <span className="uppercase tracking-widest text-[10px]">Encrypted Session</span>
+        </div>
       </div>
 
-      {/* RIGHT COLUMN: Clean Ivory Workspace (50% split) */}
-      <div className="relative bg-[#FAF7F0] flex items-center justify-center p-6 sm:p-10 lg:p-16 min-h-screen">
-        {/* Subtle Studio Grid Overlay */}
-        <div 
-          className="absolute inset-0 pointer-events-none opacity-40"
-          style={{
-            backgroundImage: `
-              linear-gradient(to right, rgba(6, 41, 30, 0.024) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(6, 41, 30, 0.024) 1px, transparent 1px)
-            `,
-            backgroundSize: "64px 64px"
-          }}
-        />
+      {/* RIGHT COLUMN: INTERACTIVE FORM CONTAINER */}
+      <div className="flex flex-col justify-center items-center p-6 sm:p-12 lg:p-16 bg-[#FAF7F0] relative overflow-y-auto">
+        {/* Mobile Logo Header */}
+        <div className="lg:hidden w-full max-w-md mb-8 flex items-center justify-between">
+          <div onClick={() => navigate("/landing")} className="cursor-pointer">
+            <Logo size="md" />
+          </div>
+          <span className="text-[10px] uppercase tracking-widest font-bold text-forest/60">
+            Portal Access
+          </span>
+        </div>
 
-        {/* Form Container Card */}
+        {/* Card Form Wrapper */}
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.1, ease: [0.19, 1, 0.22, 1], delay: 0.2 }}
-          className="relative z-10 w-full max-w-md bg-white/95 border border-forest/[0.1] shadow-premium rounded-3xl p-8 sm:p-11"
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-md bg-white/70 backdrop-blur-xl border border-forest/15 rounded-3xl p-8 sm:p-10 shadow-[0_20px_60px_rgba(6,41,30,0.06)] relative"
         >
-          {/* Header & Tabs */}
-          <div className="flex items-center justify-between border-b border-forest/[0.08] pb-5 mb-7">
+          {/* TAB SWITCHER */}
+          <div className="flex items-center justify-between border-b border-forest/10 pb-4 mb-6">
             <div>
               <h2 className="font-heading font-bold text-xl text-forest">
                 {activeTab === "login" ? "Welcome Back" : "Join Studio Portal"}
               </h2>
               <p className="text-[11px] text-text-secondary mt-0.5">
-                {activeTab === "login" ? "Access your active project portal" : "Initialize a client workspace"}
+                {activeTab === "login"
+                  ? "Access your active project portal"
+                  : "Initialize a client workspace"}
               </p>
             </div>
 
@@ -271,59 +391,80 @@ export const AuthPage: React.FC = () => {
                 type="button"
                 onClick={() => setActiveTab("login")}
                 className={`text-xs font-bold uppercase tracking-widest pb-1 transition-colors relative ${
-                  activeTab === "login" ? "text-forest" : "text-text-secondary hover:text-forest"
+                  activeTab === "login"
+                    ? "text-forest"
+                    : "text-text-secondary hover:text-forest"
                 }`}
                 {...hoverProps}
               >
                 Sign In
                 {activeTab === "login" && (
-                  <motion.div layoutId="authTabUnderline" className="absolute bottom-0 left-0 w-full h-0.5 bg-gold" />
+                  <motion.div
+                    layoutId="authTabUnderline"
+                    className="absolute bottom-0 left-0 w-full h-0.5 bg-gold"
+                  />
                 )}
               </button>
               <button
                 type="button"
                 onClick={() => setActiveTab("signup")}
                 className={`text-xs font-bold uppercase tracking-widest pb-1 transition-colors relative ${
-                  activeTab === "signup" ? "text-forest" : "text-text-secondary hover:text-forest"
+                  activeTab === "signup"
+                    ? "text-forest"
+                    : "text-text-secondary hover:text-forest"
                 }`}
                 {...hoverProps}
               >
                 Sign Up
                 {activeTab === "signup" && (
-                  <motion.div layoutId="authTabUnderline" className="absolute bottom-0 left-0 w-full h-0.5 bg-gold" />
+                  <motion.div
+                    layoutId="authTabUnderline"
+                    className="absolute bottom-0 left-0 w-full h-0.5 bg-gold"
+                  />
                 )}
               </button>
             </div>
           </div>
 
-          {/* Social SSO Button */}
+          {/* OAUTH SSO BUTTON */}
           <button
             type="button"
             onClick={handleGoogleAuth}
             disabled={isSubmitting}
-            className="w-full bg-[#FAF7F0] border border-forest/[0.14] hover:border-gold py-3.5 px-4 rounded-2xl flex items-center justify-center gap-3 text-xs font-bold text-forest tracking-wider uppercase transition-all mb-6"
+            className="w-full bg-white border border-forest/15 hover:border-forest/30 rounded-full py-3.5 px-4 flex items-center justify-center gap-3 text-xs font-heading font-bold uppercase tracking-widest text-forest shadow-sm hover:shadow transition-all mb-6"
             {...hoverProps}
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
-              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+              <path
+                fill="#4285F4"
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+              />
+              <path
+                fill="#34A853"
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+              />
+              <path
+                fill="#EA4335"
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+              />
             </svg>
-            <span>Continue with Google</span>
+            Continue with Google
           </button>
 
-          {/* Divider */}
-          <div className="relative my-6 text-center">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-forest/[0.08]" />
-            </div>
-            <span className="relative bg-white px-3 text-[10px] uppercase font-bold tracking-widest text-text-secondary">
-              Or with email
+          {/* DIVIDER */}
+          <div className="flex items-center gap-3 mb-6">
+            <div className="flex-1 h-px bg-forest/10" />
+            <span className="text-[10px] uppercase font-bold tracking-widest text-text-secondary">
+              Or continue with email
             </span>
+            <div className="flex-1 h-px bg-forest/10" />
           </div>
 
-          {/* Forms */}
+          {/* FORMS */}
           <AnimatePresence mode="wait">
             {activeTab === "login" ? (
               <motion.form
@@ -331,12 +472,12 @@ export const AuthPage: React.FC = () => {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.2 }}
                 onSubmit={handleLoginSubmit(onLogin)}
                 className="flex flex-col gap-4"
               >
                 {/* Email */}
-                <div className="flex flex-col gap-1.5 text-left">
+                <div className="flex flex-col gap-1 text-left">
                   <label className="text-[10px] uppercase font-bold tracking-widest text-text-secondary">
                     Email Address
                   </label>
@@ -358,24 +499,15 @@ export const AuthPage: React.FC = () => {
                 </div>
 
                 {/* Password */}
-                <div className="flex flex-col gap-1.5 text-left">
-                  <div className="flex justify-between items-center">
-                    <label className="text-[10px] uppercase font-bold tracking-widest text-text-secondary">
-                      Password
-                    </label>
-                    <button
-                      type="button"
-                      className="text-[10px] font-semibold text-gold hover:underline"
-                      {...hoverProps}
-                    >
-                      Forgot Password?
-                    </button>
-                  </div>
+                <div className="flex flex-col gap-1 text-left">
+                  <label className="text-[10px] uppercase font-bold tracking-widest text-text-secondary">
+                    Password
+                  </label>
                   <div className="relative group">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary group-focus-within:text-gold transition-colors" />
                     <input
                       type={showPassword ? "text" : "password"}
-                      placeholder="••••••••••••"
+                      placeholder="••••••••"
                       className="w-full bg-[#FAF7F0] border border-forest/15 focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold rounded-xl py-3 pl-11 pr-11 text-xs font-medium text-forest transition-all"
                       {...loginRegister("password")}
                       {...inputHoverProps}
@@ -396,17 +528,26 @@ export const AuthPage: React.FC = () => {
                   )}
                 </div>
 
-                {/* Remember me */}
-                <div className="flex items-center gap-2 mt-1">
-                  <input
-                    type="checkbox"
-                    id="rememberMe"
-                    className="w-3.5 h-3.5 rounded border-forest/20 text-gold focus:ring-gold"
-                    {...loginRegister("rememberMe")}
-                  />
-                  <label htmlFor="rememberMe" className="text-xs text-text-secondary select-none">
-                    Remember device for 30 days
-                  </label>
+                {/* Remember me + Forgot password */}
+                <div className="flex items-center justify-between mt-1">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="rememberMe"
+                      className="w-3.5 h-3.5 rounded border-forest/20 text-gold focus:ring-gold"
+                      {...loginRegister("rememberMe")}
+                    />
+                    <label htmlFor="rememberMe" className="text-xs text-text-secondary select-none">
+                      Remember device for 30 days
+                    </label>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotModal(true)}
+                    className="text-xs font-semibold text-forest/70 hover:text-gold transition-colors"
+                  >
+                    Forgot password?
+                  </button>
                 </div>
 
                 {/* Polished Emerald Stone CTA */}
@@ -434,9 +575,9 @@ export const AuthPage: React.FC = () => {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.2 }}
                 onSubmit={handleSignupSubmit(onSignup)}
-                className="flex flex-col gap-3.5"
+                className="flex flex-col gap-4"
               >
                 {/* Name */}
                 <div className="flex flex-col gap-1 text-left">

@@ -8,10 +8,15 @@ import { AuthLayout } from "./layouts/AuthLayout";
 import { WebsiteLayout } from "./layouts/WebsiteLayout";
 import { ClientLayout } from "./layouts/ClientLayout";
 
-// Onboarding Pages
+// Onboarding & Auth Pages
 import LandingPage from "./routes/landing/page";
 import AuthPage from "./routes/auth/page";
+import { CallbackPage } from "./routes/auth/CallbackPage";
+import { ResetPasswordPage } from "./routes/auth/ResetPasswordPage";
 import IntroPage from "./routes/intro/page";
+
+// Enterprise Auth Guard
+import { AuthGuard } from "./auth/AuthGuard";
 
 // Marketing Pages
 import MarketingPage from "./routes/marketing/page";
@@ -48,10 +53,12 @@ export const App: React.FC = () => {
           <Route path="/landing" element={<LandingPage />} />
         </Route>
 
-        {/* Onboarding Flow: Stage 2 - Auth */}
+        {/* Onboarding Flow: Stage 2 - Auth & Recovery */}
         <Route element={<AuthLayout />}>
           <Route path="/auth" element={<AuthPage />} />
         </Route>
+        <Route path="/auth/callback" element={<CallbackPage />} />
+        <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
 
         {/* Onboarding Flow: Stage 3 - Intro Video (Brand Film) */}
         <Route path="/intro" element={<IntroPage />} />
@@ -66,13 +73,26 @@ export const App: React.FC = () => {
           <Route path="*" element={<NotFoundPage />} />
         </Route>
 
-        {/* Client Portal Panel */}
-        <Route element={<ClientLayout />}>
+        {/* Client Portal Panel (Protected) */}
+        <Route
+          element={
+            <AuthGuard>
+              <ClientLayout />
+            </AuthGuard>
+          }
+        >
           <Route path="/portal" element={<ClientPortal />} />
         </Route>
 
-        {/* Tech Ambiance StudioHQ Executive Console (/admin/*) */}
-        <Route path="/admin" element={<StudioHQLayout />}>
+        {/* Tech Ambiance StudioHQ Executive Console (/admin/*) (Protected) */}
+        <Route
+          path="/admin"
+          element={
+            <AuthGuard requiredRole={["OWNER", "ADMIN", "DEVELOPER", "DESIGNER", "PROJECT_MANAGER", "STRATEGIST", "SALES"]}>
+              <StudioHQLayout />
+            </AuthGuard>
+          }
+        >
           <Route index element={<DashboardPage />} />
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="timeline" element={<TimelinePage />} />
