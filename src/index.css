@@ -1,0 +1,270 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --color-bg-primary: #FAF7F0; /* Warm premium paper */
+  --color-surface: #F5F2EA;    /* Soft parchment/warm ivory */
+  --color-forest: #06291E;     /* Deeper architectural emerald */
+  --color-text-primary: #06291E;   /* Forest as primary text color */
+  --color-text-secondary: #4A6058; /* Warm gray-green for body copy */
+  --color-text-muted: #788F86;     /* High-contrast readable muted text */
+  --color-gold: #C5A572;       /* Brushed champagne gold */
+  --color-gold-light: #E1D3B8; /* Muted champagne highlight */
+  --color-border-custom: rgba(6, 41, 30, 0.06);
+
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Inter', sans-serif;
+  
+  --shadow-sm: 0 2px 8px rgba(6, 41, 30, 0.02);
+  --shadow-md: 0 12px 32px rgba(6, 41, 30, 0.03);
+  --shadow-lg: 0 24px 64px rgba(6, 41, 30, 0.04);
+  --shadow-glass: 0 8px 32px rgba(6, 41, 30, 0.02);
+  --shadow-premium: 0 30px 80px rgba(6, 41, 30, 0.05), 0 2px 10px rgba(6, 41, 30, 0.02);
+
+  --radius-card: 1.5rem; /* Softer, premium radius */
+}
+
+/* Global Reset & Base Styles */
+html, body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  margin: 0;
+  padding: 0;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Lenis Smooth Scroll Base */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overflow: clip;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* Paper Texture Overlay */
+.paper-texture {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.018;
+  pointer-events: none;
+  z-index: 9998;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Premium Emerald Surface System v1.0 */
+.bg-emerald-stone {
+  position: relative;
+  background: 
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.08), transparent 45%),
+    radial-gradient(circle at bottom right, rgba(0, 0, 0, 0.16), transparent 60%),
+    radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.06)),
+    #072017 !important;
+  background-size: 120% 120% !important;
+  background-position: 0% 0% !important;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 30px 60px rgba(0, 0, 0, 0.12) !important;
+  transition: background-position 0.8s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.8s ease !important;
+}
+
+.bg-emerald-stone:hover {
+  background-position: 15% 15% !important;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 40px 80px rgba(0, 0, 0, 0.18) !important;
+}
+
+.bg-emerald-stone::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E") !important;
+  opacity: 0.03 !important;
+  mix-blend-mode: overlay !important;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: inherit;
+}
+
+/* Button Premium Emerald Stone Styling */
+.btn-emerald-stone,
+button.bg-forest,
+button.bg-emerald-stone {
+  position: relative;
+  overflow: hidden;
+  color: #C5A572 !important;
+  background: 
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.08), transparent 45%),
+    radial-gradient(circle at bottom right, rgba(0, 0, 0, 0.16), transparent 60%),
+    #072017 !important;
+  background-size: 110% 110% !important;
+  background-position: 0% 0% !important;
+  box-shadow: 
+    inset 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 -1px rgba(0, 0, 0, 0.25),
+    0 4px 12px rgba(6, 41, 30, 0.08) !important;
+  transition: background-position 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s ease !important;
+}
+
+.btn-emerald-stone *,
+button.bg-forest *,
+button.bg-emerald-stone * {
+  color: #C5A572 !important;
+}
+
+.btn-emerald-stone svg,
+button.bg-forest svg,
+button.bg-emerald-stone svg {
+  color: #C5A572 !important;
+  stroke: #C5A572 !important;
+}
+
+.btn-emerald-stone:hover {
+  background-position: 10% 10% !important;
+  box-shadow: 
+    inset 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 -1px rgba(0, 0, 0, 0.3),
+    0 8px 20px rgba(6, 41, 30, 0.16) !important;
+}
+
+.btn-emerald-stone::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E") !important;
+  opacity: 0.022 !important;
+  mix-blend-mode: soft-light !important;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: inherit;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: #ECE7DD;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #C79A3B;
+}
+
+/* Custom Dark Green Cursor */
+@media (pointer: fine) {
+  html, body {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='%230A3D2C' stroke='white' stroke-width='1.5'%3E%3Cpath d='M4.5 1.5v19.4l5.4-5.4 3.7 8.8 3-1.3-3.7-8.8 6.1-.6z'/%3E%3C/svg%3E") 4 2, auto;
+  }
+
+  a, button, [role="button"], input[type="submit"], input[type="button"], select {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='%230A3D2C' stroke='white' stroke-width='1.5'%3E%3Cpath d='M11.5 5.5a1.5 1.5 0 0 1 3 0v6.7l.6-.6a1.5 1.5 0 0 1 2.1 2.1l-4.2 4.2a4.5 4.5 0 0 1-6.4 0l-2.1-2.1a1.5 1.5 0 1 1 2.1-2.1l.6.6V5.5z'/%3E%3C/svg%3E") 9 4, pointer;
+  }
+}
+
+/* Diagonal Champagne Reflection (Memorable Studio Light Glancing Across Surface) */
+@keyframes diagonal-sweep-anim {
+  0% { transform: translateX(-140%) skewX(-25deg); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateX(240%) skewX(-25deg); opacity: 0; }
+}
+
+.light-sweep-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.light-sweep-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 70%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(196, 166, 97, 0.12) 35%,
+    rgba(255, 248, 230, 0.55) 50%,
+    rgba(196, 166, 97, 0.12) 65%,
+    transparent 100%
+  );
+  transform: translateX(-140%) skewX(-25deg);
+  pointer-events: none;
+  z-index: 30;
+}
+
+.animate-light-sweep::after {
+  animation: diagonal-sweep-anim 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
+}
+
+/* Ambient One-Time Shimmer for Primary Hero CTA (Triggers once after 2.5s) */
+@keyframes cta-ambient-shimmer-anim {
+  0% { transform: translateX(-140%) skewX(-20deg); opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateX(240%) skewX(-20deg); opacity: 0; }
+}
+
+.ambient-cta-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.ambient-cta-shimmer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 240, 200, 0.5),
+    transparent
+  );
+  transform: translateX(-140%) skewX(-20deg);
+  pointer-events: none;
+  z-index: 15;
+  animation: cta-ambient-shimmer-anim 1.4s cubic-bezier(0.16, 1, 0.3, 1) 2.5s forwards;
+}
+
+@keyframes ctaLightSweep {
+  0% { transform: translateX(-140%) skewX(-12deg); opacity: 0; }
+  25% { opacity: 1; }
+  75% { opacity: 1; }
+  100% { transform: translateX(240%) skewX(-12deg); opacity: 0; }
+}
+
+@media (prefers-reduced-motion) {
+  .animate-light-sweep::after,
+  .ambient-cta-shimmer::before {
+    display: none !important;
+  }
+}
