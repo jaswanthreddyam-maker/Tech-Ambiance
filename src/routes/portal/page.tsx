@@ -79,10 +79,10 @@ const WORKSPACE_PROJECTS: PortalProjectData[] = [
       { id: "m4", name: "Edge Telemetry & Production Deployment", date: "Aug 10, 2026", status: "pending" },
     ],
     files: [
-      { name: "Brand Guidelines & Color Tokens (PDF)", category: "Brand Assets", size: "4.2 MB", date: "2026-06-12", type: "PDF" },
-      { name: "Master Master Services Agreement (PDF)", category: "Contracts", size: "1.4 MB", date: "2026-06-01", type: "PDF" },
-      { name: "UI/UX Layout Prototypes (ZIP)", category: "Deliverables", size: "18.5 MB", date: "2026-06-26", type: "ZIP" },
-      { name: "Lighthouse Performance Audit (PDF)", category: "Reports", size: "1.8 MB", date: "2026-07-04", type: "PDF" },
+      { name: "Brand Guidelines & Color Tokens Final (PDF)", category: "Brand Assets", size: "4.2 MB", date: "2026-06-12", type: "PDF" },
+      { name: "Master Services Agreement v1 (PDF)", category: "Contracts", size: "1.4 MB", date: "2026-06-01", type: "PDF" },
+      { name: "UI/UX Layout Prototypes v2 (ZIP)", category: "Deliverables", size: "18.5 MB", date: "2026-06-26", type: "ZIP" },
+      { name: "Lighthouse Performance Audit v1 (PDF)", category: "Reports", size: "1.8 MB", date: "2026-07-04", type: "PDF" },
     ],
     invoices: [
       { id: "INV-2026-081", amount: "$14,000", date: "Jun 01, 2026", status: "PAID" },
@@ -303,6 +303,65 @@ export const ClientPortal: React.FC = () => {
             <Layers className="w-3.5 h-3.5 text-gold" />
             <span>{WORKSPACE_PROJECTS.length} Active Projects</span>
           </div>
+        </div>
+      </div>
+
+      {/* =========================================================
+          ⭐ ORGANIZATION-LEVEL CLIENT JOURNEY RELATIONSHIP TIMELINE
+      ========================================================= */}
+      <div className="bg-white border border-border-custom shadow-sm p-6 md:p-8 rounded-3xl overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
+          <div>
+            <span className="text-[10px] uppercase tracking-[0.24em] font-bold text-gold">
+              Executive Partnership Roadmap
+            </span>
+            <h3 className="font-heading text-xl font-bold text-text-primary mt-0.5">
+              Client Journey Relationship Timeline
+            </h3>
+          </div>
+          <span className="text-[10px] uppercase font-bold text-text-secondary bg-bg-primary px-3 py-1.5 rounded-full border border-border-custom">
+            Complete Organization Lifecycle
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4 relative">
+          {[
+            { date: "July 8", title: "Consultation Submitted", status: "completed" },
+            { date: "July 9", title: "Discovery Call Completed", status: "completed" },
+            { date: "July 11", title: "Proposal Sent", status: "completed" },
+            { date: "July 13", title: "Advance Payment Received", status: "completed" },
+            { date: "July 14", title: "Workspace Activated", status: "completed" },
+            { date: "July 15", title: "Website Project Created", status: "completed" },
+            { date: "July 20", title: "UI Approved", status: "active" },
+            { date: "August 4", title: "Website Live", status: "pending" },
+          ].map((step, idx) => (
+            <div
+              key={idx}
+              className="flex flex-col gap-2 p-3.5 rounded-2xl border border-border-custom bg-bg-primary/30 relative group hover:border-gold/50 transition-all"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[9px] font-bold uppercase tracking-wider text-gold">
+                  {step.date}
+                </span>
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    step.status === "completed"
+                      ? "bg-gold"
+                      : step.status === "active"
+                      ? "bg-emerald-500 animate-pulse"
+                      : "bg-zinc-300"
+                  }`}
+                />
+              </div>
+              <span
+                className={`text-xs font-bold leading-tight ${
+                  step.status === "pending" ? "text-text-secondary font-medium" : "text-text-primary"
+                }`}
+              >
+                {step.title}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
 
