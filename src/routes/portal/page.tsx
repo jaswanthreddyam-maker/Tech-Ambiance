@@ -212,23 +212,23 @@ export const ClientPortal: React.FC = () => {
           <div>
             <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.24em] font-bold text-gold">
               <span>Client Workspace</span>
-              <span className="text-ivory/30">•</span>
-              <span className="flex items-center gap-1 text-ivory/80">
+              <span className="text-gold/40">•</span>
+              <span className="flex items-center gap-1 text-gold">
                 <Lock className="w-3 h-3 text-gold" />
                 Read-Only Portal
               </span>
             </div>
-            <h1 className="font-heading text-2xl md:text-3xl font-bold text-ivory mt-1">
+            <h1 className="font-heading text-2xl md:text-3xl font-bold text-gold mt-1">
               {orgName}
             </h1>
-            <p className="text-xs text-ivory/60 mt-0.5">
-              Workspace: <strong className="text-ivory/90">{wsName}</strong> • Managed by Tech Ambiance StudioHQ
+            <p className="text-xs text-gold-light mt-0.5 font-medium">
+              Workspace: <strong className="text-gold font-bold">{wsName}</strong> • Managed by Tech Ambiance StudioHQ
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3 relative z-10">
-          <div className="px-4 py-2.5 rounded-full bg-ivory/10 border border-ivory/15 text-ivory text-xs font-semibold flex items-center gap-2">
+          <div className="px-4 py-2.5 rounded-full bg-gold/15 border border-gold/40 text-gold text-xs font-bold flex items-center gap-2 shadow-sm">
             <Layers className="w-3.5 h-3.5 text-gold" />
             <span>{WORKSPACE_PROJECTS.length} Active Projects</span>
           </div>

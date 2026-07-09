@@ -11,6 +11,7 @@
   --color-text-muted: #788F86;     /* High-contrast readable muted text */
   --color-gold: #C5A572;       /* Brushed champagne gold */
   --color-gold-light: #E1D3B8; /* Muted champagne highlight */
+  --color-ivory: #FAF7F0;      /* Warm ivory / cream text */
   --color-border-custom: rgba(6, 41, 30, 0.06);
 
   --font-heading: 'Playfair Display', serif;
