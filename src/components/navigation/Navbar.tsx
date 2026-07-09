@@ -176,7 +176,7 @@ export const Navbar: React.FC = () => {
             paddingTop: `${paddingY}px`,
             paddingBottom: `${paddingY}px`,
           }}
-          transition={{ type: "spring", stiffness: 220, damping: 24 }}
+          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
           className="fixed top-[28px] left-1/2 -translate-x-1/2 z-[9990] flex flex-col justify-start overflow-hidden border select-none"
           style={{
             backdropFilter: `blur(${blurVal}) saturate(180%)`,
@@ -206,7 +206,7 @@ export const Navbar: React.FC = () => {
             {/* Desktop Navigation Links */}
             <motion.div 
               animate={{ gap: `${navGap}px` }}
-              transition={{ type: "spring", stiffness: 220, damping: 24 }}
+              transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
               className="flex items-center"
             >
               {navLinks.map((link) => {
@@ -250,7 +250,7 @@ export const Navbar: React.FC = () => {
                         <motion.span
                           layoutId="activeNavPill"
                           className="absolute inset-0 bg-gold/8 border border-gold/15 rounded-full"
-                          transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                          transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
                         />
                       )}
 
@@ -258,7 +258,7 @@ export const Navbar: React.FC = () => {
                         <motion.span
                           layoutId="hoverNavPill"
                           className="absolute inset-0 bg-gold/4 rounded-full"
-                          transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                          transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
                         />
                       )}
                     </button>
