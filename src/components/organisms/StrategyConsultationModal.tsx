@@ -20,6 +20,7 @@ import {
   TrendingUp,
   Award,
 } from "lucide-react";
+import { agencyOsService } from "../../api/agencyOsService";
 
 interface StrategyConsultationModalProps {
   isOpen: boolean;
@@ -232,11 +233,31 @@ export const StrategyConsultationModal: React.FC<StrategyConsultationModalProps>
     setStep(3);
   };
 
-  const handleSubmitForm = (e: React.FormEvent) => {
+  const handleSubmitForm = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.phone.trim() || !formData.email.trim()) {
       alert("Please fill in Name, Phone, and Email.");
       return;
+    }
+    try {
+      await agencyOsService.crm.submitConsultationLead({
+        business_name: formData.businessName,
+        industry: formData.industry,
+        website: formData.website,
+        instagram: formData.instagram,
+        city: formData.city,
+        heard_source: formData.heardSource,
+        goals: formData.goals,
+        budget_range: formData.budget,
+        timeline: formData.timeline,
+        contact_name: formData.name,
+        contact_phone: formData.phone,
+        contact_email: formData.email,
+        preferred_contact: formData.preferredContact,
+        message: formData.message,
+      });
+    } catch (err) {
+      console.warn("CRM lead submission note:", err);
     }
     setStep(4); // Start Live Analysis
   };
