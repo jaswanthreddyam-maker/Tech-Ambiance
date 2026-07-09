@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../../providers/AuthProvider";
 import { useToast } from "../../providers/ToastProvider";
 import { useCursorHover } from "../../hooks/useCursorHover";
+import { agencyOsService } from "../../api/agencyOsService";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Calendar,
@@ -255,10 +256,93 @@ export const ClientPortal: React.FC = () => {
   const { toast } = useToast();
   const hoverProps = useCursorHover("pointer");
 
+  const [projectsData, setProjectsData] = useState<PortalProjectData[]>(WORKSPACE_PROJECTS);
+  const [journeySteps, setJourneySteps] = useState([
+    { date: "July 8", title: "Consultation Submitted", status: "completed" },
+    { date: "July 9", title: "Discovery Call Completed", status: "completed" },
+    { date: "July 11", title: "Proposal Sent", status: "completed" },
+    { date: "July 13", title: "Advance Payment Received", status: "completed" },
+    { date: "July 14", title: "Workspace Activated", status: "completed" },
+    { date: "July 15", title: "Website Project Created", status: "completed" },
+    { date: "July 20", title: "UI Approved", status: "active" },
+    { date: "August 4", title: "Website Live", status: "pending" },
+  ]);
   const [activeProjectIdx, setActiveProjectIdx] = useState(0);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const activeProject = WORKSPACE_PROJECTS[activeProjectIdx];
+  useEffect(() => {
+    async function loadWorkspaceDomainData() {
+      if (workspace?.id) {
+        try {
+          const { data, error } = await agencyOsService.delivery.listWorkspaceProjects(workspace.id);
+          if (!error && data && data.length > 0) {
+            const mapped: PortalProjectData[] = data.map((p: any) => ({
+              id: p.id,
+              name: p.name,
+              status: p.status || "Active Execution",
+              currentStage: p.lifecycle_stage || "Development",
+              progress: p.progress || 68,
+              activeSprint: p.active_sprint || "Sprint Deliverable",
+              budget: p.budget_formatted || "$42,000",
+              deliveryDate: p.target_delivery_date || "Aug 15, 2026",
+              sourceCode: p.source_code_url,
+              stagingUrl: p.staging_environment_url,
+              health: {
+                budget: p.health_budget || "Healthy",
+                timeline: p.health_timeline || "On Track",
+                scope: p.health_scope || "Locked",
+                clientResponse: p.health_client_response || "Excellent",
+              },
+              milestones: (p.milestones || []).map((m: any) => ({
+                id: m.id,
+                name: m.title,
+                date: m.target_date,
+                status: m.status,
+              })),
+              files: (p.deliverable_files || []).map((f: any) => ({
+                name: `${f.file_name} (${f.version_tag})`,
+                category: f.category || "Deliverables",
+                size: f.file_size || "1.0 MB",
+                date: f.created_at?.split("T")[0] || "2026-07-09",
+                type: f.file_type || "PDF",
+              })),
+              invoices: [],
+              activityFeed: (p.timeline_events || []).map((t: any) => ({
+                id: t.id,
+                timestamp: t.created_at?.split("T")[0] || "Today",
+                eventTitle: t.event_title,
+                description: t.description,
+                category: t.category || "Milestone",
+              })),
+            }));
+            setProjectsData(mapped);
+          }
+        } catch (err) {
+          console.warn("ClientPortal fallback to default projects:", err);
+        }
+      }
+
+      if (organization?.id) {
+        try {
+          const { data, error } = await agencyOsService.communication.listClientJourneyEvents(organization.id);
+          if (!error && data && data.length > 0) {
+            setJourneySteps(
+              data.map((j: any) => ({
+                date: j.event_date,
+                title: j.title,
+                status: j.status || "completed",
+              }))
+            );
+          }
+        } catch (err) {
+          console.warn("ClientPortal fallback to default journey:", err);
+        }
+      }
+    }
+    loadWorkspaceDomainData();
+  }, [workspace?.id, organization?.id]);
+
+  const activeProject = projectsData[activeProjectIdx] || WORKSPACE_PROJECTS[0];
 
   const orgName = organization?.name || "Vistaara Hospitality Pvt Ltd";
   const wsName = workspace?.name || "Vistaara Corporate Workspace";
@@ -313,7 +397,7 @@ export const ClientPortal: React.FC = () => {
         <div className="flex items-center gap-3 relative z-10">
           <div className="px-4 py-2.5 rounded-full bg-gold/15 border border-gold/40 text-gold text-xs font-bold flex items-center gap-2 shadow-sm">
             <Layers className="w-3.5 h-3.5 text-gold" />
-            <span>{WORKSPACE_PROJECTS.length} Active Projects</span>
+            <span>{projectsData.length} Active Projects</span>
           </div>
         </div>
       </div>
@@ -337,16 +421,7 @@ export const ClientPortal: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4 relative">
-          {[
-            { date: "July 8", title: "Consultation Submitted", status: "completed" },
-            { date: "July 9", title: "Discovery Call Completed", status: "completed" },
-            { date: "July 11", title: "Proposal Sent", status: "completed" },
-            { date: "July 13", title: "Advance Payment Received", status: "completed" },
-            { date: "July 14", title: "Workspace Activated", status: "completed" },
-            { date: "July 15", title: "Website Project Created", status: "completed" },
-            { date: "July 20", title: "UI Approved", status: "active" },
-            { date: "August 4", title: "Website Live", status: "pending" },
-          ].map((step, idx) => (
+          {journeySteps.map((step, idx) => (
             <div
               key={idx}
               className="flex flex-col gap-2 p-3.5 rounded-2xl border border-border-custom bg-bg-primary/30 relative group hover:border-gold/50 transition-all"
@@ -421,7 +496,7 @@ export const ClientPortal: React.FC = () => {
                         <div className="px-3 py-2 text-[9px] uppercase tracking-widest font-bold text-text-secondary border-b border-border-custom/50">
                           Switch Active Project
                         </div>
-                        {WORKSPACE_PROJECTS.map((proj, idx) => {
+                        {projectsData.map((proj, idx) => {
                           const isSelected = idx === activeProjectIdx;
                           return (
                             <button
