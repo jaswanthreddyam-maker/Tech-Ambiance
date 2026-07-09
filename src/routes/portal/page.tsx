@@ -10,8 +10,6 @@ import {
   ExternalLink,
   FileText,
   Info,
-  Send,
-  Ticket,
   ChevronDown,
   Check,
   FolderGit2,
@@ -20,12 +18,14 @@ import {
   Building2,
   Sparkles,
   CheckCircle2,
+  History,
 } from "lucide-react";
 
 interface PortalProjectData {
   id: string;
   name: string;
   status: string;
+  currentStage: "Planning" | "Design" | "Development" | "Testing" | "Deployment" | "Maintenance";
   progress: number;
   activeSprint: string;
   budget: string;
@@ -40,6 +40,7 @@ interface PortalProjectData {
   }[];
   files: {
     name: string;
+    category: "Brand Assets" | "Contracts" | "Deliverables" | "Reports" | "Credentials";
     size: string;
     date: string;
     type: string;
@@ -50,13 +51,21 @@ interface PortalProjectData {
     date: string;
     status: "PAID" | "PENDING";
   }[];
+  activityFeed: {
+    id: string;
+    timestamp: string;
+    eventTitle: string;
+    description: string;
+    category: "Deployment" | "Milestone" | "Finance" | "Design";
+  }[];
 }
 
 const WORKSPACE_PROJECTS: PortalProjectData[] = [
   {
     id: "cafe-vistaara-web",
     name: "Cafe Vistaara Premium Website",
-    status: "Development",
+    status: "Active Execution",
+    currentStage: "Development",
     progress: 68,
     activeSprint: "Animations & Performance SLAs",
     budget: "$42,000",
@@ -70,20 +79,52 @@ const WORKSPACE_PROJECTS: PortalProjectData[] = [
       { id: "m4", name: "Edge Telemetry & Production Deployment", date: "Aug 10, 2026", status: "pending" },
     ],
     files: [
-      { name: "Brand Guidelines & Color Tokens (PDF)", size: "4.2 MB", date: "2026-06-12", type: "PDF" },
-      { name: "UI/UX Layout Prototypes (ZIP)", size: "18.5 MB", date: "2026-06-26", type: "ZIP" },
-      { name: "Lighthouse Performance Audit (PDF)", size: "1.8 MB", date: "2026-07-04", type: "PDF" },
+      { name: "Brand Guidelines & Color Tokens (PDF)", category: "Brand Assets", size: "4.2 MB", date: "2026-06-12", type: "PDF" },
+      { name: "Master Master Services Agreement (PDF)", category: "Contracts", size: "1.4 MB", date: "2026-06-01", type: "PDF" },
+      { name: "UI/UX Layout Prototypes (ZIP)", category: "Deliverables", size: "18.5 MB", date: "2026-06-26", type: "ZIP" },
+      { name: "Lighthouse Performance Audit (PDF)", category: "Reports", size: "1.8 MB", date: "2026-07-04", type: "PDF" },
     ],
     invoices: [
       { id: "INV-2026-081", amount: "$14,000", date: "Jun 01, 2026", status: "PAID" },
       { id: "INV-2026-094", amount: "$14,000", date: "Jul 01, 2026", status: "PAID" },
       { id: "INV-2026-112", amount: "$14,000", date: "Aug 01, 2026", status: "PENDING" },
     ],
+    activityFeed: [
+      {
+        id: "af-1",
+        timestamp: "Today, 14:20",
+        eventTitle: "Deployment Started",
+        description: "Staging build pushed to edge servers with WebGL shaders.",
+        category: "Deployment",
+      },
+      {
+        id: "af-2",
+        timestamp: "Yesterday, 18:00",
+        eventTitle: "UI Approved",
+        description: "Editorial design system signed off by stakeholders.",
+        category: "Design",
+      },
+      {
+        id: "af-3",
+        timestamp: "3 Jul 2026",
+        eventTitle: "Payment Received",
+        description: "INV-2026-094 verified ($14,000 midpoint installment).",
+        category: "Finance",
+      },
+      {
+        id: "af-4",
+        timestamp: "24 Jun 2026",
+        eventTitle: "Milestone Completed",
+        description: "High-Fidelity Editorial Design System delivered.",
+        category: "Milestone",
+      },
+    ],
   },
   {
     id: "vistaara-qr-ordering",
     name: "QR Table Ordering & Realtime POS",
-    status: "Backend Sprint",
+    status: "Active Execution",
+    currentStage: "Development",
     progress: 24,
     activeSprint: "PostgreSQL Realtime Queue & WebSocket Engine",
     budget: "$28,500",
@@ -96,19 +137,37 @@ const WORKSPACE_PROJECTS: PortalProjectData[] = [
       { id: "qm4", name: "Kitchen Display System (KDS) Tablet App", date: "Sep 15, 2026", status: "pending" },
     ],
     files: [
-      { name: "POS Integration API Schema (YAML)", size: "480 KB", date: "2026-06-28", type: "YAML" },
-      { name: "Table QR Vector Assets (EPS/SVG)", size: "12.4 MB", date: "2026-07-02", type: "ZIP" },
-      { name: "Menu Database CSV Template (XLSX)", size: "640 KB", date: "2026-07-05", type: "XLSX" },
+      { name: "Stripe POS API Credentials & Keybox (ENC)", category: "Credentials", size: "120 KB", date: "2026-06-25", type: "ENC" },
+      { name: "POS Integration API Schema (YAML)", category: "Deliverables", size: "480 KB", date: "2026-06-28", type: "YAML" },
+      { name: "Table QR Vector Assets (EPS/SVG)", category: "Brand Assets", size: "12.4 MB", date: "2026-07-02", type: "ZIP" },
+      { name: "Menu Database CSV Template (XLSX)", category: "Deliverables", size: "640 KB", date: "2026-07-05", type: "XLSX" },
     ],
     invoices: [
       { id: "INV-2026-088", amount: "$9,500", date: "Jun 28, 2026", status: "PAID" },
       { id: "INV-2026-105", amount: "$9,500", date: "Jul 28, 2026", status: "PENDING" },
     ],
+    activityFeed: [
+      {
+        id: "qaf-1",
+        timestamp: "5 Jul 2026",
+        eventTitle: "Database Schema Deployed",
+        description: "PostgreSQL tables provisioned for orders & table sessions.",
+        category: "Deployment",
+      },
+      {
+        id: "qaf-2",
+        timestamp: "28 Jun 2026",
+        eventTitle: "Milestone Completed",
+        description: "POS & Stripe Terminal Specification finalized.",
+        category: "Milestone",
+      },
+    ],
   },
   {
     id: "vistaara-marketing-ai",
     name: "Marketing & AI Telemetry Dashboard",
-    status: "QA & Polish",
+    status: "Staging Testing",
+    currentStage: "Testing",
     progress: 88,
     activeSprint: "Executive Telemetry Metrics Pipeline",
     budget: "$35,000",
@@ -121,18 +180,35 @@ const WORKSPACE_PROJECTS: PortalProjectData[] = [
       { id: "am4", name: "Penetration Testing & SOC-2 Compliance Prep", date: "Jul 22, 2026", status: "active" },
     ],
     files: [
-      { name: "ScoutAI Telemetry Playbook (PDF)", size: "5.6 MB", date: "2026-06-15", type: "PDF" },
-      { name: "Executive Metric Definitions (DOCX)", size: "920 KB", date: "2026-06-22", type: "DOCX" },
+      { name: "ScoutAI Telemetry Playbook (PDF)", category: "Deliverables", size: "5.6 MB", date: "2026-06-15", type: "PDF" },
+      { name: "SOC-2 Penetration Testing Audit (PDF)", category: "Reports", size: "3.2 MB", date: "2026-07-06", type: "PDF" },
     ],
     invoices: [
       { id: "INV-2026-062", amount: "$17,500", date: "May 15, 2026", status: "PAID" },
       { id: "INV-2026-099", amount: "$17,500", date: "Jul 01, 2026", status: "PAID" },
     ],
+    activityFeed: [
+      {
+        id: "aaf-1",
+        timestamp: "6 Jul 2026",
+        eventTitle: "SOC-2 Audit Initiated",
+        description: "Automated penetration testing suite running against staging endpoints.",
+        category: "Deployment",
+      },
+      {
+        id: "aaf-2",
+        timestamp: "5 Jul 2026",
+        eventTitle: "Milestone Completed",
+        description: "Executive Dark Mode Visual Dashboard approved.",
+        category: "Milestone",
+      },
+    ],
   },
   {
     id: "vistaara-loyalty-app",
     name: "Vistaara Club iOS & Android Loyalty App",
-    status: "UI/UX Design",
+    status: "Prototyping",
+    currentStage: "Design",
     progress: 45,
     activeSprint: "Figma Interactive Prototypes & Token Mechanics",
     budget: "$54,000",
@@ -144,11 +220,20 @@ const WORKSPACE_PROJECTS: PortalProjectData[] = [
       { id: "lm4", name: "App Store & Google Play Submission", date: "Nov 01, 2026", status: "pending" },
     ],
     files: [
-      { name: "Vistaara Club App Storyboard (PDF)", size: "8.4 MB", date: "2026-06-20", type: "PDF" },
-      { name: "Apple Wallet & Passkit Certificate (ZIP)", size: "2.1 MB", date: "2026-07-03", type: "ZIP" },
+      { name: "Vistaara Club App Storyboard (PDF)", category: "Brand Assets", size: "8.4 MB", date: "2026-06-20", type: "PDF" },
+      { name: "Apple Wallet & Passkit Certificate (ZIP)", category: "Credentials", size: "2.1 MB", date: "2026-07-03", type: "ZIP" },
     ],
     invoices: [
       { id: "INV-2026-079", amount: "$18,000", date: "Jun 20, 2026", status: "PAID" },
+    ],
+    activityFeed: [
+      {
+        id: "laf-1",
+        timestamp: "3 Jul 2026",
+        eventTitle: "Passkit Certificate Uploaded",
+        description: "Apple Wallet cryptographic signing bundle registered.",
+        category: "Design",
+      },
     ],
   },
 ];
@@ -160,42 +245,28 @@ export const ClientPortal: React.FC = () => {
 
   const [activeProjectIdx, setActiveProjectIdx] = useState(0);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [ticketSubject, setTicketSubject] = useState("");
-  const [tickets, setTickets] = useState([
-    {
-      id: "t-104",
-      subject: "Staging DNS Custom Domain Request",
-      status: "Open" as const,
-      date: "2026-07-08",
-    },
-    {
-      id: "t-098",
-      subject: "Updated Brand Asset Package Uploaded",
-      status: "Closed" as const,
-      date: "2026-06-29",
-    },
-  ]);
 
   const activeProject = WORKSPACE_PROJECTS[activeProjectIdx];
 
-  const handleCreateTicket = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!ticketSubject.trim()) return;
-
-    const newTicket = {
-      id: `t-${Math.floor(Math.random() * 900) + 100}`,
-      subject: ticketSubject,
-      status: "Open" as const,
-      date: new Date().toISOString().split("T")[0],
-    };
-
-    setTickets((prev) => [newTicket, ...prev]);
-    setTicketSubject("");
-    toast("Support ticket submitted to Tech Ambiance StudioHQ.", "success");
-  };
-
   const orgName = organization?.name || "Vistaara Hospitality Pvt Ltd";
   const wsName = workspace?.name || "Vistaara Corporate Workspace";
+
+  const getCategoryColor = (cat: string) => {
+    switch (cat) {
+      case "Brand Assets":
+        return "bg-purple-100 text-purple-800 border-purple-200";
+      case "Contracts":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "Deliverables":
+        return "bg-emerald-100 text-emerald-800 border-emerald-200";
+      case "Reports":
+        return "bg-amber-100 text-amber-800 border-amber-200";
+      case "Credentials":
+        return "bg-rose-100 text-rose-800 border-rose-200";
+      default:
+        return "bg-zinc-100 text-zinc-700 border-zinc-200";
+    }
+  };
 
   return (
     <div className="flex flex-col gap-8 text-left select-none pb-12">
@@ -222,7 +293,7 @@ export const ClientPortal: React.FC = () => {
               {orgName}
             </h1>
             <p className="text-xs text-gold-light mt-0.5 font-medium">
-              Workspace: <strong className="text-gold font-bold">{wsName}</strong> • Managed by Tech Ambiance StudioHQ
+              Workspace: <strong className="text-gold font-bold">{wsName}</strong> • Managed authoritative by StudioHQ
             </p>
           </div>
         </div>
@@ -305,7 +376,7 @@ export const ClientPortal: React.FC = () => {
                                     isSelected ? "text-gold" : "text-text-secondary"
                                   }`}
                                 >
-                                  {proj.status} • {proj.progress}% Complete
+                                  {proj.currentStage} • {proj.progress}% Complete
                                 </div>
                               </div>
                               {isSelected && <Check className="w-4 h-4 text-gold shrink-0" />}
@@ -318,16 +389,21 @@ export const ClientPortal: React.FC = () => {
                 </div>
               </div>
 
-              <div className="px-4 py-2 bg-gold/10 border border-gold/30 rounded-lg text-xs font-bold text-gold">
-                Status: {activeProject.status}
+              <div className="flex flex-col items-end gap-1">
+                <div className="px-3 py-1.5 bg-forest text-gold border border-gold/30 rounded-lg text-xs font-bold uppercase tracking-wider">
+                  Stage: {activeProject.currentStage}
+                </div>
+                <span className="text-[10px] text-text-secondary font-semibold">
+                  Status: {activeProject.status}
+                </span>
               </div>
             </div>
 
-            {/* PROGRESS BAR */}
+            {/* STAGE & PERCENTAGE PROGRESS BAR */}
             <div className="flex flex-col gap-2 mb-4">
               <div className="flex justify-between items-center text-xs font-semibold text-text-secondary">
-                <span>Overall Build Progress</span>
-                <span className="text-gold font-bold">{activeProject.progress}%</span>
+                <span>Current Lifecycle Stage • <strong className="text-text-primary">{activeProject.currentStage}</strong></span>
+                <span className="text-gold font-bold">{activeProject.progress}% Complete</span>
               </div>
               <div className="w-full h-2.5 bg-bg-primary border border-border-custom rounded-full overflow-hidden">
                 <motion.div
@@ -343,7 +419,7 @@ export const ClientPortal: React.FC = () => {
             <p className="text-xs text-text-secondary flex items-start gap-2 mt-4 font-light">
               <Info className="w-4 h-4 text-gold shrink-0 mt-0.5" />
               <span>
-                Current Sprint: <strong className="font-semibold text-text-primary">{activeProject.activeSprint}</strong>
+                Active Sprint Deliverable: <strong className="font-semibold text-text-primary">{activeProject.activeSprint}</strong>
               </span>
             </p>
           </div>
@@ -407,26 +483,41 @@ export const ClientPortal: React.FC = () => {
             </div>
           </div>
 
-          {/* DOCUMENT DOWNLOADS FOR ACTIVE PROJECT */}
+          {/* CATEGORIZED DOCUMENT DOWNLOADS FOR ACTIVE PROJECT */}
           <div className="bg-white border border-border-custom shadow-sm p-8 rounded-2xl">
-            <h3 className="font-heading text-lg font-bold text-text-primary mb-6 flex items-center gap-3">
-              <Download className="w-5 h-5 text-gold shrink-0" />
-              <span>Document Downloads ({activeProject.name})</span>
-            </h3>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
+              <h3 className="font-heading text-lg font-bold text-text-primary flex items-center gap-3">
+                <Download className="w-5 h-5 text-gold shrink-0" />
+                <span>Categorized Deliverables & Files</span>
+              </h3>
+              <span className="text-[10px] uppercase tracking-widest font-bold text-text-secondary">
+                Authoritative Studio Repository
+              </span>
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {activeProject.files.map((file, idx) => (
                 <div
                   key={idx}
-                  className="border border-border-custom hover:border-gold hover:shadow-premium p-5 rounded-xl text-left flex flex-col justify-between transition-all duration-300 relative group"
+                  className="border border-border-custom hover:border-gold hover:shadow-premium p-5 rounded-xl text-left flex flex-col justify-between transition-all duration-300 relative group bg-bg-primary/10"
                 >
-                  <div className="p-2.5 bg-bg-primary rounded-lg border border-border-custom/50 text-gold self-start mb-4 group-hover:border-gold/30">
-                    <FileText className="w-4 h-4" />
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <div className="p-2 bg-white rounded-lg border border-border-custom text-gold">
+                      <FileText className="w-4 h-4" />
+                    </div>
+                    <span
+                      className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${getCategoryColor(
+                        file.category
+                      )}`}
+                    >
+                      {file.category}
+                    </span>
                   </div>
+
                   <div>
                     <h4 className="text-xs font-bold text-text-primary truncate">{file.name}</h4>
                     <div className="flex justify-between items-center mt-3 text-[10px] text-text-secondary font-light">
-                      <span>{file.size}</span>
+                      <span>{file.size} • {file.date}</span>
                       <button
                         type="button"
                         onClick={() => toast(`Downloading ${file.name}...`, "success")}
@@ -443,7 +534,7 @@ export const ClientPortal: React.FC = () => {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: ACTIVE PARAMETERS, INVOICES & TICKETS */}
+        {/* RIGHT COLUMN: ACTIVE PARAMETERS, INVOICES & STUDIO UPDATES ACTIVITY FEED */}
         <div className="lg:col-span-4 flex flex-col gap-8">
           
           {/* ACTIVE PARAMETERS PANEL */}
@@ -533,41 +624,33 @@ export const ClientPortal: React.FC = () => {
             </div>
           </div>
 
-          {/* SUPPORT TICKETS & MESSAGES */}
+          {/* STUDIO UPDATES & ACTIVITY TIMELINE (AUTHORITATIVE CHRONOLOGICAL FEED) */}
           <div className="bg-white border border-border-custom shadow-sm p-6 rounded-2xl flex flex-col gap-4">
-            <h3 className="font-heading text-base font-bold text-text-primary flex items-center gap-2 border-b border-border-custom pb-3">
-              <Ticket className="w-4 h-4 text-gold" />
-              StudioHQ Communication
-            </h3>
+            <div className="flex items-center justify-between border-b border-border-custom pb-3">
+              <h3 className="font-heading text-base font-bold text-text-primary flex items-center gap-2">
+                <History className="w-4 h-4 text-gold" />
+                <span>Studio Updates</span>
+              </h3>
+              <span className="text-[9px] uppercase font-bold text-gold tracking-wider">
+                Live Timeline
+              </span>
+            </div>
 
-            <form onSubmit={handleCreateTicket} className="flex gap-2">
-              <input
-                type="text"
-                placeholder="Request feature or update..."
-                value={ticketSubject}
-                onChange={(e) => setTicketSubject(e.target.value)}
-                className="flex-1 bg-bg-primary border border-border-custom rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-gold transition-colors"
-              />
-              <button
-                type="submit"
-                className="bg-forest text-gold px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center hover:bg-forest/90 transition-colors"
-              >
-                <Send className="w-3.5 h-3.5" />
-              </button>
-            </form>
-
-            <div className="flex flex-col gap-2.5 max-h-52 overflow-y-auto pr-1">
-              {tickets.map((t) => (
-                <div
-                  key={t.id}
-                  className="p-3 rounded-xl border border-border-custom/50 bg-bg-primary/30 flex items-center justify-between text-xs"
-                >
-                  <span className="font-medium text-text-primary truncate max-w-[180px]">
-                    {t.subject}
-                  </span>
-                  <span className="text-[9px] uppercase tracking-wider font-bold text-gold shrink-0">
-                    {t.status}
-                  </span>
+            <div className="flex flex-col gap-4 relative pl-3 mt-1 before:absolute before:left-1.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-border-custom">
+              {activeProject.activityFeed.map((event) => (
+                <div key={event.id} className="flex flex-col gap-1 relative pl-4">
+                  <div className="absolute -left-1 top-1.5 w-2.5 h-2.5 rounded-full bg-gold border-2 border-white shadow-sm" />
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-bold text-text-primary">
+                      {event.eventTitle}
+                    </span>
+                    <span className="text-[9px] uppercase font-bold text-text-secondary">
+                      {event.timestamp}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-text-secondary font-light leading-relaxed">
+                    {event.description}
+                  </p>
                 </div>
               ))}
             </div>
