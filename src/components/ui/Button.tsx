@@ -57,9 +57,40 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {variant === "primary" && (
-          <svg className="absolute inset-0 w-full h-full pointer-events-none select-none opacity-0 group-hover:opacity-40 transition-opacity duration-[300ms] ease-[0.16,1,0.3,1] z-0" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" viewBox="0 0 120 44">
-            <path d="M -10,10 C 20,8 15,-5 35,-10" fill="none" stroke="#C4A661" strokeWidth="1" style={{ filter: "blur(0.5px) drop-shadow(0 0 5px rgba(196,166,97,0.06))" }} />
-            <path d="M 85,54 C 100,34 95,44 130,34" fill="none" stroke="#C4A661" strokeWidth="1" style={{ filter: "blur(0.5px) drop-shadow(0 0 5px rgba(196,166,97,0.06))" }} />
+          <svg
+            className="absolute inset-0 w-full h-full pointer-events-none select-none opacity-20 group-hover:opacity-45 transition-all duration-500 ease-[0.16,1,0.3,1] z-0"
+            xmlns="http://www.w3.org/2000/svg"
+            preserveAspectRatio="none"
+            viewBox="0 0 160 44"
+          >
+            <defs>
+              <linearGradient id="btnGoldenThunder" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#D4AF37" stopOpacity="1" />
+                <stop offset="45%" stopColor="#E5C158" stopOpacity="1" />
+                <stop offset="75%" stopColor="#C5A059" stopOpacity="1" />
+                <stop offset="100%" stopColor="#D4AF37" stopOpacity="1" />
+              </linearGradient>
+            </defs>
+            {/* Minimal delicate golden crack */}
+            <path
+              d="M -5,15 C 35,26 75,12 165,25"
+              fill="none"
+              stroke="url(#btnGoldenThunder)"
+              strokeWidth="1"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ filter: "drop-shadow(0 0 4px rgba(212, 175, 55, 0.35))" }}
+            />
+            {/* Minimal subtle upper branch */}
+            <path
+              d="M 75,12 L 95,6"
+              fill="none"
+              stroke="url(#btnGoldenThunder)"
+              strokeWidth="0.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ filter: "drop-shadow(0 0 3px rgba(212, 175, 55, 0.25))" }}
+            />
           </svg>
         )}
 

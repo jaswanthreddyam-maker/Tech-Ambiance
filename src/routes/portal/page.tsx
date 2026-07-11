@@ -4,6 +4,7 @@ import { useToast } from "../../providers/ToastProvider";
 import { useCursorHover } from "../../hooks/useCursorHover";
 import { agencyOsService } from "../../api/agencyOsService";
 import { motion, AnimatePresence } from "framer-motion";
+import { useConsultationModal } from "../../providers/ConsultationModalProvider";
 import {
   Calendar,
   DollarSign,
@@ -254,6 +255,7 @@ const WORKSPACE_PROJECTS: PortalProjectData[] = [
 export const ClientPortal: React.FC = () => {
   const { organization, workspace } = useAuth();
   const { toast } = useToast();
+  const { openConsultationModal } = useConsultationModal();
   const hoverProps = useCursorHover("pointer");
 
   const [projectsData, setProjectsData] = useState<PortalProjectData[]>(WORKSPACE_PROJECTS);
@@ -394,7 +396,14 @@ export const ClientPortal: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 relative z-10">
+        <div className="flex flex-col md:flex-row items-end md:items-center gap-3 relative z-10">
+          <button
+            onClick={openConsultationModal}
+            className="px-5 py-2.5 rounded-full bg-gold text-forest hover:bg-gold-light text-xs font-bold uppercase tracking-widest flex items-center gap-2 shadow-sm transition-colors"
+            {...hoverProps}
+          >
+            Book Consultation
+          </button>
           <div className="px-4 py-2.5 rounded-full bg-gold/15 border border-gold/40 text-gold text-xs font-bold flex items-center gap-2 shadow-sm">
             <Layers className="w-3.5 h-3.5 text-gold" />
             <span>{projectsData.length} Active Projects</span>

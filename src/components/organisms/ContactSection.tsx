@@ -10,6 +10,8 @@ import { Container } from "../layout/Container";
 import { Heading, Text } from "../ui/Typography";
 import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
+import { RevealHeading, RevealParagraph } from "../motion";
+import { GoldenLightningVeins } from "../ui/GoldenLightningVeins";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -52,6 +54,7 @@ export const ContactSection: React.FC = () => {
 
   return (
     <Section id="contact" padding="normal" className="bg-surface relative overflow-hidden border-t border-forest/[0.06]">
+      <GoldenLightningVeins variant="cta" />
       <m.div
         initial={{ opacity: 0.98, y: 2 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -67,15 +70,19 @@ export const ContactSection: React.FC = () => {
                 <span className="text-[11px] uppercase font-bold tracking-[0.24em] text-gold select-none">
                   Get In Touch
                 </span>
-                <Heading level={2} className="m-0 leading-tight">
-                  Let's build <br />
-                  something <br />
-                  <span className="font-serif italic text-gold">extraordinary</span>.
-                </Heading>
+                <RevealHeading>
+                  <Heading level={2} className="m-0 leading-tight">
+                    Let's build <br />
+                    something <br />
+                    <span className="font-serif italic text-gold">extraordinary</span>.
+                  </Heading>
+                </RevealHeading>
               </div>
-              <Text size="sm" className="text-text-secondary max-w-sm m-0">
-              Have an upcoming project or want to audit your existing page ranking? Drop us a brief note and we'll reach out within 24 hours.
-            </Text>
+              <RevealParagraph>
+                <Text size="sm" className="text-text-secondary max-w-sm m-0">
+                  Have an upcoming project or want to audit your existing page ranking? Drop us a brief note and we'll reach out within 24 hours.
+                </Text>
+              </RevealParagraph>
 
             <div className="h-px bg-forest/[0.06] w-16 my-2" />
 

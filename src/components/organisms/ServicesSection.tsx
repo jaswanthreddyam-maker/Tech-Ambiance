@@ -9,22 +9,25 @@ import { ArrowRight, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../routes/routes";
 import { MOCK_SERVICES } from "../../mocks/services";
+import { RevealHeading } from "../motion";
 
 export const ServicesSection: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <Section id="services" padding="normal" className="bg-ivory relative">
-      <Container>
+    <Section id="services" padding="normal" className="bg-ivory relative overflow-hidden">
+      <Container className="relative z-10">
         
         {/* Title Block */}
         <div className="flex flex-col items-center text-center gap-4 mb-14">
           <span className="text-[11px] uppercase font-bold tracking-[0.24em] text-gold select-none">
             Capabilities
           </span>
-          <Heading level={2} className="text-forest mb-0">
-            Engineered for <span className="font-serif italic text-gold">growth</span>.
-          </Heading>
+          <RevealHeading>
+            <Heading level={2} className="text-forest mb-0">
+              Engineered for <span className="font-serif italic text-gold">growth</span>.
+            </Heading>
+          </RevealHeading>
         </div>
 
         {/* Services Grid */}

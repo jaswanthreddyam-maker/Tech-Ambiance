@@ -6,16 +6,37 @@ import { Section } from '../layout/Section';
 import { Container } from '../layout/Container';
 import { Heading, Text } from '../ui/Typography';
 import { SUCCESS_STORIES } from '../../content/successStories';
+import { MarbleVeins } from '../ui/MarbleVeins';
+import { RevealHeading } from '../motion';
 
 export const SuccessStoriesSection: React.FC = () => {
   const navigate = useNavigate();
 
   return (
     <Section id="success-stories" padding="normal" className="bg-ivory relative overflow-hidden">
-      {/* Subtle luxury ambient radial lighting */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(201,165,106,0.08)_0%,_transparent_70%)]" />
+      {/* Golden Floral Cracks Image positioned at the right end with smooth 1.5s scroll delay */}
+      <m.div
+        initial={{ opacity: 0, scale: 0.96, x: 25 }}
+        whileInView={{ opacity: 1, scale: 1, x: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{
+          duration: 1.4,
+          delay: 1.5,
+          ease: [0.16, 1, 0.3, 1],
+        }}
+        className="pointer-events-none absolute top-0 right-0 w-[85%] md:w-[60%] max-w-[800px] h-[360px] md:h-[480px] z-0 flex items-center justify-end overflow-hidden"
+      >
+        <img
+          src="/images/gold-floral-clean.png"
+          alt="Luxury Gold Floral Cracks"
+          className="w-full h-full object-contain object-right opacity-55"
+        />
+      </m.div>
 
-      <Container>
+      {/* Subtle luxury ambient radial lighting */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(201,165,106,0.08)_0%,_transparent_70%)] z-0" />
+
+      <Container className="relative z-10">
         <div className="flex flex-col gap-14 lg:gap-20">
           {/* Section Header - Editorial Luxury Alignment */}
           <div className="flex flex-col items-center text-center gap-4 max-w-3xl mx-auto">
@@ -38,10 +59,12 @@ export const SuccessStoriesSection: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: 0.1 }}
             >
-              <Heading level={2} className="text-3xl md:text-5xl tracking-tight leading-tight">
-                Digital experiences that deliver{' '}
-                <span className="font-serif italic text-gold">measurable</span> business impact.
-              </Heading>
+              <RevealHeading>
+                <Heading level={2} className="text-3xl md:text-5xl tracking-tight leading-tight">
+                  Digital experiences that deliver{' '}
+                  <span className="font-serif italic text-gold">measurable</span> business impact.
+                </Heading>
+              </RevealHeading>
             </m.div>
 
             <m.div
@@ -77,6 +100,11 @@ export const SuccessStoriesSection: React.FC = () => {
                 >
                   {/* Subtle Card Glow & Glass Texture */}
                   <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,_rgba(201,165,106,0.14)_0%,_transparent_65%)]" />
+
+                  {/* Minimal Luxury Golden Crack */}
+                  <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-20">
+                    <MarbleVeins />
+                  </div>
 
                   {/* Top Preview Image Container with Luxury Overlay */}
                   <div className="relative h-56 sm:h-64 w-full overflow-hidden rounded-t-3xl bg-[#08261F]">

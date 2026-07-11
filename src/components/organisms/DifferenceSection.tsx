@@ -3,6 +3,7 @@ import { m } from "framer-motion";
 import { Section } from "../layout/Section";
 import { Container } from "../layout/Container";
 import { Heading, Text } from "../ui/Typography";
+import { RevealHeading, RevealParagraph } from "../motion";
 
 export const DifferenceSection: React.FC = () => {
 
@@ -29,15 +30,19 @@ export const DifferenceSection: React.FC = () => {
             <span className="text-[11px] uppercase font-bold tracking-[0.24em] text-gold select-none">
               The Tech Ambiance Difference
             </span>
-            <Heading level={2}>
-              Strict engineering <br />
-              married to <span className="font-serif italic text-gold">luxury visuals</span>.
-            </Heading>
+            <RevealHeading>
+              <Heading level={2}>
+                Strict engineering <br />
+                married to <span className="font-serif italic text-gold">luxury visuals</span>.
+              </Heading>
+            </RevealHeading>
           </div>
           <div className="lg:col-span-5">
-            <Text size="lg" className="text-text-secondary max-w-md m-0">
-              We reject the compromise between aesthetic motion and page speed. Every experience we compile is audited against strict metrics to ensure you rank higher and convert better.
-            </Text>
+            <RevealParagraph>
+              <Text size="lg" className="text-text-secondary max-w-md m-0">
+                We reject the compromise between aesthetic motion and page speed. Every experience we compile is audited against strict metrics to ensure you rank higher and convert better.
+              </Text>
+            </RevealParagraph>
           </div>
         </div>
 

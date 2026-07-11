@@ -136,7 +136,19 @@ export const AuthPage: React.FC = () => {
     setIsSubmitting(true);
     try {
       await loginWithGoogle();
-      toast("Redirecting to Google SSO...", "info");
+      
+      // Check if we are running in local mock mode
+      const isMockMode = !import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_URL === "https://your-supabase-project-id.supabase.co";
+      
+      if (isMockMode) {
+        setIsSuccess(true);
+        toast("Mock Google Auth Successful", "success");
+        setTimeout(() => {
+          navigate("/portal");
+        }, 1000);
+      } else {
+        toast("Redirecting to Google SSO...", "info");
+      }
     } catch (err: any) {
       toast(err?.message || "Google Single Sign-On cancelled or failed.", "error");
       setIsSubmitting(false);
@@ -308,6 +320,46 @@ export const AuthPage: React.FC = () => {
         <div className="absolute inset-0 opacity-15 pointer-events-none mix-blend-overlay">
           <MarbleVeins />
         </div>
+
+        {/* Luxury Crack / Contour Pattern (Golden Cracks) */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 0.2 }}
+          className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden"
+        >
+          <svg
+            className="w-full h-full"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 700 700"
+            preserveAspectRatio="none"
+          >
+            {/* Large curve near the top-right */}
+            <path
+              d="M 380,-30 C 460,80 560,140 730,110"
+              fill="none"
+              stroke="rgba(201,165,106,0.15)"
+              strokeWidth="1.5"
+              style={{ filter: "blur(0.5px)" }}
+            />
+            {/* Sweeping line across the middle */}
+            <path
+              d="M -50,330 C 180,390 410,240 750,340"
+              fill="none"
+              stroke="rgba(201,165,106,0.12)"
+              strokeWidth="1.2"
+              style={{ filter: "blur(0.5px)" }}
+            />
+            {/* Subtle curve near the bottom-left */}
+            <path
+              d="M -30,620 C 120,530 260,610 420,730"
+              fill="none"
+              stroke="rgba(201,165,106,0.15)"
+              strokeWidth="1.5"
+              style={{ filter: "blur(0.5px)" }}
+            />
+          </svg>
+        </motion.div>
 
         {/* Ambient Gold Glows */}
         <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-gold/15 blur-[120px] pointer-events-none" />

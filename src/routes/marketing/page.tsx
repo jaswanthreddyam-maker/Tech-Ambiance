@@ -14,6 +14,7 @@ import { ProcessSection } from "../../components/organisms/ProcessSection";
 import { TeamSection } from "../../components/organisms/TeamSection";
 import { TestimonialsSection } from "../../components/organisms/TestimonialsSection";
 import { ContactSection } from "../../components/organisms/ContactSection";
+import { GoldenLightningVeins } from "../../components/ui/GoldenLightningVeins";
 
 export const MarketingPage: React.FC = () => {
   const { setSEO } = useSEO();
@@ -49,6 +50,9 @@ export const MarketingPage: React.FC = () => {
       <TeamSection />
       <TestimonialsSection />
       <ContactSection />
+      <div className="relative overflow-hidden w-full h-36 pointer-events-none -mt-16 z-0">
+        <GoldenLightningVeins variant="footer" />
+      </div>
     </m.div>
   );
 };

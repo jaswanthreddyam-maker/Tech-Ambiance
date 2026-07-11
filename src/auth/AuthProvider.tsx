@@ -171,6 +171,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           role: "owner",
         };
         setUser(mockUser);
+        setRoles(["OWNER"]);
         localStorage.setItem("ta_user", JSON.stringify(mockUser));
         setIsLoading(false);
         return true;
@@ -199,9 +200,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         const mockUser: User = {
           email,
           name,
-          role: "client",
+          role: "owner",
         };
         setUser(mockUser);
+        setRoles(["OWNER"]);
         localStorage.setItem("ta_user", JSON.stringify(mockUser));
         setIsLoading(false);
         return { success: true, requiresVerification: false };
@@ -220,6 +222,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const loginWithGoogle = async (): Promise<void> => {
+    if (!isSupabaseConfigured) {
+      setIsLoading(true);
+      const mockUser: User = {
+        email: "google.user@techambiance.com",
+        name: "Google Executive",
+        role: "owner",
+      };
+      setUser(mockUser);
+      setRoles(["OWNER"]);
+      localStorage.setItem("ta_user", JSON.stringify(mockUser));
+      setIsLoading(false);
+      return;
+    }
     await authService.signInWithGoogle();
   };
 

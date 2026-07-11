@@ -3,6 +3,8 @@ import { m, useScroll, useSpring } from "framer-motion";
 import { Section } from "../layout/Section";
 import { Container } from "../layout/Container";
 import { Heading, Text } from "../ui/Typography";
+import { RevealHeading } from "../motion";
+import { GoldenLightningVeins } from "../ui/GoldenLightningVeins";
 
 const PROCESS_STEPS = [
   {
@@ -47,6 +49,7 @@ export const ProcessSection: React.FC = () => {
 
   return (
     <Section id="process" padding="normal" className="bg-surface relative overflow-hidden">
+      <GoldenLightningVeins variant="process" />
       <m.div
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
@@ -60,10 +63,12 @@ export const ProcessSection: React.FC = () => {
           <span className="text-[11px] uppercase font-bold tracking-[0.24em] text-gold select-none">
             Typical Project Flow
           </span>
-          <Heading level={2} className="max-w-2xl">
-            How we compile <br />
-            your <span className="font-serif italic text-gold">digital authority</span>.
-          </Heading>
+          <RevealHeading>
+            <Heading level={2} className="max-w-2xl">
+              How we compile <br />
+              your <span className="font-serif italic text-gold">digital authority</span>.
+            </Heading>
+          </RevealHeading>
         </div>
 
         {/* Timeline container */}

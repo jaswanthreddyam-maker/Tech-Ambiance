@@ -10,6 +10,8 @@ import { testimonialsData } from "../../content/testimonials";
 import { MOCK_INSIGHTS } from "../../mocks/insights";
 import { MessageSquare, ArrowRight } from "lucide-react";
 import { ROUTES } from "../../routes/routes";
+import { RevealHeading } from "../motion";
+import { GoldenLightningVeins } from "../ui/GoldenLightningVeins";
 
 export const TestimonialsSection: React.FC = () => {
   const navigate = useNavigate();
@@ -20,16 +22,19 @@ export const TestimonialsSection: React.FC = () => {
 
   return (
     <Section id="testimonials" padding="normal" className="bg-ivory relative overflow-hidden">
+      <GoldenLightningVeins variant="testimonials" />
       
       {/* Testimonials Half */}
-      <Container className="mb-20">
+      <Container className="mb-20 relative z-10">
         <div className="flex flex-col items-center text-center gap-4 mb-10">
           <span className="text-[11px] uppercase font-bold tracking-[0.24em] text-gold select-none">
             Testimonials
           </span>
-          <Heading level={2}>
-            Loved by <span className="font-serif italic text-gold">forward-thinking founders</span>.
-          </Heading>
+          <RevealHeading>
+            <Heading level={2}>
+              Loved by <span className="font-serif italic text-gold">forward-thinking founders</span>.
+            </Heading>
+          </RevealHeading>
         </div>
 
         {/* Track 1: Scroll Left */}

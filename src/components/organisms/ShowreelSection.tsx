@@ -4,6 +4,7 @@ import { Section } from "../layout/Section";
 import { Container } from "../layout/Container";
 import { Heading } from "../ui/Typography";
 import { Play, Pause } from "lucide-react";
+import { RevealHeading } from "../motion";
 
 export const ShowreelSection: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -21,17 +22,19 @@ export const ShowreelSection: React.FC = () => {
   };
 
   return (
-    <Section id="showreel" padding="normal" className="bg-ivory border-t border-forest/[0.06]">
-      <Container size="wide">
+    <Section id="showreel" padding="normal" className="bg-ivory border-t border-forest/[0.06] relative overflow-hidden">
+      <Container size="wide" className="relative z-10">
         
         {/* Massive Header */}
         <div className="flex flex-col items-center text-center gap-4 mb-10">
           <span className="text-[11px] uppercase font-bold tracking-[0.24em] text-gold select-none">
             Tech Ambiance 2026
           </span>
-          <Heading level={2} className="text-forest hidden md:block">
-            Our latest <span className="font-serif italic text-gold">showreel</span>.
-          </Heading>
+          <RevealHeading>
+            <Heading level={2} className="text-forest hidden md:block">
+              Our latest <span className="font-serif italic text-gold">showreel</span>.
+            </Heading>
+          </RevealHeading>
         </div>
 
         {/* Video Container */}

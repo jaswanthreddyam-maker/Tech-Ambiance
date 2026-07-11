@@ -9,6 +9,8 @@ import { Card } from "../ui/Card";
 import { MarbleVeins } from "../ui/MarbleVeins";
 import { ROUTES } from "../../routes/routes";
 import { MOCK_PROJECTS } from "../../mocks/projects";
+import { RevealHeading } from "../motion";
+import { GoldenLightningVeins } from "../ui/GoldenLightningVeins";
 
 export const PortfolioSection: React.FC = () => {
 
@@ -16,17 +18,20 @@ export const PortfolioSection: React.FC = () => {
   const selectedProjects = MOCK_PROJECTS.filter(p => !p.featured);
 
   return (
-    <Section id="work" padding="normal" className="bg-surface border-t border-forest/[0.06]">
-      <Container>
+    <Section id="work" padding="normal" className="bg-surface border-t border-forest/[0.06] relative overflow-hidden">
+      <GoldenLightningVeins variant="portfolio" />
+      <Container className="relative z-10">
         
         {/* Title Block */}
         <div className="flex flex-col items-center text-center gap-4 mb-10">
           <span className="text-[11px] uppercase font-bold tracking-[0.24em] text-gold select-none">
             Selected Case Studies
           </span>
-          <Heading level={2}>
-            Handcrafted <span className="font-serif italic text-gold">digital products</span>
-          </Heading>
+          <RevealHeading>
+            <Heading level={2}>
+              Handcrafted <span className="font-serif italic text-gold">digital products</span>
+            </Heading>
+          </RevealHeading>
         </div>
 
         {/* Grid Layout */}

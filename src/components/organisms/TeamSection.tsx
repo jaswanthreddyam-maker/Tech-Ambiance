@@ -9,6 +9,7 @@ import { Heading } from "../ui/Typography";
 import { Card } from "../ui/Card";
 import { useCursorHover } from "../../hooks/useCursorHover";
 import { TEAM_MEMBERS } from "../../mocks/team";
+import { RevealHeading } from "../motion";
 
 // Clean SVG Icons for Social Links
 const LinkedinIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -63,10 +64,12 @@ export const TeamSection: React.FC = () => {
           <span className="text-[11px] uppercase font-bold tracking-[0.28em] text-gold select-none">
             Meet The Team
           </span>
-          <Heading level={2} className="text-forest max-w-2xl mb-0">
-            The minds behind <br />
-            <span className="font-serif italic text-gold font-normal">Tech Ambiance</span>.
-          </Heading>
+          <RevealHeading>
+            <Heading level={2} className="text-forest max-w-2xl mb-0">
+              The minds behind <br />
+              <span className="font-serif italic text-gold font-normal">Tech Ambiance</span>.
+            </Heading>
+          </RevealHeading>
         </m.div>
 
         {/* Members Cards Stack with Generous Scroll Rhythm (140px-180px gap) */}
@@ -119,8 +122,12 @@ export const TeamSection: React.FC = () => {
                     className="relative group overflow-hidden bg-surface border border-forest/[0.05] hover:border-gold/45 transition-all duration-500 ease-[0.16,1,0.3,1] shadow-md hover:shadow-2xl hover:-translate-y-1 rounded-3xl"
                     {...hoverProps}
                   >
-                    {/* Subtle Huge Editorial Numbering in top-left */}
-                    <div className="absolute top-4 left-6 md:top-8 md:left-10 text-[64px] sm:text-[76px] font-heading font-bold text-gold/10 select-none pointer-events-none leading-none z-0">
+                    {/* Subtle Huge Editorial Numbering (Left for odd cards 01/03, Right for even cards 02/04) */}
+                    <div
+                      className={`absolute top-4 md:top-8 text-[64px] sm:text-[76px] font-heading font-bold text-gold/10 select-none pointer-events-none leading-none z-0 ${
+                        isOdd ? "left-6 md:left-10" : "right-6 md:right-10"
+                      }`}
+                    >
                       {member.number}
                     </div>
 

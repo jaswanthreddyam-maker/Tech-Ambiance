@@ -10,6 +10,8 @@ import { MarbleVeins } from "../ui/MarbleVeins";
 import { ROUTES } from "../../routes/routes";
 import { useNavigate } from "react-router-dom";
 import { useConsultationModal } from "../../providers/ConsultationModalProvider";
+import { RevealHeading } from "../motion";
+import { GoldenLightningVeins } from "../ui/GoldenLightningVeins";
 
 interface ShowcaseProject {
   id: string;
@@ -161,6 +163,9 @@ export const HeroSection: React.FC = () => {
       <div className="absolute top-1/4 left-1/4 w-[300px] h-[300px] bg-gold/5 rounded-full filter blur-[100px] animate-pulse pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-gold/3 rounded-full filter blur-[120px] animate-pulse pointer-events-none" />
 
+      {/* Exquisitely crafted champagne-gold lightning veins */}
+      <GoldenLightningVeins variant="hero" />
+
       <Container className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center z-10 relative">
         {/* LEFT PANEL: Copy & CTAs */}
         <div className="lg:col-span-7 flex flex-col items-start text-left gap-8">
@@ -173,11 +178,13 @@ export const HeroSection: React.FC = () => {
             <span className="text-[11px] uppercase font-bold tracking-[0.24em] text-gold select-none">
               Premium Digital Studio
             </span>
-            <Heading level={1}>
-              We build digital <br />
-              <span className="font-serif italic text-gold">experiences</span> that <br />
-              businesses remember.
-            </Heading>
+            <RevealHeading>
+              <Heading level={1}>
+                We build digital <br />
+                <span className="font-serif italic text-gold">experiences</span> that <br />
+                businesses remember.
+              </Heading>
+            </RevealHeading>
           </m.div>
 
           <m.div
