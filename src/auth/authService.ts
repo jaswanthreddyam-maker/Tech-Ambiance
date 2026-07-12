@@ -27,6 +27,92 @@ export function computePermissions(roles: AuthRoleName[]): Record<string, boolea
 }
 
 export const authService = {
+  // ==============================================================================
+  // ADMIN AUTHENTICATION (STUDIOHQ)
+  // ==============================================================================
+
+  async signInWithPrimaryFactor(email: string) {
+    if (!isSupabaseConfigured) {
+      // Mock success for unconfigured environments
+      return { success: true, error: null };
+    }
+
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        shouldCreateUser: true, // Auto-signup allows seamless onboarding and prevents email enumeration
+      },
+    });
+
+    if (error) {
+      // We still throw so the UI can show generic "Unable to dispatch code" if network fails,
+      // but we shouldn't reveal email existence. Supabase handles this natively.
+      throw error;
+    }
+
+    return { success: true, error: null };
+  },
+
+  async verifyPrimaryFactor(email: string, token: string, deviceTracking: boolean) {
+    if (!isSupabaseConfigured) {
+      // Mock validation
+      if (token === "000000") {
+        return { success: true, user: { id: "mock-id", email } };
+      }
+      throw new Error("Invalid verification code.");
+    }
+
+    // 1. Verify OTP with Supabase Auth
+    const { data, error } = await supabase.auth.verifyOtp({
+      email,
+      token,
+      type: 'email',
+    });
+
+    if (error) {
+      throw new Error("Invalid or expired verification code.");
+    }
+
+    // 2. Check Authorization post-OTP
+    const { data: isAuthorized, error: authError } = await supabase.rpc('verify_admin_authorization', {
+      p_email: email
+    });
+
+    if (authError || !isAuthorized) {
+      // Unauthorized: Log event, sign out immediately, throw error
+      await supabase.rpc('log_admin_auth_event', {
+        p_email: email,
+        p_action: 'UnauthorizedAttempt'
+      });
+      await supabase.auth.signOut();
+      throw new Error("This account is not authorized to access StudioHQ.");
+    }
+
+    // 3. Authorized: Log event and register session metadata
+    await supabase.rpc('log_admin_auth_event', {
+      p_email: email,
+      p_action: 'AdminSignedIn'
+    });
+
+    // In a real app, you'd extract real OS/Browser from userAgent
+    const userAgent = navigator.userAgent;
+    await supabase.rpc('register_admin_session', {
+      p_email: email,
+      p_session_id: crypto.randomUUID(),
+      p_browser: userAgent.includes('Chrome') ? 'Chrome' : 'Browser',
+      p_os: userAgent.includes('Windows') ? 'Windows' : userAgent.includes('Mac') ? 'macOS' : 'Unknown',
+      p_ip: 'Client IP', // Usually captured via Supabase Edge Function or realtime header, mockup here
+      p_country: 'Unknown',
+      p_is_trusted: deviceTracking
+    });
+
+    return { success: true, user: data.user, session: data.session };
+  },
+
+  // ==============================================================================
+  // CLIENT AUTHENTICATION (CLIENT PORTAL)
+  // ==============================================================================
+
   async signUpWithEmail(email: string, password: string, fullName: string) {
     if (!isSupabaseConfigured) {
       return { success: true, requiresVerification: false, error: null };
@@ -209,7 +295,11 @@ export const authService = {
       });
     }
     if (roles.length === 0) {
-      roles.push("CLIENT");
+      if (import.meta.env.DEV) {
+        roles.push("OWNER"); // Bypass restriction in local development
+      } else {
+        roles.push("CLIENT");
+      }
     }
 
     // 3. Fetch Organization
@@ -244,4 +334,6 @@ export const authService = {
       permissions,
     };
   },
+
+
 };

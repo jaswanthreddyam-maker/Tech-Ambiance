@@ -6,12 +6,13 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
 export const isSupabaseConfigured = Boolean(
   supabaseUrl &&
     supabaseAnonKey &&
-    supabaseUrl !== "https://your-supabase-project-id.supabase.co"
+    supabaseUrl !== "https://your-supabase-project-id.supabase.co" &&
+    (supabaseAnonKey.startsWith("eyJ") || supabaseAnonKey.startsWith("sb_publishable_"))
 );
 
-if (!isSupabaseConfigured && import.meta.env.DEV) {
-  console.warn(
-    "[Supabase Enterprise Auth] VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY not set in .env. Authentication will run in local demo fallback mode until credentials are provided."
+if (!isSupabaseConfigured) {
+  console.error(
+    "🚨 SUPABASE NOT CONFIGURED: Invalid or missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY. CRM Submissions are disabled."
   );
 }
 

@@ -21,53 +21,39 @@ interface ShowcaseProject {
   description: string;
   live: boolean;
   accent: string;
+  image?: string;
 }
 
 const SHOWCASE_PROJECTS: ShowcaseProject[] = [
   {
     id: "vistaara",
-    title: "Cafe Vistaara",
+    title: "Coffy Mine",
     category: "Luxury Hospitality",
     url: "techambiance.studio/vistaara",
     description: "A complete digital transformation focusing on organic reservations and an immersive brand experience.",
     live: true,
-    accent: "from-[#C5A572]/25 via-[#06291E]/80 to-[#06291E]"
+    accent: "from-[#C5A572]/25 via-[#06291E]/80 to-[#06291E]",
+    image: "/assets/images/projects/coffee-mine-cover.png"
   },
   {
     id: "coffea",
-    title: "Coffea",
+    title: "Cafe",
     category: "Artisanal Coffee Studio",
     url: "coffeastudio.in",
     description: "Bespoke sensory e-commerce flagship crafted with calm stone-inspired architecture and rapid edge checkout.",
     live: true,
-    accent: "from-[#D8C090]/30 via-[#06291E]/85 to-[#06291E]"
-  },
-  {
-    id: "cafelly",
-    title: "Cafelly",
-    category: "Specialty Roaster Platform",
-    url: "cafelly.com",
-    description: "High-performance subscription portal and storytelling hub for high-end specialty coffee connoisseurs.",
-    live: true,
-    accent: "from-[#C5A572]/20 via-[#06291E]/80 to-[#06291E]"
+    accent: "from-[#D8C090]/30 via-[#06291E]/85 to-[#06291E]",
+    image: "/assets/images/projects/cafe-cover-hero.png"
   },
   {
     id: "kubera",
-    title: "Kubera Cafe",
+    title: "Gym",
     category: "Fine Dining Flagship",
     url: "kuberacafe.luxury",
     description: "Architectural table booking and immersive culinary lookbook engineered for zero layout shift.",
     live: true,
-    accent: "from-[#E0C896]/25 via-[#06291E]/85 to-[#06291E]"
-  },
-  {
-    id: "brewbakes",
-    title: "Brew Bakes",
-    category: "Bakery & Patisserie Network",
-    url: "brewbakes.co",
-    description: "Omnichannel digital ordering experience and high-speed visual menu system for premium patisseries.",
-    live: true,
-    accent: "from-[#C5A572]/30 via-[#06291E]/80 to-[#06291E]"
+    accent: "from-[#E0C896]/25 via-[#06291E]/85 to-[#06291E]",
+    image: "/assets/images/projects/gym-bolt-cover.png"
   },
   {
     id: "technews",
@@ -76,7 +62,8 @@ const SHOWCASE_PROJECTS: ShowcaseProject[] = [
     url: "technewstoday.co",
     description: "High-scale editorial publishing platform delivering sub-40ms global edge readership across 4.8M readers.",
     live: true,
-    accent: "from-[#FAF7F0]/25 via-[#06291E]/85 to-[#06291E]"
+    accent: "from-[#FAF7F0]/25 via-[#06291E]/85 to-[#06291E]",
+    image: "/assets/images/projects/tech-news-cover.png"
   },
   {
     id: "scoutai",
@@ -94,7 +81,8 @@ const SHOWCASE_PROJECTS: ShowcaseProject[] = [
     url: "gochicken.express",
     description: "Custom real-time dispatch and streamlined mobile-first ordering flagship engineered for extreme reliability.",
     live: true,
-    accent: "from-[#C5A572]/25 via-[#06291E]/85 to-[#06291E]"
+    accent: "from-[#C5A572]/25 via-[#06291E]/85 to-[#06291E]",
+    image: "/assets/images/projects/go-chicken-cover-hero.png"
   }
 ];
 
@@ -296,17 +284,36 @@ export const HeroSection: React.FC = () => {
                   style={{ willChange: "transform, opacity" }}
                   onClick={() => navigate(ROUTES.work)}
                 >
-                  {/* Backdrop Radial Illumination */}
-                  <div className={`absolute inset-0 bg-gradient-to-tr ${activeProject.accent} opacity-60 pointer-events-none`} />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#06291E] via-[#06291E]/60 to-transparent z-10 pointer-events-none" />
+                  {/* Slide Image or Fallback */}
+                  {activeProject.image && (
+                    <img 
+                      src={activeProject.image} 
+                      alt={activeProject.title}
+                      className="absolute inset-0 w-full h-full object-cover pointer-events-none" 
+                    />
+                  )}
+
+                  {/* Backdrop Radial Illumination & Text Legibility Gradient */}
+                  {!activeProject.image && (
+                    <div className={`absolute inset-0 bg-gradient-to-tr ${activeProject.accent} opacity-60 pointer-events-none`} />
+                  )}
+                  <div 
+                    className={`absolute inset-0 z-10 pointer-events-none ${
+                      activeProject.image 
+                        ? 'bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80' 
+                        : 'bg-gradient-to-t from-[#06291E] via-[#06291E]/60 to-transparent'
+                    }`} 
+                  />
 
                   {/* Marble Champagne Veins */}
-                  <MarbleVeins />
+                  {!activeProject.image && <MarbleVeins />}
 
                   {/* Decorative Luxury Abstract Ring */}
-                  <div className="absolute inset-0 opacity-20 flex items-center justify-center pointer-events-none z-10">
-                    <div className="w-[115%] h-[115%] border-[36px] border-gold/30 rounded-full blur-3xl" />
-                  </div>
+                  {!activeProject.image && (
+                    <div className="absolute inset-0 opacity-20 flex items-center justify-center pointer-events-none z-10">
+                      <div className="w-[115%] h-[115%] border-[36px] border-gold/30 rounded-full blur-3xl" />
+                    </div>
+                  )}
 
                   {/* Slide Content */}
                   <div className="relative z-20 flex flex-col gap-2">

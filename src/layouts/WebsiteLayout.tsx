@@ -7,7 +7,7 @@ import { AppCanvas } from "./AppCanvas";
 
 export const WebsiteLayout: React.FC = () => {
   return (
-    <div className="min-h-screen bg-white text-text-primary flex flex-col relative">
+    <div className="min-h-screen bg-white text-text-primary flex flex-col relative overflow-x-hidden w-full max-w-full">
       {/* Paper Texture Overlay */}
       <div className="paper-texture" />
 

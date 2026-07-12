@@ -86,4 +86,5 @@ export interface AuthContextState {
   updatePassword: (newPassword: string) => Promise<boolean>;
   hasRole: (role: AuthRoleName | AuthRoleName[]) => boolean;
   hasPermission: (permission: string) => boolean;
+  checkSession: () => Promise<void>;
 }

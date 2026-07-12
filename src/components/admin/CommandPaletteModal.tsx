@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import {
   Search,
   Briefcase,
-  KanbanSquare,
   Sparkles,
   Globe,
   X,
   ArrowRight,
 } from 'lucide-react';
-import { MOCK_WORKSPACES, MOCK_CRM_LEADS } from '../../mocks/studioHQ';
+import { workspaceRepository } from '../../repositories/workspaceRepository';
+import type { WorkspaceItem } from '../../types/studioHQ';
 
 interface CommandPaletteModalProps {
   isOpen: boolean;
@@ -21,35 +21,31 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
   onClose,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [workspaces, setWorkspaces] = useState<WorkspaceItem[]>([]);
+  const [isLoadingWs, setIsLoadingWs] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (isOpen) {
       setSearchQuery('');
+      setIsLoadingWs(true);
+      workspaceRepository.getWorkspaces()
+        .then((data) => setWorkspaces(data))
+        .catch(() => setWorkspaces([]))
+        .finally(() => setIsLoadingWs(false));
     }
   }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const filteredWorkspaces = MOCK_WORKSPACES.filter(
+  const filteredWorkspaces = workspaces.filter(
     (ws) =>
       ws.workspaceName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       ws.clientCompany.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const filteredLeads = MOCK_CRM_LEADS.filter(
-    (lead) =>
-      lead.businessName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      lead.industry.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   const handleSelectWorkspace = (slug?: string) => {
     navigate(slug ? `/admin/workspaces/${slug}` : `/admin/workspaces`);
-    onClose();
-  };
-
-  const handleSelectLead = () => {
-    navigate(`/admin/crm`);
     onClose();
   };
 
@@ -83,7 +79,18 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
               Client Workspaces
             </div>
             <div className="space-y-1.5">
-              {filteredWorkspaces.map((ws) => (
+              {isLoadingWs && (
+                <div className="flex items-center justify-center py-4">
+                  <div className="w-4 h-4 border-2 border-[#C9A56A] border-t-transparent rounded-full animate-spin" />
+                  <span className="ml-2 text-xs text-[#0B3027]/50">Loading workspaces…</span>
+                </div>
+              )}
+              {!isLoadingWs && filteredWorkspaces.length === 0 && (
+                <div className="px-4 py-3 text-xs text-[#0B3027]/45">
+                  {searchQuery ? 'No workspaces match your search.' : 'No workspaces found.'}
+                </div>
+              )}
+              {!isLoadingWs && filteredWorkspaces.map((ws) => (
                 <div
                   key={ws.id}
                   onClick={() => handleSelectWorkspace(ws.slug)}
@@ -111,41 +118,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
             </div>
           </div>
 
-          {/* CRM Leads Section */}
-          <div>
-            <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#9A7B4F] px-3 py-1">
-              CRM Consultation Leads
-            </div>
-            <div className="space-y-1.5">
-              {filteredLeads.map((lead) => (
-                <div
-                  key={lead.id}
-                  onClick={handleSelectLead}
-                  className="flex items-center justify-between px-4 py-3 rounded-2xl bg-white/80 hover:bg-white border border-[#0B3027]/8 hover:border-[#C9A56A]/50 shadow-sm hover:shadow-md cursor-pointer transition-all group"
-                >
-                  <div className="flex items-center gap-3.5">
-                    <div className="p-2 rounded-xl bg-[#C9A56A]/15 text-[#9A7B4F]">
-                      <KanbanSquare className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-sm font-bold text-[#0B3027]">
-                        {lead.businessName}
-                      </div>
-                      <div className="text-xs text-[#0B3027]/65">
-                        {lead.industry} • Scorecard: {lead.telemetryScore}/100
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-semibold bg-emerald-600/10 text-emerald-800">
-                      {lead.pipelineStage}
-                    </span>
-                    <ArrowRight className="w-4 h-4 text-[#C9A56A] opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+
 
           {/* Quick Actions */}
           <div>

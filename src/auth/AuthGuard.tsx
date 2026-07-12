@@ -44,6 +44,9 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
   }
 
   if (!isAuthenticated) {
+    if (location.pathname.startsWith("/admin")) {
+      return <Navigate to="/admin/login" state={{ from: location }} replace />;
+    }
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 

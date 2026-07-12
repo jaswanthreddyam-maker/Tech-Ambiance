@@ -275,6 +275,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     return Boolean(permissions[permission]);
   };
 
+  const checkSession = async (): Promise<void> => {
+    setIsLoading(true);
+    if (!isSupabaseConfigured) {
+      const storedUser = localStorage.getItem("ta_user");
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        setRoles(["OWNER"]);
+      }
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      setSession(currentSession);
+      setAuthUser(currentSession?.user || null);
+
+      if (currentSession?.user) {
+        await loadFullAuthContext(currentSession.user.id, currentSession);
+      } else {
+        setUser(null);
+        setProfile(null);
+        setOrganization(null);
+        setWorkspace(null);
+        setRoles([]);
+        setPermissions({});
+      }
+    } catch (err) {
+      console.error("[Enterprise Auth] checkSession error:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const isAuthenticated = Boolean(user || authUser);
   const isEmailVerified = Boolean(
     authUser ? authUser.email_confirmed_at : isAuthenticated
@@ -303,6 +338,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         updatePassword,
         hasRole,
         hasPermission,
+        checkSession,
       }}
     >
       {children}

@@ -79,8 +79,8 @@ export const SuccessStoriesSection: React.FC = () => {
             </m.div>
           </div>
 
-          {/* Desktop 3-Card Layout / Mobile Swipeable Snap Carousel */}
-          <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-6 lg:grid lg:grid-cols-3 lg:gap-8 lg:overflow-visible lg:pb-0 items-stretch">
+          {/* Mobile Swipeable Snap Carousel / Desktop 3-Card Grid */}
+          <div className="flex overflow-x-auto snap-x snap-mandatory gap-5 pb-6 lg:grid lg:grid-cols-3 lg:gap-8 lg:overflow-visible lg:pb-0 items-stretch w-full">
             {SUCCESS_STORIES.map((story, idx) => {
               const isMiddleCard = idx === 1;
 
@@ -91,8 +91,14 @@ export const SuccessStoriesSection: React.FC = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.2 }}
                   transition={{ duration: 0.75, delay: idx * 0.15, ease: [0.16, 1, 0.3, 1] }}
-                  onClick={() => navigate(`/experience/case-studies/${story.slug}`)}
-                  className={`min-w-[88vw] sm:min-w-[420px] lg:min-w-0 snap-center rounded-3xl bg-emerald-stone border border-gold/25 hover:border-gold/65 transition-all duration-500 cursor-pointer flex flex-col justify-between group relative overflow-hidden shadow-[0_12px_36px_rgba(8,38,31,0.12)] hover:shadow-[0_24px_60px_rgba(201,165,106,0.22)] ${
+                  onClick={() => {
+                    if (story.externalUrl) {
+                      window.open(story.externalUrl, '_blank', 'noopener,noreferrer');
+                    } else {
+                      navigate(`/experience/case-studies/${story.slug}`);
+                    }
+                  }}
+                  className={`min-w-[85%] max-w-[85%] sm:min-w-[360px] sm:max-w-[360px] lg:min-w-0 lg:max-w-none w-full shrink-0 snap-center rounded-3xl bg-emerald-stone border border-gold/25 hover:border-gold/65 transition-all duration-500 cursor-pointer flex flex-col justify-between group relative overflow-hidden shadow-[0_12px_36px_rgba(8,38,31,0.12)] hover:shadow-[0_24px_60px_rgba(201,165,106,0.22)] ${
                     isMiddleCard
                       ? 'lg:scale-[1.05] lg:-translate-y-2 ring-1 ring-gold/40 z-20'
                       : 'hover:-translate-y-2 z-10'
@@ -107,7 +113,7 @@ export const SuccessStoriesSection: React.FC = () => {
                   </div>
 
                   {/* Top Preview Image Container with Luxury Overlay */}
-                  <div className="relative h-56 sm:h-64 w-full overflow-hidden rounded-t-3xl bg-[#08261F]">
+                  <div className="relative h-48 sm:h-56 lg:h-64 w-full overflow-hidden rounded-t-3xl bg-[#08261F]">
                     <div
                       className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-105"
                       style={{ background: story.thumbnail }}
@@ -116,7 +122,7 @@ export const SuccessStoriesSection: React.FC = () => {
                       src={story.featuredImage}
                       alt={story.title}
                       loading="lazy"
-                      className="w-full h-full object-cover object-center opacity-85 group-hover:opacity-100 transition-all duration-700 ease-out group-hover:scale-105"
+                      className={`w-full h-full object-center opacity-85 group-hover:opacity-100 transition-all duration-700 ease-out group-hover:scale-105 ${story.imageFit === 'contain' ? 'object-contain' : 'object-cover'}`}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-emerald-stone via-emerald-stone/30 to-transparent" />
 
@@ -129,7 +135,7 @@ export const SuccessStoriesSection: React.FC = () => {
                   </div>
 
                   {/* Card Content & Metrics */}
-                  <div className="p-7 sm:p-8 flex-1 flex flex-col justify-between space-y-6 relative z-10">
+                  <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between space-y-6 relative z-10">
                     <div className="space-y-3">
                       <h3 className="font-serif text-2xl sm:text-3xl font-bold text-gold group-hover:text-white transition-colors duration-300">
                         {story.title}
@@ -156,10 +162,10 @@ export const SuccessStoriesSection: React.FC = () => {
                     {/* Premium CTA Button */}
                     <div className="pt-4 flex items-center justify-between border-t border-gold/10">
                       <span className="text-xs font-semibold tracking-wider uppercase text-gold group-hover:text-white transition-colors duration-300">
-                        Read Case Study
+                        {story.externalUrl ? "Visit Live Site" : "Read Case Study"}
                       </span>
                       <div className="w-8 h-8 rounded-full bg-gold/15 border border-gold/30 flex items-center justify-center text-gold group-hover:bg-gold group-hover:text-[#08261F] transition-all duration-300">
-                        <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+                        {story.externalUrl ? <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5 -rotate-45" /> : <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" />}
                       </div>
                     </div>
                   </div>

@@ -14,11 +14,29 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { CommandPaletteModal } from '../components/admin/CommandPaletteModal';
+import { SessionTimeout } from '../auth/SessionTimeout';
+import { ceoDashboardRepository } from '../repositories/ceoDashboardRepository';
 
 export const StudioHQLayout: React.FC = () => {
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [totalQueue, setTotalQueue] = useState(0);
+  const [apiHealthPercent, setApiHealthPercent] = useState(100);
+  
   const navigate = useNavigate();
   const location = useLocation();
+
+  React.useEffect(() => {
+    // Fetch global operations health to populate top navbar badges
+    ceoDashboardRepository.getOperationsHealth().then(healthStats => {
+      if (!healthStats || healthStats.length === 0) return;
+      
+      const queueSize = healthStats.reduce((sum: number, h: any) => sum + (h.outbox_lag || 0), 0);
+      setTotalQueue(queueSize);
+      
+      const healthyCount = healthStats.filter((h: any) => h.status === 'HEALTHY').length;
+      setApiHealthPercent(Math.round((healthyCount / healthStats.length) * 100));
+    });
+  }, []);
 
   // Keyboard listener for Ctrl + K / Cmd + K
   React.useEffect(() => {
@@ -54,7 +72,8 @@ export const StudioHQLayout: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F6F1] text-[#0B3027] font-['Inter'] flex selection:bg-[#C9A56A]/25 selection:text-[#0B3027]">
+    <SessionTimeout>
+      <div className="min-h-screen bg-[#F8F6F1] text-[#0B3027] font-['Inter'] flex selection:bg-[#C9A56A]/25 selection:text-[#0B3027]">
       {/* Deep Emerald Luxury Sidebar */}
       <aside className="w-68 shrink-0 bg-[#0B3027] text-[#F8F6F1] border-r border-[#C9A56A]/20 p-5 flex flex-col justify-between z-40 shadow-2xl">
         <div className="space-y-7">
@@ -203,12 +222,12 @@ export const StudioHQLayout: React.FC = () => {
           {/* Minimalist Studio Health Pills */}
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/80 border border-[#0B3027]/10 shadow-sm text-xs font-semibold text-[#0B3027]">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Worker Queue: 0</span>
+              <span className={`w-2 h-2 rounded-full ${totalQueue > 0 ? 'bg-amber-500' : 'bg-emerald-500 animate-pulse'}`} />
+              <span>Worker Queue: {totalQueue}</span>
             </div>
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/80 border border-[#C9A56A]/30 shadow-sm text-xs font-semibold text-[#9A7B4F]">
               <Activity className="w-3.5 h-3.5 text-[#C9A56A]" />
-              <span>API: 100%</span>
+              <span>API: {apiHealthPercent}%</span>
             </div>
             <button
               onClick={() => navigate('/landing')}
@@ -234,5 +253,6 @@ export const StudioHQLayout: React.FC = () => {
         onClose={() => setIsCommandPaletteOpen(false)}
       />
     </div>
+    </SessionTimeout>
   );
 };

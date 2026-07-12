@@ -1,8 +1,6 @@
 import type {
   WorkspaceItem,
   LinearTaskItem,
-  EncryptedSecretItem,
-  CrmLeadItem,
   StudioEventItem,
 } from '../types/studioHQ';
 
@@ -96,7 +94,7 @@ export const MOCK_LINEAR_TASKS: LinearTaskItem[] = [
   },
 ];
 
-export const MOCK_CREDENTIALS_VAULT: EncryptedSecretItem[] = [
+export const MOCK_SECRETS: any[] = [
   {
     id: 'cred-1',
     serviceName: 'Cloudflare Edge DNS & Production SSL',
@@ -120,73 +118,7 @@ export const MOCK_CREDENTIALS_VAULT: EncryptedSecretItem[] = [
   },
 ];
 
-export const MOCK_CRM_LEADS: CrmLeadItem[] = [
-  {
-    id: 'lead-1',
-    businessName: 'Apex Dining Group Flagship',
-    industry: 'Restaurant',
-    telemetryScore: 88,
-    pipelineStage: 'NEGOTIATION',
-    budgetRange: '50K-100K+',
-    timelineRange: 'Within 2 Weeks',
-    contactName: 'Rohan Deshmukh',
-    contactEmail: 'rohan@apexdining.com',
-    amountFormatted: '$65,000',
-    currencyCode: 'USD',
-  },
-  {
-    id: 'lead-2',
-    businessName: 'Velvet Lounge Luxury Suites',
-    industry: 'Hotel',
-    telemetryScore: 84,
-    pipelineStage: 'PROPOSAL_SENT',
-    budgetRange: '25K-50K',
-    timelineRange: '1 Month',
-    contactName: 'Siddharth Rao',
-    contactEmail: 'siddharth@velvetlounge.in',
-    amountFormatted: '$42,000',
-    currencyCode: 'USD',
-  },
-  {
-    id: 'lead-3',
-    businessName: 'Aethelgard Aesthetics Clinic',
-    industry: 'Clinic',
-    telemetryScore: 79,
-    pipelineStage: 'MEETING_SCHEDULED',
-    budgetRange: '25K-50K',
-    timelineRange: 'Within 2 Weeks',
-    contactName: 'Dr. Neha Verma',
-    contactEmail: 'nverma@aethelgard.clinic',
-    amountFormatted: '₹32,00,000',
-    currencyCode: 'INR',
-  },
-  {
-    id: 'lead-4',
-    businessName: 'Prestige Realty & Skyline Towers',
-    industry: 'Real Estate',
-    telemetryScore: 92,
-    pipelineStage: 'WON',
-    budgetRange: '50K-100K+',
-    timelineRange: 'Within 2 Weeks',
-    contactName: 'Kunal Singhania',
-    contactEmail: 'kunal@prestigerealestate.com',
-    amountFormatted: '$85,000',
-    currencyCode: 'USD',
-  },
-  {
-    id: 'lead-5',
-    businessName: 'Aura Artisan Salon Spa',
-    industry: 'Salon',
-    telemetryScore: 65,
-    pipelineStage: 'LEAD',
-    budgetRange: '25K-50K',
-    timelineRange: 'More than 1 Month',
-    contactName: 'Tanvi Nair',
-    contactEmail: 'tanvi@aurasalon.co',
-    amountFormatted: '$28,000',
-    currencyCode: 'USD',
-  },
-];
+
 
 export const MOCK_STUDIO_TIMELINE: StudioEventItem[] = [
   {

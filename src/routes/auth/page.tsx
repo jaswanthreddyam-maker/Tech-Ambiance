@@ -36,7 +36,7 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 
 export const AuthPage: React.FC = () => {
   const navigate = useNavigate();
-  const { login, signup, loginWithGoogle, resetPasswordForEmail } = useAuth();
+  const { login, signup, loginWithGoogle, resetPasswordForEmail, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const { setSEO } = React.useRef(useSEO()).current;
   const hoverProps = useCursorHover("pointer");
@@ -54,6 +54,12 @@ export const AuthPage: React.FC = () => {
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
   const [isForgotSubmitting, setIsForgotSubmitting] = useState(false);
+
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/portal", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   React.useEffect(() => {
     const mode = searchParams.get("mode");
@@ -138,7 +144,8 @@ export const AuthPage: React.FC = () => {
       await loginWithGoogle();
       
       // Check if we are running in local mock mode
-      const isMockMode = !import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_URL === "https://your-supabase-project-id.supabase.co";
+      const { isSupabaseConfigured } = await import("../../lib/supabase");
+      const isMockMode = !isSupabaseConfigured;
       
       if (isMockMode) {
         setIsSuccess(true);

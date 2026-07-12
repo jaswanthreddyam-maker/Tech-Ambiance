@@ -20,7 +20,8 @@ import {
   TrendingUp,
   Award,
 } from "lucide-react";
-import { agencyOsService } from "../../api/agencyOsService";
+import { crmRepository } from "../../repositories/crmRepository";
+import { isSupabaseConfigured } from "../../lib/supabase";
 
 interface StrategyConsultationModalProps {
   isOpen: boolean;
@@ -114,11 +115,19 @@ export const StrategyConsultationModal: React.FC<StrategyConsultationModalProps>
   const [analysisProgress, setAnalysisProgress] = useState<number>(0);
   const [analysisText, setAnalysisText] = useState<string>("Initializing telemetry...");
 
+  // Submission Resiliency
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [idempotencyKey, setIdempotencyKey] = useState("");
+
   // Reset modal state when opened
   useEffect(() => {
     if (isOpen) {
       setStep(1);
       setAnalysisProgress(0);
+      setIsSubmitting(false);
+      setSubmitError("");
+      setIdempotencyKey(crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(7));
     }
   }, [isOpen]);
 
@@ -239,27 +248,38 @@ export const StrategyConsultationModal: React.FC<StrategyConsultationModalProps>
       alert("Please fill in Name, Phone, and Email.");
       return;
     }
+
+    setIsSubmitting(true);
+    setSubmitError("");
+
     try {
-      await agencyOsService.crm.submitConsultationLead({
-        business_name: formData.businessName,
-        industry: formData.industry,
-        website: formData.website,
-        instagram: formData.instagram,
-        city: formData.city,
-        heard_source: formData.heardSource,
-        goals: formData.goals,
-        budget_range: formData.budget,
-        timeline: formData.timeline,
-        contact_name: formData.name,
-        contact_phone: formData.phone,
-        contact_email: formData.email,
-        preferred_contact: formData.preferredContact,
-        message: formData.message,
-      });
-    } catch (err) {
-      console.warn("CRM lead submission note:", err);
+      await crmRepository.createLead(
+        {
+          business_name: formData.businessName,
+          industry: formData.industry,
+          website: formData.website,
+          instagram: formData.instagram,
+          city: formData.city,
+          heard_source: formData.heardSource,
+          goals: formData.goals,
+          budget_range: formData.budget,
+          timeline: formData.timeline,
+          contact_name: formData.name,
+          contact_phone: formData.phone,
+          contact_email: formData.email,
+          preferred_contact: formData.preferredContact,
+          message: formData.message,
+        },
+        idempotencyKey
+      );
+      // DB persisted successfully, move to success screen
+      setStep(4); // Start Live Analysis
+    } catch (err: any) {
+      console.error("CRM lead submission failed:", err);
+      setSubmitError(err.message || "Failed to submit consultation. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
-    setStep(4); // Start Live Analysis
   };
 
   // Generate printable/downloadable Digital Snapshot PDF Report
@@ -577,13 +597,21 @@ export const StrategyConsultationModal: React.FC<StrategyConsultationModalProps>
             </div>
 
             {/* Scrollable Body Content */}
-            <div
-              className="relative z-10 p-6 sm:p-9 overflow-y-auto overscroll-contain flex-grow"
-              data-lenis-prevent="true"
-              onWheel={(e) => e.stopPropagation()}
-              onTouchMove={(e) => e.stopPropagation()}
-            >
-              <AnimatePresence mode="wait">
+            <div className="relative z-10 flex-1 overflow-y-auto overflow-x-hidden p-6 sm:p-10 custom-scrollbar">
+              {!isSupabaseConfigured ? (
+                <div className="py-12 flex flex-col items-center justify-center text-center max-w-md mx-auto">
+                  <div className="w-16 h-16 rounded-full bg-[#C9A56A]/10 border border-[#C9A56A]/20 flex items-center justify-center mb-6">
+                    <Mail className="w-8 h-8 text-[#C9A56A]" />
+                  </div>
+                  <h3 className="font-heading font-bold text-2xl text-[#F7F3EA] mb-4">
+                    Temporarily Unavailable
+                  </h3>
+                  <p className="text-sm text-[#F7F3EA]/70 leading-relaxed mb-8">
+                    We are temporarily unable to receive automated submissions. Please email <span className="text-[#C9A56A] font-semibold">hello@techambiance.com</span> or call us directly to book your strategy consultation.
+                  </p>
+                </div>
+              ) : (
+                <AnimatePresence mode="wait">
                 {/* ========================================================
                     STEP 1: BUSINESS INFORMATION
                 ======================================================== */}
@@ -1024,12 +1052,28 @@ export const StrategyConsultationModal: React.FC<StrategyConsultationModalProps>
 
                       <button
                         type="submit"
-                        className="inline-flex items-center gap-2.5 bg-gold text-forest px-8 py-4 rounded-full font-heading font-bold text-xs uppercase tracking-widest hover:bg-ivory transition-all shadow-[0_8px_24px_rgba(197,165,114,0.35)]"
+                        disabled={isSubmitting}
+                        className="inline-flex items-center gap-2.5 bg-gold text-forest px-8 py-4 rounded-full font-heading font-bold text-xs uppercase tracking-widest hover:bg-ivory disabled:opacity-70 disabled:cursor-not-allowed transition-all shadow-[0_8px_24px_rgba(197,165,114,0.35)]"
                       >
-                        <span>Book My Free Strategy Call</span>
-                        <ArrowRight className="w-4 h-4" />
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>Sending...</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>Submit Request</span>
+                            <ArrowRight className="w-4 h-4" />
+                          </>
+                        )}
                       </button>
                     </div>
+
+                    {submitError && (
+                      <div className="mt-4 p-4 rounded-xl border border-red-500/20 bg-red-500/10 text-center">
+                        <p className="text-xs text-red-200">Unable to submit. Please contact us directly at <span className="font-bold underline">hello@techambiance.com</span></p>
+                      </div>
+                    )}
                   </motion.form>
                 )}
 
@@ -1192,7 +1236,8 @@ export const StrategyConsultationModal: React.FC<StrategyConsultationModalProps>
                     </div>
                   </motion.div>
                 )}
-              </AnimatePresence>
+                </AnimatePresence>
+              )}
             </div>
           </motion.div>
         </div>

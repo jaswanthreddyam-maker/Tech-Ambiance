@@ -33,7 +33,9 @@ html, body {
   font-family: var(--font-body);
   margin: 0;
   padding: 0;
-  overflow-x: clip;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

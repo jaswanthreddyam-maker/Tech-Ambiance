@@ -3,7 +3,7 @@ import { m } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Mail, Phone, MapPin, Loader2, ArrowRight } from "lucide-react";
+import { Mail, Phone, MapPin, Loader2, ArrowRight, ChevronDown } from "lucide-react";
 import { useToast } from "../../providers/ToastProvider";
 import { Section } from "../layout/Section";
 import { Container } from "../layout/Container";
@@ -30,11 +30,17 @@ export const ContactSection: React.FC = () => {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),
     mode: "onChange",
+    defaultValues: { projectType: "" }
   });
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const selectedProjectType = watch("projectType");
 
   const onSubmit = async (data: ContactFormValues) => {
     setIsSubmitting(true);
@@ -158,22 +164,45 @@ export const ContactSection: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Select Project Type */}
-                <div className="flex flex-col gap-1.5">
+                {/* Custom Select Project Type */}
+                <div className="flex flex-col gap-1.5 relative">
                   <label className="text-[9px] uppercase font-bold tracking-[0.2em] text-text-secondary/70">
                     Select Project Requirement
                   </label>
-                  <select
-                    className="w-full bg-surface border border-forest/[0.06] focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/30 rounded-xl py-3 px-4 text-xs font-medium text-text-primary transition-all"
-                    {...register("projectType")}
+                  
+                  {/* Hidden input for react-hook-form integration */}
+                  <input type="hidden" {...register("projectType")} />
+                  
+                  <button
+                    type="button"
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    className={`w-full bg-surface border ${isDropdownOpen ? 'border-gold/60 ring-1 ring-gold/30' : 'border-forest/[0.06]'} flex items-center justify-between rounded-xl py-3 px-4 text-xs font-medium text-text-primary transition-all`}
                   >
-                    <option value="">-- Choose option --</option>
-                    {projectTypes.map((type) => (
-                      <option key={type} value={type}>
-                        {type}
-                      </option>
-                    ))}
-                  </select>
+                    <span className={selectedProjectType ? "text-text-primary" : "text-text-secondary/35"}>
+                      {selectedProjectType || "-- Choose option --"}
+                    </span>
+                    <ChevronDown className={`w-4 h-4 text-forest/40 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  <div className={`absolute z-50 top-full left-0 right-0 mt-2 bg-surface/95 backdrop-blur-xl border border-forest/[0.06] shadow-2xl shadow-forest/5 rounded-xl overflow-hidden transition-all duration-300 origin-top ${isDropdownOpen ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0 pointer-events-none'}`}>
+                    <div className="py-1">
+                      {projectTypes.map((type) => (
+                        <button
+                          key={type}
+                          type="button"
+                          onClick={() => {
+                            setValue("projectType", type, { shouldValidate: true });
+                            setIsDropdownOpen(false);
+                          }}
+                          className={`w-full text-left px-4 py-2.5 text-xs font-medium transition-colors hover:bg-gold/10 hover:text-gold ${selectedProjectType === type ? 'bg-gold/5 text-gold' : 'text-text-primary/70'}`}
+                        >
+                          {type}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   {errors.projectType && (
                     <span className="text-[10px] font-bold text-red-500 mt-0.5">
                       {errors.projectType.message}

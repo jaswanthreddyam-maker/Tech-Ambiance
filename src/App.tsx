@@ -1,6 +1,5 @@
 import React from "react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
-import { AnimatePresence } from "framer-motion";
 
 // Layout wrappers
 import { LandingLayout } from "./layouts/LandingLayout";
@@ -15,8 +14,8 @@ import { CallbackPage } from "./routes/auth/CallbackPage";
 import { ResetPasswordPage } from "./routes/auth/ResetPasswordPage";
 import IntroPage from "./routes/intro/page";
 
-// Enterprise Auth Guard
 import { AuthGuard } from "./auth/AuthGuard";
+import { AdminGuard } from "./auth/AdminGuard";
 
 // Marketing Pages
 import MarketingPage from "./routes/marketing/page";
@@ -37,14 +36,15 @@ import { CmsEditorPage } from "./routes/admin/CmsEditorPage";
 import { AiCenterPage } from "./routes/admin/AiCenterPage";
 import { MediaPage } from "./routes/admin/MediaPage";
 import { TimelinePage } from "./routes/admin/TimelinePage";
-import { SettingsPage } from "./routes/admin/SettingsPage";
+import { StudioTeamPage } from "./routes/admin/components/StudioTeamPage";
+import { AdminAuthPage } from "./routes/auth/admin/page";
 
 export const App: React.FC = () => {
   const location = useLocation();
 
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
+    <>
+      <Routes location={location}>
         {/* Redirect root to /landing */}
         <Route path="/" element={<Navigate to="/landing" replace />} />
 
@@ -85,12 +85,13 @@ export const App: React.FC = () => {
         </Route>
 
         {/* Tech Ambiance StudioHQ Executive Console (/admin/*) (Protected) */}
+        <Route path="/auth/admin" element={<AdminAuthPage />} />
         <Route
           path="/admin"
           element={
-            <AuthGuard requiredRole={["OWNER", "ADMIN", "DEVELOPER", "DESIGNER", "PROJECT_MANAGER", "STRATEGIST", "SALES"]}>
+            <AdminGuard requiredRole={["OWNER", "ADMIN", "DEVELOPER", "DESIGNER", "PROJECT_MANAGER", "STRATEGIST", "SALES"]}>
               <StudioHQLayout />
-            </AuthGuard>
+            </AdminGuard>
           }
         >
           <Route index element={<DashboardPage />} />
@@ -102,10 +103,10 @@ export const App: React.FC = () => {
           <Route path="cms" element={<CmsEditorPage />} />
           <Route path="ai-center" element={<AiCenterPage />} />
           <Route path="media" element={<MediaPage />} />
-          <Route path="settings" element={<SettingsPage />} />
+          <Route path="settings" element={<StudioTeamPage />} />
         </Route>
       </Routes>
-    </AnimatePresence>
+    </>
   );
 };
 
