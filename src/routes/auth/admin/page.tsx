@@ -121,7 +121,10 @@ export const AdminAuthPage: React.FC = () => {
           body: JSON.stringify({ pin: pinToken })
         });
         const result = await response.json();
-        if (!result.success) throw new Error(result.error || "Failed to create PIN.");
+        if (!response.ok || !result.success) {
+          console.error('Create PIN Server Response:', response.status, result);
+          throw new Error(result.error || result.message || `Server returned ${response.status}: Failed to create PIN.`);
+        }
         
         // After creating, we must verify it to get the cookie
         setStep('verify-pin');
