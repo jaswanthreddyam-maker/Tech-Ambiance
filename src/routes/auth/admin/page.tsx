@@ -41,7 +41,8 @@ export const AdminAuthPage: React.FC = () => {
       }, 1000);
       
     } catch (err: any) {
-      setError('Unable to send verification code. Please try again.');
+      console.error('Admin OTP Dispatch Error:', err);
+      setError(err?.message || 'Unable to send verification code. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
