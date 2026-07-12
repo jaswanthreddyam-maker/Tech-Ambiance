@@ -4,6 +4,20 @@
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
+-- Ensure domain_events_outbox exists
+CREATE TABLE IF NOT EXISTS public.domain_events_outbox (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  aggregate_type TEXT NOT NULL,
+  aggregate_id UUID NOT NULL,
+  event_type TEXT NOT NULL,
+  payload JSONB NOT NULL,
+  status TEXT NOT NULL DEFAULT 'PENDING',
+  attempts INTEGER NOT NULL DEFAULT 0,
+  processed_at TIMESTAMPTZ NULL,
+  last_error TEXT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- 1. admin_security table
 CREATE TABLE IF NOT EXISTS public.admin_security (
   user_id UUID PRIMARY KEY REFERENCES public.profiles(id) ON DELETE CASCADE,
