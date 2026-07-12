@@ -123,13 +123,13 @@ serve(async (req: Request) => {
       headers.set('Content-Type', 'application/json');
       headers.append('Set-Cookie', `admin_session_id=${sessionId}; HttpOnly; Secure; Path=/; Max-Age=28800; SameSite=Lax`);
 
-      return new Response(JSON.stringify({ success: true }), { headers });
+      return new Response(JSON.stringify({ success: true, sessionId }), { headers });
     }
 
     if (action === 'validate' || action === 'refresh') {
-      const sessionId = getCookie('admin_session_id');
+      const sessionId = getCookie('admin_session_id') || bodyData.sessionId || req.headers.get('x-admin-session-id');
       if (!sessionId) {
-        return new Response(JSON.stringify({ success: false, error: 'No session cookie.' }), {
+        return new Response(JSON.stringify({ success: false, error: 'No session cookie or sessionId.' }), {
           status: 401,
           headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' }
         });

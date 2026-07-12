@@ -152,6 +152,9 @@ export const AdminAuthPage: React.FC = () => {
         });
         const result = await response.json();
         if (!result.success) throw new Error(result.error || "Invalid PIN.");
+        if (result.sessionId) {
+          sessionStorage.setItem('admin_session_id', result.sessionId);
+        }
         
         setStep('success');
         setTimeout(async () => {

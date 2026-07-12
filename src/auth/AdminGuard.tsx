@@ -45,14 +45,16 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children, requiredRole }
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.access_token) throw new Error("No token");
 
+        const adminSessionId = sessionStorage.getItem('admin_session_id') || '';
         const response = await fetch('/functions/v1/admin-auth?action=validate', {
           method: 'POST',
           credentials: 'include',
           headers: {
             'Authorization': `Bearer ${session.access_token}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'x-admin-session-id': adminSessionId
           },
-          body: JSON.stringify({ action: 'validate' })
+          body: JSON.stringify({ action: 'validate', sessionId: adminSessionId })
         });
 
         const result = await response.json();
@@ -69,9 +71,10 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children, requiredRole }
                   credentials: 'include',
                   headers: {
                     'Authorization': `Bearer ${session.access_token}`,
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'x-admin-session-id': adminSessionId
                   },
-                  body: JSON.stringify({ action: 'refresh' })
+                  body: JSON.stringify({ action: 'refresh', sessionId: adminSessionId })
                 });
               } catch {
                 console.error("Failed to refresh admin session");
