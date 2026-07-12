@@ -43,11 +43,14 @@ ALTER TABLE public.admin_pin_history ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.executive_sessions ENABLE ROW LEVEL SECURITY;
 
 -- No direct access for clients for modification, but users can SELECT their own record to check if PIN exists.
+DROP POLICY IF EXISTS "Users can view their own security record" ON public.admin_security;
 CREATE POLICY "Users can view their own security record"
 ON public.admin_security FOR SELECT
 TO authenticated
 USING (user_id = auth.uid());
+
 -- However, we can allow users to read their own active sessions for a dashboard later.
+DROP POLICY IF EXISTS "Users can view their own executive sessions" ON public.executive_sessions;
 CREATE POLICY "Users can view their own executive sessions"
   ON public.executive_sessions FOR SELECT
   USING (auth.uid() = user_id);
