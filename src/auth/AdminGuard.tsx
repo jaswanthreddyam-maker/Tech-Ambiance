@@ -3,7 +3,6 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './useAuth';
 import type { AuthRoleName } from './types';
 import { Loader2 } from 'lucide-react';
-import { supabase } from '../lib/supabase';
 
 interface AdminGuardProps {
   children: React.ReactNode;
@@ -19,7 +18,6 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children, requiredRole }
 
   useEffect(() => {
     let mounted = true;
-    let refreshInterval: number;
 
     const validateSession = async () => {
       // 1. Check basic Auth
@@ -51,7 +49,6 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children, requiredRole }
 
     return () => {
       mounted = false;
-      if (refreshInterval) clearInterval(refreshInterval);
     };
   }, [isAuthenticated, hasRole, user, checkSession, requiredRole]);
 
