@@ -315,3 +315,6 @@ BEGIN
   RETURN TRUE;
 END;
 $$ LANGUAGE plpgsql;
+
+-- Force PostgREST API Gateway to immediately refresh its schema cache
+NOTIFY pgrst, 'reload schema';
