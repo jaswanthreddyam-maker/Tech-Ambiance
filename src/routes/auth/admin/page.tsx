@@ -111,14 +111,14 @@ export const AdminAuthPage: React.FC = () => {
       if (!session) throw new Error("No active session");
 
       if (step === 'create-pin') {
-        const response = await fetch('/functions/v1/admin-auth/create-pin', {
+        const response = await fetch('/functions/v1/admin-auth?action=create-pin', {
           method: 'POST',
           credentials: 'include',
           headers: {
             'Authorization': `Bearer ${session.access_token}`,
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ pin: pinToken })
+          body: JSON.stringify({ action: 'create-pin', pin: pinToken })
         });
         const result = await response.json();
         if (!response.ok || !result.success) {
@@ -134,7 +134,7 @@ export const AdminAuthPage: React.FC = () => {
       }
 
       if (step === 'verify-pin') {
-        const response = await fetch('/functions/v1/admin-auth/verify', {
+        const response = await fetch('/functions/v1/admin-auth?action=verify', {
           method: 'POST',
           credentials: 'include',
           headers: {
@@ -142,6 +142,7 @@ export const AdminAuthPage: React.FC = () => {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({ 
+            action: 'verify',
             pin: pinToken, 
             metadata: { 
               user_agent: navigator.userAgent,

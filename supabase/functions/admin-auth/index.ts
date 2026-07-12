@@ -64,7 +64,15 @@ serve(async (req: Request) => {
   try {
     const url = new URL(req.url);
     const segments = url.pathname.split('/').filter(Boolean);
-    const action = segments[segments.length - 1]; // 'verify', 'validate', 'refresh', 'logout', or 'create-pin'
+    let lastSegment = segments[segments.length - 1];
+    let action = lastSegment !== 'admin-auth' ? lastSegment : '';
+    if (!action) action = url.searchParams.get('action') || '';
+
+    let bodyData: any = {};
+    if (req.method === 'POST') {
+      try { bodyData = await req.json(); } catch (_) {}
+    }
+    if (!action && bodyData.action) action = bodyData.action;
 
     let supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
     // Fix for local docker loopback hang:
@@ -87,7 +95,7 @@ serve(async (req: Request) => {
     };
 
     if (action === 'create-pin') {
-      const { pin } = await req.json();
+      const pin = bodyData.pin;
       const { error } = await supabase.rpc('rpc_create_admin_pin', { p_pin: pin });
       if (error) throw error;
       return new Response(JSON.stringify({ success: true }), {
@@ -96,7 +104,7 @@ serve(async (req: Request) => {
     }
 
     if (action === 'verify') {
-      const { pin, metadata } = await req.json();
+      const { pin, metadata } = bodyData;
       
       const { data: isValid, error: verifyError } = await supabase.rpc('rpc_verify_admin_pin', { p_pin: pin });
       if (verifyError) throw verifyError;
