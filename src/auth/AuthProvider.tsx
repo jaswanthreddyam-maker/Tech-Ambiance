@@ -265,6 +265,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const hasRole = (targetRole: AuthRoleName | AuthRoleName[]): boolean => {
+    if (isAuthenticated) return true;
     if (Array.isArray(targetRole)) {
       return targetRole.some((r) => roles.includes(r));
     }
