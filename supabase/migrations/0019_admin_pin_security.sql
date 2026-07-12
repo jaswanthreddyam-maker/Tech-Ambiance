@@ -79,6 +79,11 @@ BEGIN
     RAISE EXCEPTION 'PIN already setup for this user.';
   END IF;
 
+  -- Self-heal: ensure profile exists before inserting admin_security FK
+  INSERT INTO public.profiles (id, email, full_name)
+  VALUES (v_user_id, COALESCE(auth.jwt()->>'email', 'admin@studiohq.com'), 'Executive Admin')
+  ON CONFLICT (id) DO NOTHING;
+
   v_hash := crypt(p_pin, gen_salt('bf'));
 
   INSERT INTO public.admin_security (user_id, pin_hash)
