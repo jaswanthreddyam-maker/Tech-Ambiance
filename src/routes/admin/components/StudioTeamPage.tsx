@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, UserPlus, Clock, Key, Loader2, RefreshCw, XCircle } from 'lucide-react';
-import { useAuth } from '../../../auth/useAuth';
 import type { AuthRoleName } from '../../../auth/types';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { studioTeamQueries, studioTeamKeys, type StudioTeamQueryFilters } from '../../../repositories/studioTeamQueries';
@@ -8,7 +7,6 @@ import { studioTeamCommands } from '../../../repositories/studioTeamCommands';
 import { supabase } from '../../../lib/supabase';
 
 export const StudioTeamPage: React.FC = () => {
-  const { organization } = useAuth();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<'members' | 'invitations' | 'permissions'>('members');
   const [showInviteModal, setShowInviteModal] = useState(false);
