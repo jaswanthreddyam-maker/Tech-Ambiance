@@ -13,12 +13,20 @@ export const studioTeamCommands = {
     if (!user) throw new Error("Not authenticated");
     
     const { data: profile } = await supabase.from('profiles').select('active_organization_id').eq('id', user.id).single();
-    if (!profile?.active_organization_id) throw new Error("No active organization found");
+    
+    let orgId = profile?.active_organization_id;
+    if (!orgId) {
+      const { data: fallbackOrg } = await supabase.from('organizations').select('id').limit(1).maybeSingle();
+      if (!fallbackOrg) throw new Error("No active organization found and no fallback organizations exist.");
+      orgId = fallbackOrg.id;
+      // Auto-heal the profile
+      await supabase.from('profiles').update({ active_organization_id: orgId }).eq('id', user.id);
+    }
 
     const { data, error } = await supabase.rpc('create_studio_invitation', {
       p_email: email,
       p_role_name: roleName,
-      p_org_id: profile.active_organization_id
+      p_org_id: orgId
     });
     
     if (error) throw error;
