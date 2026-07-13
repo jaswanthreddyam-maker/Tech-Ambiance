@@ -136,6 +136,14 @@ export const Navbar: React.FC = () => {
     ? "none"
     : (isExpanded ? (isScrolled ? "1100px" : "1180px") : "80px");
 
+  const navLeft = isMobile 
+    ? "18px"
+    : (isExpanded 
+        ? (isScrolled 
+            ? (isHovered ? "calc(50vw - min(47vw, 550px))" : "calc(50vw - min(45vw, 550px))")
+            : "calc(50vw - min(48vw, 590px))")
+        : "calc(50vw - min(45vw, 550px))");
+
   const borderRadius = isMobile && isMobileMenuOpen ? 24 : (isExpanded ? 30 : 999);
 
   // Context-Aware styles interpolation
@@ -187,6 +195,7 @@ export const Navbar: React.FC = () => {
             height: navHeight,
             width: navWidth,
             maxWidth: navMaxWidth,
+            left: navLeft,
             borderRadius: borderRadius,
             backgroundColor: bg,
             borderColor: border,
@@ -200,16 +209,17 @@ export const Navbar: React.FC = () => {
             layout: { type: "spring", stiffness: 350, damping: 30 },
             width: { duration: 0.65, ease: [0.16, 1, 0.3, 1] },
             maxWidth: { duration: 0.65, ease: [0.16, 1, 0.3, 1] },
+            left: { duration: 0.65, ease: [0.16, 1, 0.3, 1] },
             height: { duration: 0.65, ease: [0.16, 1, 0.3, 1] },
             borderRadius: { duration: 0.65, ease: [0.16, 1, 0.3, 1] },
           }}
-          className="fixed top-[28px] left-1/2 -translate-x-1/2 z-[9990] flex overflow-hidden border select-none"
+          className="fixed top-[28px] z-[9990] flex overflow-hidden border select-none"
           style={{
             backdropFilter: `blur(${blurVal}) saturate(180%)`,
             WebkitBackdropFilter: `blur(${blurVal}) saturate(180%)`,
           }}
         >
-          <div className={`w-full h-full flex items-center ${isExpanded ? "justify-between" : "justify-center"}`}>
+          <div className={`w-full h-full relative flex items-center ${isExpanded ? "justify-between" : "justify-center"}`}>
             
             {/* Logo Capsule wrapper */}
             <motion.div
@@ -246,21 +256,22 @@ export const Navbar: React.FC = () => {
               </Link>
             </motion.div>
 
-            {/* Desktop Navigation Links */}
+            {/* Desktop Navigation Links (Centered) */}
             <AnimatePresence>
               {isExpanded && (
-                <motion.div 
-                  initial={{ opacity: 0, filter: "blur(10px)", y: -10 }}
-                  animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
-                  exit={{ opacity: 0, filter: "blur(10px)", y: -10 }}
-                  transition={{ 
-                    duration: 0.25, 
-                    delay: isExpanded ? 0.12 : 0, 
-                    ease: "easeOut" 
-                  }}
-                  className="flex items-center shrink-0"
-                >
-                  <div className="flex items-center" style={{ gap: `${navGap}px` }}>
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-auto">
+                  <motion.div 
+                    initial={{ opacity: 0, filter: "blur(10px)", y: -10 }}
+                    animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+                    exit={{ opacity: 0, filter: "blur(10px)", y: -10 }}
+                    transition={{ 
+                      duration: 0.25, 
+                      delay: isExpanded ? 0.12 : 0, 
+                      ease: "easeOut" 
+                    }}
+                    className="flex items-center shrink-0"
+                  >
+                    <div className="flex items-center" style={{ gap: `${navGap}px` }}>
                     {navLinks.map((link) => {
                       const isActive = link.id === "portal" ? isPortalActive : activeSection === link.id;
                       const isHoveredItem = hoveredLink === link.name;
@@ -317,10 +328,26 @@ export const Navbar: React.FC = () => {
                         </Magnetic>
                       );
                     })}
-                  </div>
+                    </div>
+                  </motion.div>
+                </div>
+              )}
+            </AnimatePresence>
 
-                  {/* Desktop Authentication Actions (Login & Sign Up) */}
-                  <div className="shrink-0 flex items-center gap-3.5 md:gap-4 ml-8">
+            {/* Desktop Authentication Actions (Login & Sign Up) */}
+            <AnimatePresence>
+              {isExpanded && (
+                <motion.div
+                  initial={{ opacity: 0, filter: "blur(10px)", y: -10 }}
+                  animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+                  exit={{ opacity: 0, filter: "blur(10px)", y: -10 }}
+                  transition={{ 
+                    duration: 0.25, 
+                    delay: isExpanded ? 0.12 : 0, 
+                    ease: "easeOut" 
+                  }}
+                  className="shrink-0 flex items-center gap-3.5 md:gap-4 z-10"
+                >
                     {/* Login Action */}
                     <Magnetic>
                       <button
@@ -356,7 +383,6 @@ export const Navbar: React.FC = () => {
                         <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform duration-300 mt-0.5 !text-[#C5A572] relative z-10" />
                       </motion.button>
                     </Magnetic>
-                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
