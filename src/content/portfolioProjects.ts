@@ -21,17 +21,17 @@ export const PORTFOLIO_PROJECTS: Project[] = [
   },
   {
     id: "proj_2",
-    slug: "fit-forge",
-    title: "FitForge Gyms",
-    industry: "Health & Fitness",
-    description: "High-conversion landing pages and membership portals for a fast-growing gym franchise.",
+    slug: "restaurant",
+    title: "Restaurant",
+    industry: "Culinary & Dining",
+    description: "Bespoke digital reservation platform and luxury brand showcase for an acclaimed dining destination.",
     businessImpact: [
-      { metric: "Memberships", value: "+45%", label: "Online Signups" },
+      { metric: "Table Bookings", value: "+65%", label: "Direct Reservations" },
     ],
     services: ["Web Development", "Conversion Optimization"],
     technologies: ["React", "Tailwind CSS"],
     images: {
-      cover: "/assets/images/projects/fitforge-cover.avif",
+      cover: "/assets/images/projects/restaurant-cover.png",
       gallery: [],
     },
     featured: false,
