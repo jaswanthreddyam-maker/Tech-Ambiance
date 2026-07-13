@@ -219,7 +219,7 @@ export const AdminAuthPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col justify-center max-w-sm w-full mx-auto mt-12 mb-12">
+        <div className="flex-1 flex flex-col justify-center max-w-md w-full mx-auto mt-12 mb-12">
           
           <AnimatePresence mode="wait">
             
