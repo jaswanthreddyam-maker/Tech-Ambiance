@@ -9,13 +9,13 @@ import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
 import { MarbleVeins } from "../ui/MarbleVeins";
 import { ROUTES } from "../../routes/routes";
-import { MOCK_PROJECTS } from "../../mocks/projects";
+import { PORTFOLIO_PROJECTS } from "../../content/portfolioProjects";
 
 export const FeaturedCaseStudy: React.FC = () => {
   const navigate = useNavigate();
 
   // Find the featured project (Cafe Vistaara)
-  const featuredProject = MOCK_PROJECTS.find(p => p.featured) || MOCK_PROJECTS[0];
+  const featuredProject = PORTFOLIO_PROJECTS.find(p => p.featured) || PORTFOLIO_PROJECTS[0];
 
   return (
     <Section id="featured-case-study" padding="normal" className="bg-ivory relative">

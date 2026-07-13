@@ -7,7 +7,7 @@ import { Heading, Text } from "../ui/Typography";
 import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { testimonialsData } from "../../content/testimonials";
-import { MOCK_INSIGHTS } from "../../mocks/insights";
+import { STUDIO_INSIGHTS } from "../../content/studioInsights";
 import { MessageSquare, ArrowRight } from "lucide-react";
 import { ROUTES } from "../../routes/routes";
 import { RevealHeading } from "../motion";
@@ -113,7 +113,7 @@ export const TestimonialsSection: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {MOCK_INSIGHTS.map((insight) => (
+          {STUDIO_INSIGHTS.map((insight) => (
             <m.div
               key={insight.id}
               initial={{ opacity: 0, y: 4 }}

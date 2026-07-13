@@ -66,7 +66,7 @@ export const ShowreelSection: React.FC = () => {
             loop
             muted
             playsInline
-            preload="none"
+            preload="metadata"
             aria-label="Tech Ambiance Showreel Video"
           />
 

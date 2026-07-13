@@ -1,6 +1,6 @@
 import type { Project } from "../domain/project/project.types";
 
-export const MOCK_PROJECTS: Project[] = [
+export const PORTFOLIO_PROJECTS: Project[] = [
   {
     id: "proj_1",
     slug: "cafe-vistaara",
@@ -37,3 +37,5 @@ export const MOCK_PROJECTS: Project[] = [
     featured: false,
   }
 ];
+
+export const MOCK_PROJECTS = PORTFOLIO_PROJECTS;

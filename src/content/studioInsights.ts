@@ -1,6 +1,6 @@
 import type { Insight } from "../domain/insight/insight.types";
 
-export const MOCK_INSIGHTS: Insight[] = [
+export const STUDIO_INSIGHTS: Insight[] = [
   {
     id: "ins_1",
     slug: "why-design-systems-matter",
@@ -30,3 +30,5 @@ export const MOCK_INSIGHTS: Insight[] = [
     tags: ["SEO", "AI", "Marketing"],
   },
 ];
+
+export const MOCK_INSIGHTS = STUDIO_INSIGHTS;

@@ -2,7 +2,12 @@ project_id = "Tech_Ambiance"
 
 [auth]
 site_url = "http://localhost:5173"
-additional_redirect_urls = ["http://localhost:5173/*", "http://127.0.0.1:5173/*"]
+additional_redirect_urls = [
+  "http://localhost:5173/*",
+  "http://127.0.0.1:5173/*",
+  "https://tech-ambiance.vercel.app/**",
+  "https://tech-ambiance-*.vercel.app/**"
+]
 
 [auth.email]
 enable_signup = true

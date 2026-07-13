@@ -1,6 +1,6 @@
 import type { Service } from "../domain/service/service.types";
 
-export const MOCK_SERVICES: Service[] = [
+export const STUDIO_SERVICES: Service[] = [
   {
     id: "svc_1",
     slug: "premium-web-design",
@@ -23,3 +23,5 @@ export const MOCK_SERVICES: Service[] = [
     features: ["Technical SEO", "Content Strategy", "On-page Optimization", "Analytics & Tracking"],
   },
 ];
+
+export const MOCK_SERVICES = STUDIO_SERVICES;

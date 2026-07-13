@@ -8,7 +8,7 @@ import { Button } from "../ui/Button";
 import { ArrowRight, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../routes/routes";
-import { MOCK_SERVICES } from "../../mocks/services";
+import { STUDIO_SERVICES } from "../../content/studioServices";
 import { RevealHeading } from "../motion";
 
 export const ServicesSection: React.FC = () => {
@@ -32,7 +32,7 @@ export const ServicesSection: React.FC = () => {
 
         {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {MOCK_SERVICES.map((service, idx) => (
+          {STUDIO_SERVICES.map((service, idx) => (
             <m.div 
               key={service.id}
               initial={{ opacity: 0, y: 8 }}

@@ -6,44 +6,12 @@ import type {
   AuthRoleName,
   Organization,
   Profile,
-  Project,
   User,
   Workspace,
 } from "./types";
 import type { Session, User as SupabaseAuthUser } from "@supabase/supabase-js";
 
 const AuthContext = createContext<AuthContextState | undefined>(undefined);
-
-// Mock project for demonstration / staging portal view compatibility
-const defaultMockProject: Project = {
-  id: "proj-1",
-  name: "Cafe Vistaara Premium Website",
-  status: "Development",
-  progress: 68,
-  startDate: "2026-06-01",
-  deliveryDate: "2026-08-15",
-  budget: "$12,500 USD",
-  activeMilestone: "Front-end Animations & Core Framework Implementation",
-  milestones: [
-    { id: "m1", name: "Discovery & Brand Identity Strategy", date: "2026-06-10", status: "completed" },
-    { id: "m2", name: "High-Fidelity UI/UX Web Layout Designs", date: "2026-06-25", status: "completed" },
-    { id: "m3", name: "Core Front-end React + Tailwind Setup", date: "2026-07-05", status: "completed" },
-    { id: "m4", name: "Animations, Transitions & Motion Details", date: "2026-07-20", status: "active" },
-    { id: "m5", name: "SEO Optimizations & Lighthouse Verification", date: "2026-08-01", status: "pending" },
-    { id: "m6", name: "Launch & Production Server Handover", date: "2026-08-15", status: "pending" },
-  ],
-  invoices: [
-    { id: "inv-001", amount: "$5,000.00", date: "2026-06-02", status: "Paid" },
-    { id: "inv-002", amount: "$3,750.00", date: "2026-07-01", status: "Paid" },
-    { id: "inv-003", amount: "$3,750.00", date: "2026-08-10", status: "Pending" },
-  ],
-  sourceCode: "https://github.com/techambiance/cafe-vistaara",
-  demoUrl: "https://vistaara.experience.techambiance.com",
-  supportTickets: [
-    { id: "t-001", subject: "Integrate custom reservation widgets", status: "Resolved", date: "2026-06-28" },
-    { id: "t-002", subject: "Review custom hover animation parameters on mobile viewports", status: "Open", date: "2026-07-07" },
-  ],
-};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -59,7 +27,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Backward compatible states
   const [user, setUser] = useState<User | null>(null);
-  const [project] = useState<Project | null>(defaultMockProject);
 
   const loadFullAuthContext = async (userId: string, activeSession: Session | null) => {
     try {
@@ -97,12 +64,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     async function initSession() {
       setIsLoading(true);
       if (!isSupabaseConfigured) {
-        const storedUser = localStorage.getItem("ta_user");
-        if (storedUser) {
-          const parsedUser = JSON.parse(storedUser);
-          setUser(parsedUser);
-          setRoles(["OWNER"]);
-        }
+        setUser(null);
+        setRoles([]);
         if (mounted) setIsLoading(false);
         return;
       }
@@ -165,16 +128,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsLoading(true);
     try {
       if (!isSupabaseConfigured) {
-        const mockUser: User = {
-          email,
-          name: email.split("@")[0].charAt(0).toUpperCase() + email.split("@")[0].slice(1),
-          role: "owner",
-        };
-        setUser(mockUser);
-        setRoles(["OWNER"]);
-        localStorage.setItem("ta_user", JSON.stringify(mockUser));
-        setIsLoading(false);
-        return true;
+        throw new Error("Supabase is not configured. Configure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY before signing in.");
       }
 
       const res = await authService.signInWithEmail(email, password);
@@ -197,16 +151,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsLoading(true);
     try {
       if (!isSupabaseConfigured) {
-        const mockUser: User = {
-          email,
-          name,
-          role: "owner",
-        };
-        setUser(mockUser);
-        setRoles(["OWNER"]);
-        localStorage.setItem("ta_user", JSON.stringify(mockUser));
-        setIsLoading(false);
-        return { success: true, requiresVerification: false };
+        throw new Error("Supabase is not configured. Configure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY before creating accounts.");
       }
 
       const res = await authService.signUpWithEmail(email, password, name);
@@ -223,17 +168,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const loginWithGoogle = async (): Promise<void> => {
     if (!isSupabaseConfigured) {
-      setIsLoading(true);
-      const mockUser: User = {
-        email: "google.user@techambiance.com",
-        name: "Google Executive",
-        role: "owner",
-      };
-      setUser(mockUser);
-      setRoles(["OWNER"]);
-      localStorage.setItem("ta_user", JSON.stringify(mockUser));
-      setIsLoading(false);
-      return;
+      throw new Error("Supabase is not configured. Configure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY before using Google sign-in.");
     }
     await authService.signInWithGoogle();
   };
@@ -242,7 +177,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsLoading(true);
     try {
       await authService.signOut();
-      localStorage.removeItem("ta_user");
       setUser(null);
       setSession(null);
       setAuthUser(null);
@@ -265,7 +199,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const hasRole = (targetRole: AuthRoleName | AuthRoleName[]): boolean => {
-    if (isAuthenticated) return true;
     if (Array.isArray(targetRole)) {
       return targetRole.some((r) => roles.includes(r));
     }
@@ -279,12 +212,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const checkSession = async (): Promise<void> => {
     setIsLoading(true);
     if (!isSupabaseConfigured) {
-      const storedUser = localStorage.getItem("ta_user");
-      if (storedUser) {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-        setRoles(["OWNER"]);
-      }
+      setUser(null);
+      setRoles([]);
       setIsLoading(false);
       return;
     }
@@ -327,7 +256,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         organization,
         workspace,
         user,
-        project,
+        project: null,
         isAuthenticated,
         isLoading,
         isEmailVerified,

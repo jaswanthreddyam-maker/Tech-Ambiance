@@ -11,7 +11,7 @@ export const CallbackPage: React.FC = () => {
 
     async function handleAuthCallback() {
       if (!isSupabaseConfigured) {
-        if (active) navigate("/portal", { replace: true });
+        if (active) navigate("/auth?error=supabase_not_configured", { replace: true });
         return;
       }
 

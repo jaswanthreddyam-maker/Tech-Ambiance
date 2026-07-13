@@ -8,14 +8,14 @@ import { Heading, Text } from "../ui/Typography";
 import { Card } from "../ui/Card";
 import { MarbleVeins } from "../ui/MarbleVeins";
 import { ROUTES } from "../../routes/routes";
-import { MOCK_PROJECTS } from "../../mocks/projects";
+import { PORTFOLIO_PROJECTS } from "../../content/portfolioProjects";
 import { RevealHeading } from "../motion";
 import { GoldenLightningVeins } from "../ui/GoldenLightningVeins";
 
 export const PortfolioSection: React.FC = () => {
 
   // Filter out the featured project if we want, or just show all.
-  const selectedProjects = MOCK_PROJECTS.filter(p => !p.featured);
+  const selectedProjects = PORTFOLIO_PROJECTS.filter(p => !p.featured);
 
   return (
     <Section id="work" padding="normal" className="bg-surface border-t border-forest/[0.06] relative overflow-hidden">

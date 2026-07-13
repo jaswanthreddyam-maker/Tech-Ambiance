@@ -142,20 +142,7 @@ export const AuthPage: React.FC = () => {
     setIsSubmitting(true);
     try {
       await loginWithGoogle();
-      
-      // Check if we are running in local mock mode
-      const { isSupabaseConfigured } = await import("../../lib/supabase");
-      const isMockMode = !isSupabaseConfigured;
-      
-      if (isMockMode) {
-        setIsSuccess(true);
-        toast("Mock Google Auth Successful", "success");
-        setTimeout(() => {
-          navigate("/portal");
-        }, 1000);
-      } else {
-        toast("Redirecting to Google SSO...", "info");
-      }
+      toast("Redirecting to Google SSO...", "info");
     } catch (err: any) {
       toast(err?.message || "Google Single Sign-On cancelled or failed.", "error");
       setIsSubmitting(false);

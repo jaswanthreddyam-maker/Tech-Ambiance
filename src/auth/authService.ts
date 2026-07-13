@@ -6,6 +6,12 @@ import type {
   Workspace,
 } from "./types";
 
+const requireSupabase = () => {
+  if (!isSupabaseConfigured) {
+    throw new Error("Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY for this environment.");
+  }
+};
+
 export function computePermissions(roles: AuthRoleName[]): Record<string, boolean> {
   const perms: Record<string, boolean> = {};
 
@@ -32,10 +38,7 @@ export const authService = {
   // ==============================================================================
 
   async signInWithPrimaryFactor(email: string) {
-    if (!isSupabaseConfigured) {
-      // Mock success for unconfigured environments
-      return { success: true, error: null };
-    }
+    requireSupabase();
 
     const { error } = await supabase.auth.signInWithOtp({
       email,
@@ -54,13 +57,7 @@ export const authService = {
   },
 
   async verifyPrimaryFactor(email: string, token: string, deviceTracking: boolean) {
-    if (!isSupabaseConfigured) {
-      // Mock validation
-      if (token === "000000") {
-        return { success: true, user: { id: "mock-id", email } };
-      }
-      throw new Error("Invalid verification code.");
-    }
+    requireSupabase();
 
     // 1. Verify OTP with Supabase Auth
     const { data, error } = await supabase.auth.verifyOtp({
@@ -114,9 +111,7 @@ export const authService = {
   // ==============================================================================
 
   async signUpWithEmail(email: string, password: string, fullName: string) {
-    if (!isSupabaseConfigured) {
-      return { success: true, requiresVerification: false, error: null };
-    }
+    requireSupabase();
 
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -141,9 +136,7 @@ export const authService = {
   },
 
   async signInWithEmail(email: string, password: string) {
-    if (!isSupabaseConfigured) {
-      return { success: true, user: null, error: null };
-    }
+    requireSupabase();
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -158,9 +151,7 @@ export const authService = {
   },
 
   async signInWithGoogle() {
-    if (!isSupabaseConfigured) {
-      return;
-    }
+    requireSupabase();
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -190,7 +181,7 @@ export const authService = {
   },
 
   async resendVerificationEmail(email: string) {
-    if (!isSupabaseConfigured) return true;
+    requireSupabase();
     const { error } = await supabase.auth.resend({
       type: "signup",
       email,
@@ -203,9 +194,7 @@ export const authService = {
   },
 
   async resetPasswordForEmail(email: string) {
-    if (!isSupabaseConfigured) {
-      return true;
-    }
+    requireSupabase();
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/auth/reset-password`,
@@ -218,9 +207,7 @@ export const authService = {
   },
 
   async updatePassword(newPassword: string) {
-    if (!isSupabaseConfigured) {
-      return true;
-    }
+    requireSupabase();
 
     const { error } = await supabase.auth.updateUser({
       password: newPassword,
@@ -239,37 +226,7 @@ export const authService = {
     roles: AuthRoleName[];
     permissions: Record<string, boolean>;
   }> {
-    if (!isSupabaseConfigured) {
-      const mockProfile: Profile = {
-        id: userId,
-        email: "demo@techambiance.com",
-        full_name: "Executive Client",
-        active_organization_id: "org-demo",
-        active_workspace_id: "ws-demo",
-      };
-      const mockOrg: Organization = {
-        id: "org-demo",
-        name: "Tech Ambiance Flagship Organization",
-        slug: "tech-ambiance-flagship",
-        brand_color: "#0B3027",
-      };
-      const mockWs: Workspace = {
-        id: "ws-demo",
-        organization_id: "org-demo",
-        name: "Primary Studio Workspace",
-        slug: "primary-workspace",
-        status: "ACTIVE",
-        is_default: true,
-      };
-      const mockRoles: AuthRoleName[] = ["OWNER"];
-      return {
-        profile: mockProfile,
-        organization: mockOrg,
-        workspace: mockWs,
-        roles: mockRoles,
-        permissions: computePermissions(mockRoles),
-      };
-    }
+    requireSupabase();
 
     // 1. Fetch profile
     const { data: profileData } = await supabase

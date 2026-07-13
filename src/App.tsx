@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 
 // Layout wrappers
@@ -7,44 +7,53 @@ import { AuthLayout } from "./layouts/AuthLayout";
 import { WebsiteLayout } from "./layouts/WebsiteLayout";
 import { ClientLayout } from "./layouts/ClientLayout";
 
-// Onboarding & Auth Pages
-import LandingPage from "./routes/landing/page";
-import AuthPage from "./routes/auth/page";
-import { CallbackPage } from "./routes/auth/CallbackPage";
-import { ResetPasswordPage } from "./routes/auth/ResetPasswordPage";
-import IntroPage from "./routes/intro/page";
-
 import { AuthGuard } from "./auth/AuthGuard";
 import { AdminGuard } from "./auth/AdminGuard";
 
-// Marketing Pages
-import MarketingPage from "./routes/marketing/page";
-import PortfolioDetails from "./routes/marketing/PortfolioDetails";
-
-// Portal Pages
-import ClientPortal from "./routes/portal/page";
-
-// 404 Page
-import NotFoundPage from "./routes/NotFound";
-
 // Tech Ambiance StudioHQ Executive Console (/admin/*)
 import { StudioHQLayout } from "./layouts/StudioHQLayout";
-import { DashboardPage } from "./routes/admin/DashboardPage";
-import { WorkspacesPage } from "./routes/admin/WorkspacesPage";
-import { CrmPipelinePage } from "./routes/admin/CrmPipelinePage";
-import { CmsEditorPage } from "./routes/admin/CmsEditorPage";
-import { AiCenterPage } from "./routes/admin/AiCenterPage";
-import { MediaPage } from "./routes/admin/MediaPage";
-import { TimelinePage } from "./routes/admin/TimelinePage";
-import { StudioTeamPage } from "./routes/admin/components/StudioTeamPage";
-import { AdminAuthPage } from "./routes/auth/admin/page";
+
+const lazyNamed = <T extends React.ComponentType<any>>(
+  importer: () => Promise<Record<string, T>>,
+  exportName: string
+) =>
+  React.lazy(async () => {
+    const module = await importer();
+    return { default: module[exportName] };
+  });
+
+const LandingPage = React.lazy(() => import("./routes/landing/page"));
+const AuthPage = React.lazy(() => import("./routes/auth/page"));
+const CallbackPage = lazyNamed(() => import("./routes/auth/CallbackPage"), "CallbackPage");
+const ResetPasswordPage = lazyNamed(() => import("./routes/auth/ResetPasswordPage"), "ResetPasswordPage");
+const IntroPage = React.lazy(() => import("./routes/intro/page"));
+const MarketingPage = React.lazy(() => import("./routes/marketing/page"));
+const PortfolioDetails = React.lazy(() => import("./routes/marketing/PortfolioDetails"));
+const ClientPortal = React.lazy(() => import("./routes/portal/page"));
+const NotFoundPage = React.lazy(() => import("./routes/NotFound"));
+const DashboardPage = lazyNamed(() => import("./routes/admin/DashboardPage"), "DashboardPage");
+const WorkspacesPage = lazyNamed(() => import("./routes/admin/WorkspacesPage"), "WorkspacesPage");
+const CrmPipelinePage = lazyNamed(() => import("./routes/admin/CrmPipelinePage"), "CrmPipelinePage");
+const CmsEditorPage = lazyNamed(() => import("./routes/admin/CmsEditorPage"), "CmsEditorPage");
+const AiCenterPage = lazyNamed(() => import("./routes/admin/AiCenterPage"), "AiCenterPage");
+const MediaPage = lazyNamed(() => import("./routes/admin/MediaPage"), "MediaPage");
+const TimelinePage = lazyNamed(() => import("./routes/admin/TimelinePage"), "TimelinePage");
+const StudioTeamPage = lazyNamed(() => import("./routes/admin/components/StudioTeamPage"), "StudioTeamPage");
+const AdminAuthPage = lazyNamed(() => import("./routes/auth/admin/page"), "AdminAuthPage");
+
+const RouteFallback: React.FC = () => (
+  <div className="min-h-screen w-full bg-[#FAF7F0] flex items-center justify-center">
+    <div className="h-10 w-10 rounded-full border border-[#0B3027]/20 border-t-[#0B3027] animate-spin" />
+  </div>
+);
 
 export const App: React.FC = () => {
   const location = useLocation();
 
   return (
     <>
-      <Routes location={location}>
+      <Suspense fallback={<RouteFallback />}>
+        <Routes location={location}>
         {/* Redirect root to /landing */}
         <Route path="/" element={<Navigate to="/landing" replace />} />
 
@@ -105,7 +114,8 @@ export const App: React.FC = () => {
           <Route path="media" element={<MediaPage />} />
           <Route path="settings" element={<StudioTeamPage />} />
         </Route>
-      </Routes>
+        </Routes>
+      </Suspense>
     </>
   );
 };

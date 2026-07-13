@@ -46,6 +46,12 @@ export interface ProjectHealthPayload {
   client_response: string;
 }
 
+const requireSupabase = () => {
+  if (!isSupabaseConfigured) {
+    throw new Error("Supabase is not configured for this environment.");
+  }
+};
+
 // ============================================================================
 // AGENCY OS SERVICE (CQRS COMMAND & QUERY ENGINE)
 // ============================================================================
@@ -56,10 +62,7 @@ export const agencyOsService = {
   // --------------------------------------------------------------------------
   crm: {
     async submitConsultationLead(payload: LeadConsultationPayload) {
-      if (!isSupabaseConfigured) {
-        console.warn("Supabase not configured; returning mock lead response.");
-        return { data: { id: "mock-lead-id", ...payload, status: "PENDING_REVIEW" }, error: null };
-      }
+      requireSupabase();
       const { data, error } = await supabase
         .from("lead_consultations")
         .insert([payload])
@@ -69,7 +72,7 @@ export const agencyOsService = {
     },
 
     async listLeads(statusFilter?: string) {
-      if (!isSupabaseConfigured) return { data: [], error: null };
+      requireSupabase();
       let query = supabase.from("lead_consultations").select("*").order("created_at", { ascending: false });
       if (statusFilter) {
         query = query.eq("status", statusFilter);
@@ -85,7 +88,7 @@ export const agencyOsService = {
       advance_deposit_amount: number;
       expires_at: string;
     }) {
-      if (!isSupabaseConfigured) return { data: { id: "mock-proposal-id", ...payload }, error: null };
+      requireSupabase();
       return await supabase.from("proposals").insert([payload]).select().single();
     },
   },
@@ -95,7 +98,7 @@ export const agencyOsService = {
   // --------------------------------------------------------------------------
   finance: {
     async listInvoices(organizationId?: string) {
-      if (!isSupabaseConfigured) return { data: [], error: null };
+      requireSupabase();
       let query = supabase.from("invoices").select("*").order("created_at", { ascending: false });
       if (organizationId) {
         query = query.eq("organization_id", organizationId);
@@ -111,12 +114,12 @@ export const agencyOsService = {
       amount: number;
       due_date: string;
     }) {
-      if (!isSupabaseConfigured) return { data: { id: "mock-invoice-id", ...payload, status: "PENDING" }, error: null };
+      requireSupabase();
       return await supabase.from("invoices").insert([payload]).select().single();
     },
 
     async verifyPayment(invoiceId: string, actorUserId: string) {
-      if (!isSupabaseConfigured) return { data: true, error: null };
+      requireSupabase();
       const { data, error } = await supabase
         .from("invoices")
         .update({ status: "PAID", paid_at: new Date().toISOString() })
@@ -142,7 +145,7 @@ export const agencyOsService = {
   // --------------------------------------------------------------------------
   delivery: {
     async listWorkspaceProjects(workspaceId: string) {
-      if (!isSupabaseConfigured) return { data: [], error: null };
+      requireSupabase();
       const { data, error } = await supabase
         .from("projects")
         .select(`
@@ -157,7 +160,7 @@ export const agencyOsService = {
     },
 
     async completeMilestone(milestoneId: string, projectId: string, milestoneTitle: string, actorUserId: string) {
-      if (!isSupabaseConfigured) return { data: true, error: null };
+      requireSupabase();
       const { data, error } = await supabase
         .from("milestones")
         .update({ status: "completed", completed_at: new Date().toISOString() })
@@ -188,7 +191,7 @@ export const agencyOsService = {
     },
 
     async updateProjectLifecycleStage(projectId: string, newStage: LifecycleStage, actorUserId: string) {
-      if (!isSupabaseConfigured) return { data: true, error: null };
+      requireSupabase();
       const { data, error } = await supabase
         .from("projects")
         .update({ lifecycle_stage: newStage, updated_at: new Date().toISOString() })
@@ -228,12 +231,12 @@ export const agencyOsService = {
       category: "Deployment" | "Milestone" | "Finance" | "Design" | "Internal";
       visibility: "CLIENT" | "INTERNAL";
     }) {
-      if (!isSupabaseConfigured) return { data: null, error: null };
+      requireSupabase();
       return await supabase.from("timeline_events").insert([payload]).select().single();
     },
 
     async listClientJourneyEvents(organizationId: string) {
-      if (!isSupabaseConfigured) return { data: [], error: null };
+      requireSupabase();
       return await supabase
         .from("client_journey_events")
         .select("*")
@@ -257,7 +260,7 @@ export const agencyOsService = {
       storage_path: string;
       uploaded_by?: string;
     }) {
-      if (!isSupabaseConfigured) return { data: { id: "mock-file-id", ...payload }, error: null };
+      requireSupabase();
       const { data, error } = await supabase.from("deliverable_files").insert([payload]).select().single();
 
       if (!error && data) {
@@ -285,7 +288,7 @@ export const agencyOsService = {
       old_state?: Record<string, any>;
       new_state?: Record<string, any>;
     }) {
-      if (!isSupabaseConfigured) return { data: null, error: null };
+      requireSupabase();
       return await supabase.from("admin_audit_logs").insert([payload]);
     },
   },

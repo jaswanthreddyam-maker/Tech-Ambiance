@@ -16,6 +16,12 @@ if (!isSupabaseConfigured) {
   );
 }
 
+if (!isSupabaseConfigured && import.meta.env.PROD) {
+  throw new Error(
+    "Supabase is not configured for production. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY."
+  );
+}
+
 // Fallback URL/Key so Vite does not throw unhandled exception on boot if .env is missing
 const fallbackUrl = supabaseUrl || "https://placeholder-project.supabase.co";
 const fallbackKey =
