@@ -8,7 +8,6 @@ import { Heading, Text } from "../ui/Typography";
 import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
 import { MarbleVeins } from "../ui/MarbleVeins";
-import { ROUTES } from "../../routes/routes";
 import { PORTFOLIO_PROJECTS } from "../../content/portfolioProjects";
 
 export const FeaturedCaseStudy: React.FC = () => {
@@ -33,7 +32,7 @@ export const FeaturedCaseStudy: React.FC = () => {
           </div>
 
           {/* The Featured Project Card */}
-          <Card padding="none" variant="default" className="relative group overflow-hidden cursor-pointer bg-emerald-stone text-gold rounded-3xl" onClick={() => navigate(`${ROUTES.work}/${featuredProject.slug}`)}>
+          <Card padding="none" variant="default" className="relative group overflow-hidden cursor-pointer bg-emerald-stone text-gold rounded-3xl" onClick={() => navigate(`/portfolio/${featuredProject.slug}`)}>
             {/* Marble Champagne Veins */}
             <MarbleVeins />
 
@@ -55,7 +54,7 @@ export const FeaturedCaseStudy: React.FC = () => {
                   
                   {/* Business Impact Metrics */}
                   <div className="flex gap-10 mt-2 pt-6 border-t border-gold/10">
-                    {featuredProject.businessImpact.map((impact, idx) => (
+                    {(featuredProject.businessImpact || []).map((impact, idx) => (
                       <div key={idx} className="flex flex-col gap-1">
                         <span className="text-3xl md:text-4xl font-heading text-gold leading-none font-light">{impact.value}</span>
                         <span className="text-[8px] uppercase tracking-[0.2em] font-semibold text-gold/60">

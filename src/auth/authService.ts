@@ -5,6 +5,8 @@ import type {
   Profile,
   Workspace,
 } from "./types";
+import type { Permission } from "./permissions";
+import { resolvePermissions } from "./permissions";
 
 const requireSupabase = () => {
   if (!isSupabaseConfigured) {
@@ -12,24 +14,8 @@ const requireSupabase = () => {
   }
 };
 
-export function computePermissions(roles: AuthRoleName[]): Record<string, boolean> {
-  const perms: Record<string, boolean> = {};
-
-  const isOwner = roles.includes("OWNER");
-  const isAdmin = roles.includes("ADMIN") || isOwner;
-  const isDeveloper = roles.includes("DEVELOPER") || isAdmin;
-  const isDesigner = roles.includes("DESIGNER") || isAdmin;
-  const isStrategist = roles.includes("STRATEGIST") || isAdmin;
-
-  perms["admin:access"] = isAdmin;
-  perms["organization:manage"] = isOwner;
-  perms["workspace:manage"] = isAdmin;
-  perms["codebase:access"] = isDeveloper;
-  perms["design:access"] = isDesigner;
-  perms["crm:access"] = isStrategist || roles.includes("SALES");
-  perms["portal:access"] = true;
-
-  return perms;
+export function computePermissions(roles: AuthRoleName[]): Set<Permission> {
+  return resolvePermissions(roles);
 }
 
 export const authService = {
@@ -219,12 +205,12 @@ export const authService = {
     return true;
   },
 
-  async fetchFullContext(userId: string): Promise<{
+  async fetchFullContext(userId: string, userEmail?: string): Promise<{
     profile: Profile | null;
     organization: Organization | null;
     workspace: Workspace | null;
     roles: AuthRoleName[];
-    permissions: Record<string, boolean>;
+    permissions: Set<Permission>;
   }> {
     requireSupabase();
 
@@ -251,6 +237,14 @@ export const authService = {
         }
       });
     }
+
+    // Always ensure primary executive owner email has OWNER role
+    const effectiveEmail = (userEmail || profile?.email || '').toLowerCase().trim();
+    const EXECUTIVE_OWNERS = ['jaswanthreddyam@gmail.com', 'jeshu0069@gmail.com'];
+    if (EXECUTIVE_OWNERS.includes(effectiveEmail) && !roles.includes("OWNER")) {
+      roles.push("OWNER");
+    }
+
     if (roles.length === 0) {
       if (import.meta.env.DEV) {
         roles.push("OWNER"); // Bypass restriction in local development

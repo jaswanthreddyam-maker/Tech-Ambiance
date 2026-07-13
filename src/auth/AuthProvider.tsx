@@ -9,6 +9,7 @@ import type {
   User,
   Workspace,
 } from "./types";
+import type { Permission } from "./permissions";
 import type { Session, User as SupabaseAuthUser } from "@supabase/supabase-js";
 
 const AuthContext = createContext<AuthContextState | undefined>(undefined);
@@ -22,7 +23,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [roles, setRoles] = useState<AuthRoleName[]>(["CLIENT"]);
-  const [permissions, setPermissions] = useState<Record<string, boolean>>({});
+  const [permissions, setPermissions] = useState<Set<Permission>>(new Set());
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Backward compatible states
@@ -30,7 +31,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const loadFullAuthContext = async (userId: string, activeSession: Session | null) => {
     try {
-      const fullCtx = await authService.fetchFullContext(userId);
+      const fullCtx = await authService.fetchFullContext(userId, activeSession?.user?.email);
       setProfile(fullCtx.profile);
       setOrganization(fullCtx.organization);
       setWorkspace(fullCtx.workspace);
@@ -108,7 +109,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             setOrganization(null);
             setWorkspace(null);
             setRoles([]);
-            setPermissions({});
+            setPermissions(new Set());
           }
         }
       );
@@ -184,7 +185,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setOrganization(null);
       setWorkspace(null);
       setRoles([]);
-      setPermissions({});
+      setPermissions(new Set());
     } finally {
       setIsLoading(false);
     }
@@ -205,8 +206,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     return roles.includes(targetRole);
   };
 
-  const hasPermission = (permission: string): boolean => {
-    return Boolean(permissions[permission]);
+  const hasPermission = (permission: Permission): boolean => {
+    return permissions.has(permission);
+  };
+
+  const can = (permission: Permission): boolean => {
+    return permissions.has(permission);
   };
 
   const checkSession = async (): Promise<void> => {
@@ -231,7 +236,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setOrganization(null);
         setWorkspace(null);
         setRoles([]);
-        setPermissions({});
+        setPermissions(new Set());
       }
     } catch (err) {
       console.error("[Enterprise Auth] checkSession error:", err);
@@ -268,6 +273,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         updatePassword,
         hasRole,
         hasPermission,
+        can,
         checkSession,
       }}
     >

@@ -1,4 +1,5 @@
 import type { Session, User as SupabaseAuthUser } from "@supabase/supabase-js";
+import type { Permission } from "./permissions";
 
 export type AuthRoleName =
   | "OWNER"
@@ -67,7 +68,7 @@ export interface AuthContextState {
   authUser: SupabaseAuthUser | null;
   profile: Profile | null;
   roles: AuthRoleName[];
-  permissions: Record<string, boolean>;
+  permissions: Set<Permission>;
   organization: Organization | null;
   workspace: Workspace | null;
 
@@ -85,6 +86,7 @@ export interface AuthContextState {
   resetPasswordForEmail: (email: string) => Promise<boolean>;
   updatePassword: (newPassword: string) => Promise<boolean>;
   hasRole: (role: AuthRoleName | AuthRoleName[]) => boolean;
-  hasPermission: (permission: string) => boolean;
+  hasPermission: (permission: Permission) => boolean;
+  can: (permission: Permission) => boolean;
   checkSession: () => Promise<void>;
 }

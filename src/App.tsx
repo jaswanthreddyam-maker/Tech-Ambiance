@@ -9,6 +9,7 @@ import { ClientLayout } from "./layouts/ClientLayout";
 
 import { AuthGuard } from "./auth/AuthGuard";
 import { AdminGuard } from "./auth/AdminGuard";
+import { Dashboard } from "./auth/permissions";
 
 // Tech Ambiance StudioHQ Executive Console (/admin/*)
 import { StudioHQLayout } from "./layouts/StudioHQLayout";
@@ -40,6 +41,9 @@ const MediaPage = lazyNamed(() => import("./routes/admin/MediaPage"), "MediaPage
 const TimelinePage = lazyNamed(() => import("./routes/admin/TimelinePage"), "TimelinePage");
 const StudioTeamPage = lazyNamed(() => import("./routes/admin/components/StudioTeamPage"), "StudioTeamPage");
 const AdminAuthPage = lazyNamed(() => import("./routes/auth/admin/page"), "AdminAuthPage");
+const PortfolioPage = React.lazy(() => import("./routes/portfolio/page"));
+const PortfolioDetailPage = React.lazy(() => import("./routes/portfolio/detail"));
+const AdminPortfolioPage = lazyNamed(() => import("./routes/admin/PortfolioPage"), "AdminPortfolioPage");
 
 const RouteFallback: React.FC = () => (
   <div className="min-h-screen w-full bg-[#FAF7F0] flex items-center justify-center">
@@ -77,6 +81,9 @@ export const App: React.FC = () => {
           <Route path="/experience" element={<MarketingPage />} />
           <Route path="/experience/portfolio/:id" element={<PortfolioDetails />} />
           <Route path="/experience/case-studies/:id" element={<PortfolioDetails />} />
+          <Route path="/portfolio" element={<PortfolioPage />} />
+          <Route path="/portfolio/:slug" element={<PortfolioDetailPage />} />
+          <Route path="/work" element={<Navigate to="/portfolio" replace />} />
           <Route path="/privacy" element={<div className="py-40 text-center font-heading text-2xl font-bold">Privacy Policy Staging Environment</div>} />
           <Route path="/terms" element={<div className="py-40 text-center font-heading text-2xl font-bold">Terms of Service Staging Environment</div>} />
           <Route path="*" element={<NotFoundPage />} />
@@ -98,7 +105,7 @@ export const App: React.FC = () => {
         <Route
           path="/admin"
           element={
-            <AdminGuard requiredRole={["OWNER", "ADMIN", "DEVELOPER", "DESIGNER", "PROJECT_MANAGER", "STRATEGIST", "SALES"]}>
+            <AdminGuard requiredPermission={Dashboard.READ}>
               <StudioHQLayout />
             </AdminGuard>
           }
@@ -112,6 +119,7 @@ export const App: React.FC = () => {
           <Route path="cms" element={<CmsEditorPage />} />
           <Route path="ai-center" element={<AiCenterPage />} />
           <Route path="media" element={<MediaPage />} />
+          <Route path="portfolio" element={<AdminPortfolioPage />} />
           <Route path="settings" element={<StudioTeamPage />} />
         </Route>
         </Routes>

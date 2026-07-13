@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   Activity,
   ExternalLink,
+  Layers,
 } from 'lucide-react';
 import { CommandPaletteModal } from '../components/admin/CommandPaletteModal';
 import { SessionTimeout } from '../auth/SessionTimeout';
@@ -148,6 +149,10 @@ export const StudioHQLayout: React.FC = () => {
                 <NavLink to="/admin/media" className={navLinkClasses}>
                   <FolderKanban className="w-4 h-4" />
                   <span>Universal Media Vault</span>
+                </NavLink>
+                <NavLink to="/admin/portfolio" className={navLinkClasses}>
+                  <Layers className="w-4 h-4" />
+                  <span>Portfolio Manager</span>
                 </NavLink>
               </nav>
             </div>
