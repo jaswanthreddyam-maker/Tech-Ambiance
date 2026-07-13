@@ -248,10 +248,9 @@ export const LandingPage: React.FC = () => {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.15, ease: [0.19, 1, 0.22, 1], delay: 0.3 }}
-            className="font-heading font-bold text-5xl sm:text-6xl md:text-7xl lg:text-[5.25rem] text-forest leading-[1.04] tracking-tight mb-8"
+            className="font-heading font-bold text-4xl sm:text-5xl md:text-6xl lg:text-[4.25rem] text-forest leading-[1.08] tracking-tight mb-8"
           >
-            Crafting Digital <br />
-            Experiences <br />
+            Crafting Digital Experiences <br />
             Businesses <br />
             <span className="font-serif italic text-gold font-normal">Remember.</span>
           </motion.h1>
