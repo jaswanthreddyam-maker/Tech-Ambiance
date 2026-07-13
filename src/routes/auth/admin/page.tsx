@@ -8,7 +8,7 @@ import { supabase } from '../../../lib/supabase';
 
 export const AdminAuthPage: React.FC = () => {
   const [email, setEmail] = useState('');
-  const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
+  const [otp, setOtp] = useState<string[]>(Array(8).fill(''));
   const [pin, setPin] = useState<string[]>(Array(6).fill(''));
   const [step, setStep] = useState<'email' | 'otp' | 'create-pin' | 'verify-pin' | 'success'>('email');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -51,8 +51,8 @@ export const AdminAuthPage: React.FC = () => {
   const handleOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = otp.join('');
-    if (token.length < 6) {
-      setError('Please enter the 6-digit code.');
+    if (token.length < 8) {
+      setError('Please enter the 8-digit code.');
       return;
     }
 
@@ -176,7 +176,7 @@ export const AdminAuthPage: React.FC = () => {
     if (type === 'otp') setOtp(newArr);
     else setPin(newArr);
 
-    const maxIdx = 5;
+    const maxIdx = type === 'otp' ? 7 : 5;
     if (value !== '' && index < maxIdx) {
       const nextInput = document.getElementById(`${type}-${index + 1}`);
       nextInput?.focus();
@@ -187,7 +187,7 @@ export const AdminAuthPage: React.FC = () => {
     e.preventDefault();
     const pasted = e.clipboardData.getData('text').replace(/\D/g, '');
     if (!pasted) return;
-    const maxLen = 6;
+    const maxLen = type === 'otp' ? 8 : 6;
     const digits = pasted.slice(0, maxLen).split('');
     const newArr = Array(maxLen).fill('');
     digits.forEach((d, i) => { newArr[i] = d; });
@@ -292,13 +292,13 @@ export const AdminAuthPage: React.FC = () => {
                   Verification Code Sent
                 </h1>
                 <p className="text-sm text-[#0B3D2E]/70 mb-8 font-medium">
-                  Enter the secure 6-digit code sent to:<br/>
+                  Enter the secure 8-digit code sent to:<br/>
                   <span className="text-[#0B3D2E] font-bold mt-1 inline-block">{email}</span>
                 </p>
 
                 <div className="bg-white border border-[#0B3D2E]/10 rounded-[24px] p-6 md:p-8 shadow-[0_8px_30px_rgba(11,61,46,0.04)]">
                   <form onSubmit={handleOtpSubmit} className="flex flex-col gap-6">
-                    <div className="flex justify-between gap-2">
+                    <div className="flex justify-between gap-1 sm:gap-2">
                       {otp.map((digit, index) => (
                         <input
                           key={index}
@@ -310,7 +310,7 @@ export const AdminAuthPage: React.FC = () => {
                           onChange={(e) => handleDigitChange(index, e.target.value, 'otp')}
                           onKeyDown={(e) => handleDigitKeyDown(index, e, 'otp')}
                           onPaste={(e) => handlePaste(e, 'otp')}
-                          className="w-8 h-11 sm:w-10 sm:h-12 md:w-11 md:h-14 text-center bg-[#FAF7F0]/50 border border-[#0B3D2E]/10 rounded-xl text-base md:text-lg font-bold text-[#0B3D2E] focus:outline-none focus:border-[#C5A572] focus:ring-1 focus:ring-[#C5A572] transition-all"
+                          className="w-7 h-10 sm:w-9 sm:h-12 md:w-11 md:h-14 text-center bg-[#FAF7F0]/50 border border-[#0B3D2E]/10 rounded-xl text-base md:text-lg font-bold text-[#0B3D2E] focus:outline-none focus:border-[#C5A572] focus:ring-1 focus:ring-[#C5A572] transition-all"
                         />
                       ))}
                     </div>
