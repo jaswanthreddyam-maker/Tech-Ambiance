@@ -8,11 +8,80 @@ import { portfolioRepository } from '../../repositories/portfolioRepository';
 import type { Project } from '../../domain/project/project.types';
 
 // ============================================================================
+// Background Atmospheres
+// ============================================================================
+
+const LightVeins: React.FC<{ paths: string[] }> = ({ paths }) => (
+  <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none" aria-hidden="true">
+    <svg className="absolute inset-0 w-full h-full opacity-[0.06]" viewBox="0 0 1000 550" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="lightVeinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#C5A572" stopOpacity="0.2" />
+          <stop offset="30%" stopColor="#C5A572" stopOpacity="1" />
+          <stop offset="70%" stopColor="#C5A572" stopOpacity="1" />
+          <stop offset="100%" stopColor="#C5A572" stopOpacity="0.2" />
+        </linearGradient>
+      </defs>
+      {paths.map((d, i) => (
+        <path 
+          key={i}
+          d={d} 
+          fill="none" 
+          stroke="url(#lightVeinGrad)" 
+          strokeWidth={i === 0 ? "1.2" : "0.75"} 
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{ filter: "drop-shadow(0 0 4px rgba(197,165,114,0.1))" }}
+        />
+      ))}
+    </svg>
+  </div>
+);
+
+const DarkAtmosphere: React.FC = () => (
+  <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none" aria-hidden="true">
+    <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-[#C5A572]/[0.02] blur-[100px] rounded-full" />
+    <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-[#000000]/20 blur-[150px] rounded-full" />
+    
+    <svg className="absolute inset-0 w-full h-full opacity-20" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" viewBox="0 0 500 500">
+      <defs>
+        <linearGradient id="darkVeinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#C5A572" stopOpacity="0.01" />
+          <stop offset="40%" stopColor="#C5A572" stopOpacity="0.1" />
+          <stop offset="100%" stopColor="#C5A572" stopOpacity="0.01" />
+        </linearGradient>
+      </defs>
+      <path 
+        d="M -20,80 C 120,120 180,40 320,160 T 520,60" 
+        fill="none" 
+        stroke="url(#darkVeinGrad)" 
+        strokeWidth="0.8" 
+        style={{ filter: "blur(0.5px)" }} 
+      />
+    </svg>
+
+    <div className="absolute inset-0 opacity-[0.025]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
+
+    <div className="absolute inset-x-0 bottom-8 text-center opacity-[0.03] flex items-center justify-center hidden md:flex">
+      <span className="text-[110px] font-heading font-bold tracking-[0.08em] text-[#C5A572] leading-none whitespace-nowrap">
+        TECH AMBIANCE
+      </span>
+    </div>
+  </div>
+);
+
+// ============================================================================
 // Hero Section
 // ============================================================================
 const HeroSection: React.FC = () => {
   return (
     <section className="relative min-h-[90vh] flex flex-col justify-center items-center px-6 md:px-12 bg-[#FAF7F0] overflow-hidden pt-32 pb-20">
+      <LightVeins paths={[
+        "M -20,60 L 110,105 L 185,92 L 310,165 L 440,148 L 590,260 L 740,235 L 920,380 L 1050,355",
+        "M 310,165 L 365,115 L 490,95 L 610,35",
+        "M 590,260 L 630,335 L 585,410 L 660,490"
+      ]} />
+      
       <div className="absolute inset-0 z-0">
         <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#C5A572]/10 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-[#0B3D2E]/5 rounded-full blur-[150px] pointer-events-none" />
@@ -76,8 +145,9 @@ const TransformationsSection: React.FC = () => {
   }, []);
 
   return (
-    <section className="bg-[#0B3D2E] py-32 px-6 md:px-12 relative text-[#FAF7F0]">
-      <div className="max-w-7xl mx-auto">
+    <section className="bg-[#0B3D2E] py-32 px-6 md:px-12 relative text-[#FAF7F0] overflow-hidden">
+      <DarkAtmosphere />
+      <div className="max-w-7xl mx-auto relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 relative">
           
           {/* Sticky Left Column: Industries */}
@@ -165,8 +235,12 @@ const DigitalAssetsSection: React.FC = () => {
   }, []);
 
   return (
-    <section className="py-32 px-6 md:px-12 bg-[#FAF7F0]">
-      <div className="max-w-7xl mx-auto">
+    <section className="py-32 px-6 md:px-12 bg-[#FAF7F0] relative overflow-hidden">
+      <LightVeins paths={[
+        "M -10,240 L 160,215 L 290,260 L 480,210 L 670,255 L 860,195 L 1040,235",
+        "M 290,260 L 340,345 L 510,320 L 640,395"
+      ]} />
+      <div className="max-w-7xl mx-auto relative z-10">
         <div className="mb-20">
           <h2 className="font-mono text-xs font-bold tracking-[0.2em] text-[#C5A572] uppercase mb-6">
             Digital Assets We Create
@@ -218,8 +292,12 @@ const ProvenTransformationsSection: React.FC = () => {
   if (projects.length === 0) return null;
 
   return (
-    <section className="py-32 px-6 md:px-12 bg-white">
-      <div className="max-w-7xl mx-auto">
+    <section className="py-32 px-6 md:px-12 bg-white relative overflow-hidden">
+      <LightVeins paths={[
+        "M 40,490 L 195,395 L 285,420 L 460,265 L 610,290 L 780,140 L 960,85",
+        "M 460,265 L 495,185 L 640,135 L 720,40"
+      ]} />
+      <div className="max-w-7xl mx-auto relative z-10">
         <div className="mb-20 text-center">
           <h2 className="font-mono text-xs font-bold tracking-[0.2em] text-[#C5A572] uppercase mb-6">
             Proven Transformations
@@ -281,8 +359,9 @@ const ProvenTransformationsSection: React.FC = () => {
 // ============================================================================
 const StudioHQSection: React.FC = () => {
   return (
-    <section className="py-32 px-6 md:px-12 bg-[#0B3D2E] text-[#FAF7F0]">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+    <section className="py-32 px-6 md:px-12 bg-[#0B3D2E] text-[#FAF7F0] relative overflow-hidden">
+      <DarkAtmosphere />
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center relative z-10">
         <div>
           <h2 className="font-mono text-xs font-bold tracking-[0.2em] text-[#C5A572] uppercase mb-8">
             The StudioHQ Differentiator
@@ -351,8 +430,12 @@ const TechnologySection: React.FC = () => {
   }, []);
 
   return (
-    <section className="py-32 px-6 md:px-12 bg-white">
-      <div className="max-w-7xl mx-auto text-center">
+    <section className="py-32 px-6 md:px-12 bg-white relative overflow-hidden">
+      <LightVeins paths={[
+        "M 80,85 L 260,155 L 390,130 L 580,270 L 750,240 L 940,365",
+        "M 390,130 L 425,65 L 590,40 L 730,15"
+      ]} />
+      <div className="max-w-7xl mx-auto text-center relative z-10">
         <h2 className="font-mono text-xs font-bold tracking-[0.2em] text-[#C5A572] uppercase mb-16">
           The Engineering Stack
         </h2>
@@ -377,8 +460,12 @@ const TechnologySection: React.FC = () => {
 // ============================================================================
 const CTASection: React.FC = () => {
   return (
-    <section className="py-32 px-6 md:px-12 bg-[#FAF7F0] border-t border-[#0B3D2E]/10">
-      <div className="max-w-4xl mx-auto text-center">
+    <section className="py-32 px-6 md:px-12 bg-[#FAF7F0] border-t border-[#0B3D2E]/10 relative overflow-hidden">
+      <LightVeins paths={[
+        "M 180,35 L 310,115 L 430,95 L 560,195 L 710,165 L 860,275",
+        "M 430,95 L 485,35 L 640,20"
+      ]} />
+      <div className="max-w-4xl mx-auto text-center relative z-10">
         
         <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-left mb-24 max-w-3xl mx-auto">
           <div className="col-span-2 md:col-span-3 text-center mb-8">
