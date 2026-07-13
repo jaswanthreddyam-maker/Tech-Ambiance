@@ -34,6 +34,7 @@ export const PORTFOLIO_PROJECTS: Project[] = [
       cover: "/assets/images/projects/restaurant-cover.png",
       gallery: [],
     },
+    url: "https://bhavanamrestaurantdemo.netlify.app",
     featured: false,
   }
 ];

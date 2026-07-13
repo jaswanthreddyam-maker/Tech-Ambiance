@@ -36,15 +36,8 @@ export const PortfolioSection: React.FC = () => {
 
         {/* Grid Layout */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {selectedProjects.map((project, idx) => (
-            <m.div
-              key={project.id}
-              initial={{ opacity: 0, y: 6 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-30%" }}
-              transition={{ duration: 1.15, ease: [0.19, 1, 0.22, 1], delay: Math.floor(idx / 2) * 0.14 }}
-            >
-              <Link to={`${ROUTES.work}/${project.slug}`} className="block h-full group">
+          {selectedProjects.map((project, idx) => {
+            const cardContent = (
                 <Card 
                   padding="none" 
                   variant="default"
@@ -67,16 +60,26 @@ export const PortfolioSection: React.FC = () => {
                         <div className="w-4 h-1 bg-forest/10 rounded" />
                       </div>
                       {/* Browser Body simulator */}
-                      <div className="flex-1 bg-emerald-stone p-6 flex flex-col justify-end relative overflow-hidden">
-                        <MarbleVeins />
-                        <div className="absolute inset-0 bg-gradient-to-t from-forest/80 to-transparent z-10" />
-                        <div className="absolute inset-0 opacity-15 group-hover:scale-105 transition-transform duration-[1200ms] flex items-center justify-center">
-                          <div className="w-40 h-40 border border-gold rounded-full blur-2xl opacity-[0.05]" />
-                        </div>
-                        <div className="relative z-20 flex flex-col gap-1.5 text-left select-none">
-                          <div className="w-16 h-1.5 bg-gold/60 rounded" />
-                          <div className="w-32 h-3.5 bg-gold/20 rounded" />
-                        </div>
+                      <div className="flex-1 bg-white relative overflow-hidden">
+                        {project.images?.cover ? (
+                          <img
+                            src={project.images.cover}
+                            alt={project.title}
+                            className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-emerald-stone p-6 flex flex-col justify-end relative overflow-hidden">
+                            <MarbleVeins />
+                            <div className="absolute inset-0 bg-gradient-to-t from-forest/80 to-transparent z-10" />
+                            <div className="absolute inset-0 opacity-15 group-hover:scale-105 transition-transform duration-[1200ms] flex items-center justify-center">
+                              <div className="w-40 h-40 border border-gold rounded-full blur-2xl opacity-[0.05]" />
+                            </div>
+                            <div className="relative z-20 flex flex-col gap-1.5 text-left select-none">
+                              <div className="w-16 h-1.5 bg-gold/60 rounded" />
+                              <div className="w-32 h-3.5 bg-gold/20 rounded" />
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -98,18 +101,41 @@ export const PortfolioSection: React.FC = () => {
                       </Text>
                     </div>
 
-                    <div className="mt-8 pt-6 border-t border-forest/[0.06] flex flex-wrap gap-2">
-                       {project.services.map(service => (
-                          <span key={service} className="text-[8px] uppercase tracking-widest font-bold text-text-secondary bg-forest/[0.03] px-2.5 py-1 rounded-full border border-forest/[0.02]">
-                            {service}
+                    {/* Services/Tags Footer */}
+                    <div className="flex flex-wrap gap-2 mt-6 pt-6 border-t border-forest/[0.06]">
+                       {project.services.slice(0, 2).map((svc, sIdx) => (
+                          <span 
+                            key={sIdx} 
+                            className="text-[9px] uppercase tracking-wider font-semibold text-text-secondary bg-forest/[0.03] px-2.5 py-1 rounded"
+                          >
+                            {svc}
                           </span>
                        ))}
                     </div>
                   </div>
                 </Card>
-              </Link>
-            </m.div>
-          ))}
+            );
+
+            return (
+              <m.div
+                key={project.id}
+                initial={{ opacity: 0, y: 6 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-30%" }}
+                transition={{ duration: 1.15, ease: [0.19, 1, 0.22, 1], delay: Math.floor(idx / 2) * 0.14 }}
+              >
+                {project.url ? (
+                  <a href={project.url} target="_blank" rel="noopener noreferrer" className="block h-full group">
+                    {cardContent}
+                  </a>
+                ) : (
+                  <Link to={`${ROUTES.work}/${project.slug}`} className="block h-full group">
+                    {cardContent}
+                  </Link>
+                )}
+              </m.div>
+            );
+          })}
         </div>
 
       </Container>
