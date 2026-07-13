@@ -38,9 +38,9 @@ export const StudioTeamPage: React.FC = () => {
       setShowInviteModal(false);
       setInviteEmail("");
       setInviteError("");
-      
-      // Construct the invite link and display it to the user to bypass email delivery limits!
-      const link = `${window.location.origin}/auth/accept-invite?token=${data.token}`;
+      // Construct the invite link and display it to the user
+      // The user just needs to log in at the admin portal, the database trigger will auto-link their invitation!
+      const link = `${window.location.origin}/auth/admin`;
       setNewInviteLink(link);
     },
     onError: (err: any) => {
