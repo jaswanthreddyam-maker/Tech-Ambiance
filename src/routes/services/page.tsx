@@ -210,7 +210,7 @@ const ProvenTransformationsSection: React.FC = () => {
   useEffect(() => {
     // Only fetch published projects that have metrics to show as proof
     portfolioRepository.getAllProjects().then(data => {
-      const published = data.filter(p => p.status === 'PUBLISHED' && p.metrics.length > 0);
+      const published = data.filter(p => p.status === 'PUBLISHED' && p.metrics && p.metrics.length > 0);
       setProjects(published.slice(0, 3)); // Show top 3
     });
   }, []);
@@ -250,7 +250,7 @@ const ProvenTransformationsSection: React.FC = () => {
                 <div className="absolute bottom-0 left-0 p-8 w-full">
                   <h4 className="text-white text-2xl font-bold mb-2">{project.title}</h4>
                   
-                  {project.metrics[0] && (
+                  {project.metrics && project.metrics[0] && (
                     <div className="flex items-end gap-3 text-[#C5A572] mt-4">
                       <span className="text-4xl font-bold leading-none">
                         {project.metrics[0].display_prefix}{project.metrics[0].value}{project.metrics[0].suffix}
