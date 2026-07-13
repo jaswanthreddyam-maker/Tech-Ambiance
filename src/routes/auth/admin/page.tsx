@@ -44,6 +44,9 @@ export const AdminAuthPage: React.FC = () => {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) throw new Error("Authentication failed");
 
+        // Accept any pending invitations for the user
+        await supabase.rpc('accept_pending_invitations');
+
         // Check PIN setup
         const { data: securityRecord } = await supabase
           .from('admin_security')
@@ -107,6 +110,9 @@ export const AdminAuthPage: React.FC = () => {
       
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error("Authentication failed");
+
+      // Accept any pending invitations for the user
+      await supabase.rpc('accept_pending_invitations');
 
       // Verify roles before proceeding
       const roles = ['OWNER', 'ADMIN', 'DEVELOPER', 'DESIGNER', 'PROJECT_MANAGER', 'STRATEGIST', 'SALES'];
