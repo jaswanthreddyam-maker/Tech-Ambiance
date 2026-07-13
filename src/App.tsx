@@ -43,8 +43,8 @@ const TimelinePage = lazyNamed(() => import("./routes/admin/TimelinePage"), "Tim
 const StudioTeamPage = lazyNamed(() => import("./routes/admin/components/StudioTeamPage"), "StudioTeamPage");
 const AdminAuthPage = lazyNamed(() => import("./routes/auth/admin/page"), "AdminAuthPage");
 const PortfolioPage = React.lazy(() => import("./routes/portfolio/page"));
-const PortfolioDetailPage = React.lazy(() => import("./routes/portfolio/detail"));
-const AdminPortfolioPage = lazyNamed(() => import("./routes/admin/PortfolioPage"), "AdminPortfolioPage");
+const PortfolioDetailPage = React.lazy(() => import("./routes/portfolio/detail.tsx"));
+const AdminPortfolioPage = lazyNamed(() => import("./routes/admin/PortfolioPage.tsx"), "AdminPortfolioPage");
 
 const RouteFallback: React.FC = () => (
   <div className="min-h-screen w-full bg-[#FAF7F0] flex items-center justify-center">
