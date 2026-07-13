@@ -30,7 +30,8 @@ export const studioTeamCommands = {
     });
     
     if (error) throw error;
-    return data;
+    // We now return { id, token } instead of just the UUID
+    return data as { id: string; token: string };
   },
 
   async revokeInvitation(invitationId: string) {

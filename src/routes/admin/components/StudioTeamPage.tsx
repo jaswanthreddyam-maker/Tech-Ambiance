@@ -13,6 +13,7 @@ export const StudioTeamPage: React.FC = () => {
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<AuthRoleName>("OWNER");
   const [inviteError, setInviteError] = useState("");
+  const [newInviteLink, setNewInviteLink] = useState("");
 
   const [filters] = useState<StudioTeamQueryFilters>({ page: 1, pageSize: 10 });
 
@@ -32,11 +33,15 @@ export const StudioTeamPage: React.FC = () => {
   // 2. Mutations
   const inviteMutation = useMutation({
     mutationFn: ({ email, role }: { email: string, role: AuthRoleName }) => studioTeamCommands.inviteMember(email, role),
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: studioTeamKeys.all });
       setShowInviteModal(false);
       setInviteEmail("");
       setInviteError("");
+      
+      // Construct the invite link and display it to the user to bypass email delivery limits!
+      const link = `${window.location.origin}/auth/accept-invite?token=${data.token}`;
+      setNewInviteLink(link);
     },
     onError: (err: any) => {
       setInviteError(err.message || "Failed to send invitation.");
@@ -130,6 +135,33 @@ export const StudioTeamPage: React.FC = () => {
           </button>
         ))}
       </div>
+
+      {newInviteLink && (
+        <div className="bg-[#0B3027] text-white p-4 rounded-xl border border-[#C9A56A]/30 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2">
+          <div>
+            <h3 className="font-semibold">Invitation Created!</h3>
+            <p className="text-sm text-white/80">Since you're on the Resend free tier, emails only send to verified domains. Copy this link and send it directly:</p>
+          </div>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <input 
+              type="text" 
+              readOnly 
+              value={newInviteLink} 
+              className="bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 text-sm w-full sm:w-64 focus:outline-none"
+              onClick={(e) => (e.target as HTMLInputElement).select()}
+            />
+            <button 
+              onClick={() => {
+                navigator.clipboard.writeText(newInviteLink);
+                setNewInviteLink("");
+              }}
+              className="px-4 py-1.5 bg-[#C9A56A] text-[#0B3027] text-sm font-semibold rounded-lg hover:bg-[#D4B37F] transition-colors whitespace-nowrap"
+            >
+              Copy & Close
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="min-h-[400px]">
         {activeTab === 'permissions' && (
