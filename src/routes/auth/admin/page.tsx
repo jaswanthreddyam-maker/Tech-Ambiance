@@ -12,6 +12,8 @@ export const AdminAuthPage: React.FC = () => {
   const [pin, setPin] = useState<string[]>(Array(6).fill(''));
   const [step, setStep] = useState<'email' | 'otp' | 'create-pin' | 'verify-pin' | 'success'>('email');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [usePasswordFallback, setUsePasswordFallback] = useState(false);
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [rememberDevice, setRememberDevice] = useState(false);
   const [countdown, setCountdown] = useState(0);
@@ -28,6 +30,39 @@ export const AdminAuthPage: React.FC = () => {
 
     setIsSubmitting(true);
     setError(null);
+
+    // Bypass: Use Password Fallback if enabled
+    if (usePasswordFallback) {
+      try {
+        const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+        if (signInError) {
+          // If sign in fails, maybe they don't exist yet. Try to sign up.
+          const { data, error: signUpError } = await supabase.auth.signUp({ email, password });
+          if (signUpError) throw signUpError;
+        }
+        
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error("Authentication failed");
+
+        // Check PIN setup
+        const { data: securityRecord } = await supabase
+          .from('admin_security')
+          .select('user_id')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+
+        if (!securityRecord) setStep('create-pin');
+        else setStep('verify-pin');
+        
+      } catch (err: any) {
+        console.error('Password Fallback Error:', err);
+        setError(err?.message || 'Password authentication failed.');
+      } finally {
+        setIsSubmitting(false);
+      }
+      return;
+    }
+
     try {
       await authService.signInWithPrimaryFactor(email);
       setStep('otp');
@@ -42,7 +77,14 @@ export const AdminAuthPage: React.FC = () => {
       
     } catch (err: any) {
       console.error('Admin OTP Dispatch Error:', err);
-      setError(err?.message || 'Unable to send verification code. Please try again.');
+      let errorMsg = 'Unable to send verification code. Please try again.';
+      if (err instanceof Error) errorMsg = err.message;
+      else if (typeof err === 'string') errorMsg = err;
+      else if (err && typeof err === 'object' && err.message) errorMsg = err.message;
+      else if (err && typeof err === 'object' && Object.keys(err).length === 0) {
+        errorMsg = 'Email delivery blocked: Your Supabase SMTP provider (Resend Free Tier) is rejecting emails to unverified addresses.';
+      }
+      setError(errorMsg);
     } finally {
       setIsSubmitting(false);
     }
@@ -241,36 +283,65 @@ export const AdminAuthPage: React.FC = () => {
                 <div className="bg-white border border-[#0B3D2E]/10 rounded-[24px] p-6 md:p-8 shadow-[0_8px_30px_rgba(11,61,46,0.04)]">
                   <form onSubmit={handleEmailSubmit} className="flex flex-col gap-5">
                     <div className="flex flex-col gap-2">
-                      <label htmlFor="email" className="text-[10px] uppercase font-bold tracking-widest text-[#0B3D2E]/60 ml-1">
+                      <label className="text-[10px] font-bold text-[#0B3D2E]/60 uppercase tracking-widest pl-1">
                         Company Email
                       </label>
                       <input
-                        id="email"
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="owner@techambiance.com"
+                        placeholder="admin@techambiance.com"
+                        className="w-full bg-[#FAF7F0] border border-[#0B3D2E]/10 rounded-xl px-4 py-3.5 text-sm font-medium text-[#0B3D2E] placeholder:text-[#0B3D2E]/30 focus:outline-none focus:ring-2 focus:ring-[#C5A572]/50 transition-all"
                         disabled={isSubmitting}
-                        className="w-full bg-[#FAF7F0]/50 border border-[#0B3D2E]/10 rounded-xl px-4 py-3.5 text-sm text-[#0B3D2E] placeholder-[#0B3D2E]/30 focus:outline-none focus:border-[#C5A572] focus:ring-1 focus:ring-[#C5A572] transition-all"
                       />
                     </div>
-                    
+
+                    {usePasswordFallback && (
+                      <div className="flex flex-col gap-2">
+                        <label className="text-[10px] font-bold text-[#0B3D2E]/60 uppercase tracking-widest pl-1">
+                          Override Password
+                        </label>
+                        <input
+                          type="password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="Dev bypass password"
+                          className="w-full bg-[#FAF7F0] border border-[#0B3D2E]/10 rounded-xl px-4 py-3.5 text-sm font-medium text-[#0B3D2E] placeholder:text-[#0B3D2E]/30 focus:outline-none focus:ring-2 focus:ring-[#C5A572]/50 transition-all"
+                          disabled={isSubmitting}
+                        />
+                      </div>
+                    )}
+
                     {error && (
-                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xs text-red-600 font-medium">
-                        {error}
-                      </motion.div>
+                      <div className="text-xs font-semibold text-red-600 bg-red-50 p-3 rounded-lg border border-red-100 flex items-start gap-2">
+                        <span className="mt-0.5 font-mono">{}</span> <span>{error}</span>
+                      </div>
                     )}
 
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full mt-2 group relative bg-[#0B3D2E] text-[#C5A572] rounded-xl py-3.5 flex items-center justify-center gap-2 overflow-hidden transition-all hover:bg-[#072a1f]"
+                      className="w-full mt-2 bg-[#0B3D2E] text-[#FAF7F0] rounded-xl py-3.5 px-4 font-semibold text-xs tracking-wider flex items-center justify-between group hover:bg-[#115541] transition-colors disabled:opacity-70 disabled:cursor-not-allowed shadow-[0_4px_14px_rgba(11,61,46,0.2)]"
                     >
-                      <span className="text-xs uppercase font-bold tracking-widest relative z-10">
-                        {isSubmitting ? 'Sending...' : 'Send Verification Code'}
-                      </span>
-                      {!isSubmitting && <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform relative z-10" />}
-                      <div className="absolute inset-0 bg-[#C5A572]/10 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+                      {isSubmitting ? (
+                        <div className="flex items-center gap-2 mx-auto">
+                          <Loader2 className="w-4 h-4 animate-spin text-[#C5A572]" />
+                          <span>AUTHENTICATING...</span>
+                        </div>
+                      ) : (
+                        <>
+                          <span>{usePasswordFallback ? 'AUTHENTICATE (DEV)' : 'SEND VERIFICATION CODE'}</span>
+                          <ArrowRight className="w-4 h-4 text-[#C5A572] group-hover:translate-x-1 transition-transform" />
+                        </>
+                      )}
+                    </button>
+                    
+                    <button
+                      type="button"
+                      onClick={() => setUsePasswordFallback(!usePasswordFallback)}
+                      className="text-[10px] uppercase font-bold text-[#0B3D2E]/40 hover:text-[#0B3D2E]/80 transition-colors mt-2 text-center"
+                    >
+                      {usePasswordFallback ? 'Use Standard OTP Login' : 'Dev Mode: Use Password Bypass'}
                     </button>
                   </form>
                 </div>
