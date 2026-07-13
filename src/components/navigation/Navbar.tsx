@@ -10,7 +10,7 @@ import { ROUTES } from "../../routes/routes";
 import logoImg from "../../assets/logo.png";
 
 export const Navbar: React.FC = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
@@ -223,10 +223,9 @@ export const Navbar: React.FC = () => {
                   <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: [0.15, 0.22, 0.15] }}
-                    exit={{ opacity: 0 }}
+                    exit={{ opacity: 0, transition: { duration: 0.2 } }}
                     transition={{ 
-                      opacity: { duration: 4, repeat: Infinity, ease: "easeInOut" },
-                      exit: { duration: 0.2 }
+                      opacity: { duration: 4, repeat: Infinity, ease: "easeInOut" }
                     }}
                     className="absolute inset-0 bg-[#C5A572] blur-xl rounded-full z-0 pointer-events-none"
                   />
