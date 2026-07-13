@@ -45,6 +45,10 @@ const AdminAuthPage = lazyNamed(() => import("./routes/auth/admin/page"), "Admin
 const PortfolioPage = React.lazy(() => import("./routes/portfolio/page"));
 const PortfolioDetailPage = React.lazy(() => import("./routes/portfolio/detail.tsx"));
 const AdminPortfolioPage = lazyNamed(() => import("./routes/admin/PortfolioPage.tsx"), "AdminPortfolioPage");
+const InsightsPage = React.lazy(() => import("./routes/insights/page.tsx"));
+const InsightsDetailPage = React.lazy(() => import("./routes/insights/detail.tsx"));
+
+import { CommandPalette } from "./components/search/CommandPalette";
 
 const RouteFallback: React.FC = () => (
   <div className="min-h-screen w-full bg-[#FAF7F0] flex items-center justify-center">
@@ -57,6 +61,7 @@ export const App: React.FC = () => {
 
   return (
     <>
+      <CommandPalette />
       <Suspense fallback={<RouteFallback />}>
         <Routes location={location}>
         {/* Redirect root to /landing */}
@@ -85,6 +90,8 @@ export const App: React.FC = () => {
           <Route path="/portfolio" element={<PortfolioPage />} />
           <Route path="/portfolio/:slug" element={<PortfolioDetailPage />} />
           <Route path="/services" element={<ServicesPage />} />
+          <Route path="/insights" element={<InsightsPage />} />
+          <Route path="/insights/:slug" element={<InsightsDetailPage />} />
           <Route path="/work" element={<Navigate to="/portfolio" replace />} />
           <Route path="/privacy" element={<div className="py-40 text-center font-heading text-2xl font-bold">Privacy Policy Staging Environment</div>} />
           <Route path="/terms" element={<div className="py-40 text-center font-heading text-2xl font-bold">Terms of Service Staging Environment</div>} />

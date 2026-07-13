@@ -70,7 +70,7 @@ export const Footer: React.FC = () => {
                 <Link to={ROUTES.work} className="text-[13px] text-gold/70 hover:text-gold transition-colors" {...hoverProps}>Featured Projects</Link>
               </li>
               <li>
-                <Link to={ROUTES.insights} className="text-[13px] text-gold/70 hover:text-gold transition-colors" {...hoverProps}>Insights</Link>
+                <Link to={ROUTES.insights} className="text-[13px] text-gold/70 hover:text-gold transition-colors" {...hoverProps}>Blueprint</Link>
               </li>
               <li>
                 <Link to={ROUTES.manifesto} className="text-[13px] text-gold/70 hover:text-gold transition-colors" {...hoverProps}>Manifesto</Link>
