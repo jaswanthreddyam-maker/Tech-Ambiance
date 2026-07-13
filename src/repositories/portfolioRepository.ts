@@ -225,7 +225,33 @@ export const portfolioRepository = {
    * Create a new portfolio project.
    */
   async createProject(projectData: Partial<Project>): Promise<Project | null> {
-    if (!isSupabaseConfigured) return null;
+    if (!isSupabaseConfigured) {
+      const mockProject: Project = {
+        id: `mock-${Date.now()}`,
+        slug: projectData.slug || `mock-${Date.now()}`,
+        title: projectData.title || 'Untitled',
+        description: projectData.description,
+        cover_image_path: projectData.cover_image_path,
+        status: projectData.status ?? 'DRAFT',
+        featured_rank: projectData.featured_rank,
+        display_order: projectData.display_order ?? PORTFOLIO_PROJECTS.length,
+        technology_stack: projectData.technology_stack ?? [],
+        services: projectData.services ?? [],
+        overview: projectData.overview,
+        challenge: projectData.challenge,
+        solution: projectData.solution,
+        seo_title: projectData.seo_title,
+        meta_description: projectData.meta_description,
+        og_image_path: projectData.og_image_path,
+        canonical_url: projectData.canonical_url,
+        metrics: [],
+        links: [],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      PORTFOLIO_PROJECTS.push(mockProject);
+      return mockProject;
+    }
 
     const { data, error } = await supabase
       .from('portfolio_projects')
@@ -262,7 +288,14 @@ export const portfolioRepository = {
    * Update an existing portfolio project.
    */
   async updateProject(id: string, projectData: Partial<Project>): Promise<Project | null> {
-    if (!isSupabaseConfigured) return null;
+    if (!isSupabaseConfigured) {
+      const idx = PORTFOLIO_PROJECTS.findIndex(p => p.id === id);
+      if (idx !== -1) {
+        PORTFOLIO_PROJECTS[idx] = { ...PORTFOLIO_PROJECTS[idx], ...projectData };
+        return PORTFOLIO_PROJECTS[idx];
+      }
+      return null;
+    }
 
     const { data, error } = await supabase
       .from('portfolio_projects')
@@ -315,7 +348,13 @@ export const portfolioRepository = {
    * Clone a project as a new DRAFT with " (Copy)" suffix.
    */
   async cloneProject(id: string): Promise<Project | null> {
-    if (!isSupabaseConfigured) return null;
+    if (!isSupabaseConfigured) {
+      const source = PORTFOLIO_PROJECTS.find(p => p.id === id);
+      if (!source) return null;
+      const clone = { ...source, id: `mock-${Date.now()}`, title: `${source.title} (Copy)`, slug: `${source.slug}-copy`, status: 'DRAFT' as ProjectStatus };
+      PORTFOLIO_PROJECTS.push(clone);
+      return clone;
+    }
 
     // Fetch the source project with all relations
     const { data: source, error: fetchErr } = await supabase
@@ -407,7 +446,11 @@ export const portfolioRepository = {
    * Delete a portfolio project (cascade deletes metrics, media, links, categories).
    */
   async deleteProject(id: string): Promise<boolean> {
-    if (!isSupabaseConfigured) return false;
+    if (!isSupabaseConfigured) {
+      const idx = PORTFOLIO_PROJECTS.findIndex(p => p.id === id);
+      if (idx !== -1) PORTFOLIO_PROJECTS.splice(idx, 1);
+      return true;
+    }
 
     const { error } = await supabase
       .from('portfolio_projects')

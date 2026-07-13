@@ -81,7 +81,7 @@ export const StudioTeamPage: React.FC = () => {
 
 
   const handleSendInvitation = async () => {
-    if (!inviteEmail || !organization?.id) return;
+    if (!inviteEmail) return;
     setInviteError("");
     inviteMutation.mutate({ email: inviteEmail, role: inviteRole });
   };

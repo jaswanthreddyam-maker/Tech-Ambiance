@@ -412,7 +412,7 @@ export const AdminPortfolioPage: React.FC = () => {
       {isDrawerOpen && (
         <div className="fixed inset-0 z-50 flex justify-end">
           <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => { setIsDrawerOpen(false); resetForm(); }} />
-          <div className="relative w-full max-w-2xl bg-[#FAF7F0] shadow-2xl overflow-y-auto animate-in slide-in-from-right duration-300">
+          <div className="relative w-full max-w-2xl bg-[#FAF7F0] shadow-2xl h-full flex flex-col animate-in slide-in-from-right duration-300">
             {/* Drawer header */}
             <div className="sticky top-0 z-10 bg-[#FAF7F0] border-b border-[#0B3027]/10 px-8 py-5 flex items-center justify-between">
               <div>
@@ -427,7 +427,7 @@ export const AdminPortfolioPage: React.FC = () => {
             </div>
 
             {/* Drawer body */}
-            <div className="px-8 py-6 space-y-8">
+            <div className="px-8 py-6 space-y-8 flex-1 overflow-y-auto">
               {/* Core */}
               <div className="space-y-4">
                 <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#C9A56A]">Core Details</h3>
