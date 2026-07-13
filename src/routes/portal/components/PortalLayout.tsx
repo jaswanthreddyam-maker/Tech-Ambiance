@@ -24,18 +24,21 @@ export const PortalLayout: React.FC<{ children: React.ReactNode }> = ({ children
   if (projects.length === 0) {
     return (
       <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center p-8">
-        <div className="max-w-md w-full bg-white/60 backdrop-blur-xl border border-[#0B3027]/10 p-10 rounded-[2rem] shadow-2xl text-center">
+        <div className="max-w-md w-full bg-white/80 backdrop-blur-xl border border-[#0B3027]/10 p-10 rounded-[2rem] shadow-2xl text-center">
           <div className="w-16 h-16 bg-[#0B3027]/5 rounded-2xl flex items-center justify-center mx-auto mb-6">
             <Building2 className="w-8 h-8 text-[#C9A56A]" />
           </div>
           <h1 className="font-['Cormorant_Garamond'] text-4xl font-bold text-[#0B3027] mb-3">
-            Preparing Your Workspace
+            Workspace Pending Setup
           </h1>
           <p className="text-[#0B3027]/70 text-sm leading-relaxed mb-8">
-            Our engineering team is currently provisioning your project architecture. You will be notified the moment your initial milestones are defined.
+            Your workspace will be updated after your consultation request is reviewed and accepted.
           </p>
-          <button disabled className="w-full py-3 px-4 bg-[#0B3027]/5 text-[#0B3027]/40 rounded-xl font-semibold text-sm cursor-not-allowed">
-            Project Setup In Progress...
+          <button 
+            onClick={() => openConsultationModal()}
+            className="w-full py-3.5 px-6 bg-[#0B3027] text-[#FAF7F0] rounded-xl font-semibold text-xs uppercase tracking-widest hover:bg-[#0B3027]/90 transition-all shadow-lg"
+          >
+            Book Consultation
           </button>
         </div>
       </div>
