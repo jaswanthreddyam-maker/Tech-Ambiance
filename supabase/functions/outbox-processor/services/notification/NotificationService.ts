@@ -1,5 +1,5 @@
 import { EmailPayload } from "./channels/EmailProvider.ts";
-import { ResendProvider } from "./providers/ResendProvider.ts";
+import { SmtpProvider } from "./providers/SmtpProvider.ts";
 
 export interface NotificationPayload {
   recipient: string;
@@ -8,10 +8,10 @@ export interface NotificationPayload {
 }
 
 export class NotificationService {
-  private emailProvider: ResendProvider;
+  private emailProvider: SmtpProvider;
 
   constructor() {
-    this.emailProvider = new ResendProvider();
+    this.emailProvider = new SmtpProvider();
   }
 
   async sendEmail(payload: NotificationPayload): Promise<{ providerMessageId: string }> {
