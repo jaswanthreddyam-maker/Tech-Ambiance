@@ -13,7 +13,9 @@ import {
   Activity,
   ExternalLink,
   Layers,
+  LogOut,
 } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 import { CommandPaletteModal } from '../components/admin/CommandPaletteModal';
 import { SessionTimeout } from '../auth/SessionTimeout';
 import { ceoDashboardRepository } from '../repositories/ceoDashboardRepository';
@@ -240,6 +242,16 @@ export const StudioHQLayout: React.FC = () => {
             >
               <span>Public Studio</span>
               <span>→</span>
+            </button>
+            <button
+              onClick={async () => {
+                await supabase.auth.signOut();
+                navigate('/auth/admin');
+              }}
+              className="p-2 rounded-full bg-white/80 border border-[#0B3027]/10 shadow-sm text-[#0B3027] hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all"
+              title="Log Out"
+            >
+              <LogOut className="w-4 h-4" />
             </button>
           </div>
         </header>
