@@ -31,6 +31,7 @@ const IntroPage = React.lazy(() => import("./routes/intro/page"));
 const MarketingPage = React.lazy(() => import("./routes/marketing/page"));
 const PortfolioDetails = React.lazy(() => import("./routes/marketing/PortfolioDetails"));
 const ClientPortal = React.lazy(() => import("./routes/portal/page"));
+const ServicesPage = React.lazy(() => import("./routes/services/page"));
 const NotFoundPage = React.lazy(() => import("./routes/NotFound"));
 const DashboardPage = lazyNamed(() => import("./routes/admin/DashboardPage"), "DashboardPage");
 const WorkspacesPage = lazyNamed(() => import("./routes/admin/WorkspacesPage"), "WorkspacesPage");
@@ -83,6 +84,7 @@ export const App: React.FC = () => {
           <Route path="/experience/case-studies/:id" element={<PortfolioDetails />} />
           <Route path="/portfolio" element={<PortfolioPage />} />
           <Route path="/portfolio/:slug" element={<PortfolioDetailPage />} />
+          <Route path="/services" element={<ServicesPage />} />
           <Route path="/work" element={<Navigate to="/portfolio" replace />} />
           <Route path="/privacy" element={<div className="py-40 text-center font-heading text-2xl font-bold">Privacy Policy Staging Environment</div>} />
           <Route path="/terms" element={<div className="py-40 text-center font-heading text-2xl font-bold">Terms of Service Staging Environment</div>} />
