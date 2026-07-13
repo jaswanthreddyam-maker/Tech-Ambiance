@@ -37,7 +37,7 @@ export const AdminAuthPage: React.FC = () => {
         const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
         if (signInError) {
           // If sign in fails, maybe they don't exist yet. Try to sign up.
-          const { data, error: signUpError } = await supabase.auth.signUp({ email, password });
+          const { error: signUpError } = await supabase.auth.signUp({ email, password });
           if (signUpError) throw signUpError;
         }
         
