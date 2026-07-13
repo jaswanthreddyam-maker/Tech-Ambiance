@@ -33,7 +33,7 @@ export const StudioTeamPage: React.FC = () => {
   // 2. Mutations
   const inviteMutation = useMutation({
     mutationFn: ({ email, role }: { email: string, role: AuthRoleName }) => studioTeamCommands.inviteMember(email, role),
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: studioTeamKeys.all });
       setShowInviteModal(false);
       setInviteEmail("");
