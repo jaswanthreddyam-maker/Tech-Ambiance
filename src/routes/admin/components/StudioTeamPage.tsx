@@ -13,7 +13,7 @@ export const StudioTeamPage: React.FC = () => {
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<AuthRoleName>("OWNER");
   const [inviteError, setInviteError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+  const [newInviteLink, setNewInviteLink] = useState("");
 
   const [filters] = useState<StudioTeamQueryFilters>({ page: 1, pageSize: 10 });
 
@@ -38,9 +38,10 @@ export const StudioTeamPage: React.FC = () => {
       setShowInviteModal(false);
       setInviteEmail("");
       setInviteError("");
-      
-      setSuccessMessage("Invitation sent successfully! The user will receive an email shortly.");
-      setTimeout(() => setSuccessMessage(""), 5000);
+      // Construct the invite link and display it to the user
+      // The user just needs to log in at the admin portal, the database trigger will auto-link their invitation!
+      const link = `${window.location.origin}/auth/admin`;
+      setNewInviteLink(link);
     },
     onError: (err: any) => {
       setInviteError(err.message || "Failed to send invitation.");
@@ -135,18 +136,30 @@ export const StudioTeamPage: React.FC = () => {
         ))}
       </div>
 
-      {successMessage && (
-        <div className="bg-[#0B3027] text-white p-4 rounded-xl border border-[#C9A56A]/30 flex items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2">
-          <div className="flex items-center gap-3">
-            <ShieldCheck className="w-5 h-5 text-[#C9A56A]" />
-            <h3 className="font-semibold text-sm">{successMessage}</h3>
+      {newInviteLink && (
+        <div className="bg-[#0B3027] text-white p-4 rounded-xl border border-[#C9A56A]/30 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2">
+          <div>
+            <h3 className="font-semibold">Invitation Created!</h3>
+            <p className="text-sm text-white/80">Since you're on the Resend free tier, emails only send to verified domains. Copy this link and send it directly:</p>
           </div>
-          <button 
-            onClick={() => setSuccessMessage("")}
-            className="text-white/60 hover:text-white"
-          >
-            <XCircle className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <input 
+              type="text" 
+              readOnly 
+              value={newInviteLink} 
+              className="bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 text-sm w-full sm:w-64 focus:outline-none"
+              onClick={(e) => (e.target as HTMLInputElement).select()}
+            />
+            <button 
+              onClick={() => {
+                navigator.clipboard.writeText(newInviteLink);
+                setNewInviteLink("");
+              }}
+              className="px-4 py-1.5 bg-[#C9A56A] text-[#0B3027] text-sm font-semibold rounded-lg hover:bg-[#D4B37F] transition-colors whitespace-nowrap"
+            >
+              Copy & Close
+            </button>
+          </div>
         </div>
       )}
 
