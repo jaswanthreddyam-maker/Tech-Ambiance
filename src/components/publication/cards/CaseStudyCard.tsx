@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { PublicationArticle } from "../../../repositories/publicationRepository";
+import type { PublicationArticle } from "../../../repositories/publicationRepository";
 import { ArrowUpRight } from "lucide-react";
 
 interface Props {

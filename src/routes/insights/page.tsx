@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { publicationRepository, PublicationCategory } from "../../repositories/publicationRepository";
+import { publicationRepository } from "../../repositories/publicationRepository";
+import type { PublicationCategory } from "../../repositories/publicationRepository";
 import { BlueprintAtmosphere } from "../../components/ui/BlueprintAtmosphere";
 import { BlueprintTabs } from "../../components/publication/filters/BlueprintTabs";
 import { FeaturedCover } from "../../components/publication/cards/FeaturedCover";

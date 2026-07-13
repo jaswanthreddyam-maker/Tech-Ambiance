@@ -1,5 +1,5 @@
 import React from "react";
-import { PublicationArticle } from "../../../repositories/publicationRepository";
+import type { PublicationArticle } from "../../../repositories/publicationRepository";
 import { ArticleRenderer } from "./ArticleRenderer";
 
 interface Props {

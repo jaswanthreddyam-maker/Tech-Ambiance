@@ -27,7 +27,6 @@ export const InsightsDetailPage: React.FC = () => {
     restDelta: 0.001
   });
 
-  const progressPercentage = useTransform(scrollYProgress, [0, 1], [0, 100]);
   const [currentProgress, setCurrentProgress] = useState(0);
 
   useEffect(() => {

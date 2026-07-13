@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { PublicationCategory } from "../../../repositories/publicationRepository";
+import type { PublicationCategory } from "../../../repositories/publicationRepository";
 
 interface Props {
   categories: (PublicationCategory | "All")[];
