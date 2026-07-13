@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { motion, useScroll, useSpring, useTransform } from "framer-motion";
+import { motion, useScroll, useSpring } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { publicationRepository } from "../../repositories/publicationRepository";
 
