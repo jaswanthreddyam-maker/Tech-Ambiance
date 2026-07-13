@@ -6,37 +6,15 @@ import { servicesRepository } from '../../repositories/servicesRepository';
 import type { Transformation, DigitalAsset, TechItem } from '../../repositories/servicesRepository';
 import { portfolioRepository } from '../../repositories/portfolioRepository';
 import type { Project } from '../../domain/project/project.types';
+import { GoldenLightningVeins } from '../../components/ui/GoldenLightningVeins';
 
 // ============================================================================
 // Background Atmospheres
 // ============================================================================
 
-const LightVeins: React.FC<{ paths: string[] }> = ({ paths }) => (
-  <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none" aria-hidden="true">
-    <svg className="absolute inset-0 w-full h-full opacity-[0.06]" viewBox="0 0 1000 550" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="lightVeinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#C5A572" stopOpacity="0.2" />
-          <stop offset="30%" stopColor="#C5A572" stopOpacity="1" />
-          <stop offset="70%" stopColor="#C5A572" stopOpacity="1" />
-          <stop offset="100%" stopColor="#C5A572" stopOpacity="0.2" />
-        </linearGradient>
-      </defs>
-      {paths.map((d, i) => (
-        <path 
-          key={i}
-          d={d} 
-          fill="none" 
-          stroke="url(#lightVeinGrad)" 
-          strokeWidth={i === 0 ? "1.2" : "0.75"} 
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          style={{ filter: "drop-shadow(0 0 4px rgba(197,165,114,0.1))" }}
-        />
-      ))}
-    </svg>
-  </div>
-);
+// ============================================================================
+// Background Atmospheres
+// ============================================================================
 
 const DarkAtmosphere: React.FC = () => (
   <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none" aria-hidden="true">
@@ -76,11 +54,7 @@ const DarkAtmosphere: React.FC = () => (
 const HeroSection: React.FC = () => {
   return (
     <section className="relative min-h-[90vh] flex flex-col justify-center items-center px-6 md:px-12 bg-[#FAF7F0] overflow-hidden pt-32 pb-20">
-      <LightVeins paths={[
-        "M -20,60 L 110,105 L 185,92 L 310,165 L 440,148 L 590,260 L 740,235 L 920,380 L 1050,355",
-        "M 310,165 L 365,115 L 490,95 L 610,35",
-        "M 590,260 L 630,335 L 585,410 L 660,490"
-      ]} />
+      <GoldenLightningVeins variant="hero" />
       
       <div className="absolute inset-0 z-0">
         <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#C5A572]/10 rounded-full blur-[120px] pointer-events-none" />
@@ -236,10 +210,7 @@ const DigitalAssetsSection: React.FC = () => {
 
   return (
     <section className="py-32 px-6 md:px-12 bg-[#FAF7F0] relative overflow-hidden">
-      <LightVeins paths={[
-        "M -10,240 L 160,215 L 290,260 L 480,210 L 670,255 L 860,195 L 1040,235",
-        "M 290,260 L 340,345 L 510,320 L 640,395"
-      ]} />
+      <GoldenLightningVeins variant="process" />
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="mb-20">
           <h2 className="font-mono text-xs font-bold tracking-[0.2em] text-[#C5A572] uppercase mb-6">
@@ -293,10 +264,7 @@ const ProvenTransformationsSection: React.FC = () => {
 
   return (
     <section className="py-32 px-6 md:px-12 bg-white relative overflow-hidden">
-      <LightVeins paths={[
-        "M 40,490 L 195,395 L 285,420 L 460,265 L 610,290 L 780,140 L 960,85",
-        "M 460,265 L 495,185 L 640,135 L 720,40"
-      ]} />
+      <GoldenLightningVeins variant="portfolio" />
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="mb-20 text-center">
           <h2 className="font-mono text-xs font-bold tracking-[0.2em] text-[#C5A572] uppercase mb-6">
@@ -431,10 +399,7 @@ const TechnologySection: React.FC = () => {
 
   return (
     <section className="py-32 px-6 md:px-12 bg-white relative overflow-hidden">
-      <LightVeins paths={[
-        "M 80,85 L 260,155 L 390,130 L 580,270 L 750,240 L 940,365",
-        "M 390,130 L 425,65 L 590,40 L 730,15"
-      ]} />
+      <GoldenLightningVeins variant="testimonials" />
       <div className="max-w-7xl mx-auto text-center relative z-10">
         <h2 className="font-mono text-xs font-bold tracking-[0.2em] text-[#C5A572] uppercase mb-16">
           The Engineering Stack
@@ -461,10 +426,7 @@ const TechnologySection: React.FC = () => {
 const CTASection: React.FC = () => {
   return (
     <section className="py-32 px-6 md:px-12 bg-[#FAF7F0] border-t border-[#0B3D2E]/10 relative overflow-hidden">
-      <LightVeins paths={[
-        "M 180,35 L 310,115 L 430,95 L 560,195 L 710,165 L 860,275",
-        "M 430,95 L 485,35 L 640,20"
-      ]} />
+      <GoldenLightningVeins variant="cta" />
       <div className="max-w-4xl mx-auto text-center relative z-10">
         
         <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-left mb-24 max-w-3xl mx-auto">
