@@ -33,19 +33,37 @@ export const Navbar: React.FC = () => {
 
   const isMobile = windowWidth < 1024;
 
+  const [mouseY, setMouseY] = useState(0);
+  const [isScrollingUp, setIsScrollingUp] = useState(false);
+
   // 1. Listen to scroll events to toggle capsule compression
   useEffect(() => {
+    let lastScrollY = window.scrollY;
     const handleScroll = () => {
-      if (window.scrollY > 40) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
+      const current = window.scrollY;
+      setScrollY(current);
+      if (current !== lastScrollY) {
+        setIsScrollingUp(current < lastScrollY);
       }
+      lastScrollY = current;
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Track Mouse Position for dynamic expansion
+  useEffect(() => {
+    const handleMouse = (e: MouseEvent) => setMouseY(e.clientY);
+    window.addEventListener("mousemove", handleMouse);
+    return () => window.removeEventListener("mousemove", handleMouse);
+  }, []);
+
+  const isScrolled = scrollY > 40;
+  
+  // Dynamic Island Expansion Logic
+  // Expand if: we are on mobile, OR near the top, OR mouse is near top, OR scrolling upward, OR hovering the capsule explicitly.
+  const isExpanded = isMobile || scrollY < 120 || mouseY < 120 || isScrollingUp || isHovered;
 
   // 2. Context-Aware section tracking using IntersectionObserver
   useEffect(() => {
@@ -108,17 +126,17 @@ export const Navbar: React.FC = () => {
   // Dynamic values calculation (Apple Dynamic Island / Raycast Inspired capsule transitions)
   const navHeight = isMobile
     ? (isMobileMenuOpen ? 370 : (isScrolled ? 56 : 64))
-    : (isScrolled ? (isHovered ? 68 : 62) : (isHovered ? 80 : 74));
+    : (isExpanded ? (isScrolled ? (isHovered ? 68 : 62) : (isHovered ? 80 : 74)) : 62);
 
   const navWidth = isMobile
     ? "calc(100% - 36px)"
-    : (isScrolled ? (isHovered ? "94%" : "90%") : "96%");
+    : (isExpanded ? (isScrolled ? (isHovered ? "94%" : "90%") : "96%") : "80px");
 
   const navMaxWidth = isMobile
     ? "none"
-    : (isScrolled ? "1100px" : "1180px");
+    : (isExpanded ? (isScrolled ? "1100px" : "1180px") : "80px");
 
-  const borderRadius = isMobile && isMobileMenuOpen ? "24px" : "9999px";
+  const borderRadius = isMobile && isMobileMenuOpen ? 24 : (isExpanded ? 30 : 999);
 
   // Context-Aware styles interpolation
   let bg = "rgba(250, 247, 240, 0.88)";
@@ -140,9 +158,9 @@ export const Navbar: React.FC = () => {
   const finalShadow = `${shadow}, inset 0 1px 0 rgba(255, 255, 255, 0.4)`;
 
   // Padding calculations
-  let paddingX = isScrolled ? 12 : 16;
-  let paddingY = isScrolled ? 7 : 10;
-  if (isHovered && !isMobile) {
+  let paddingX = isExpanded ? (isScrolled ? 12 : 16) : 0;
+  let paddingY = isExpanded ? (isScrolled ? 7 : 10) : 0;
+  if (isExpanded && isHovered && !isMobile) {
     paddingX += 2;
     paddingY += 1;
   }
@@ -158,40 +176,66 @@ export const Navbar: React.FC = () => {
       ========================================================= */}
       {!isMobile && (
         <motion.nav
+          layout
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => {
             setIsHovered(false);
             setHoveredLink(null);
           }}
+          initial={false}
           animate={{
-            height: `${navHeight}px`,
+            height: navHeight,
             width: navWidth,
             maxWidth: navMaxWidth,
             borderRadius: borderRadius,
             backgroundColor: bg,
             borderColor: border,
             boxShadow: finalShadow,
-            paddingLeft: `${paddingX}px`,
-            paddingRight: `${paddingX}px`,
-            paddingTop: `${paddingY}px`,
-            paddingBottom: `${paddingY}px`,
+            paddingLeft: paddingX,
+            paddingRight: paddingX,
+            paddingTop: paddingY,
+            paddingBottom: paddingY,
           }}
-          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-          className="fixed top-[28px] left-1/2 -translate-x-1/2 z-[9990] flex flex-col justify-start overflow-hidden border select-none"
+          transition={{ 
+            layout: { type: "spring", stiffness: 350, damping: 30 },
+            width: { duration: 0.65, ease: [0.16, 1, 0.3, 1] },
+            maxWidth: { duration: 0.65, ease: [0.16, 1, 0.3, 1] },
+            height: { duration: 0.65, ease: [0.16, 1, 0.3, 1] },
+            borderRadius: { duration: 0.65, ease: [0.16, 1, 0.3, 1] },
+          }}
+          className="fixed top-[28px] left-1/2 -translate-x-1/2 z-[9990] flex overflow-hidden border select-none"
           style={{
             backdropFilter: `blur(${blurVal}) saturate(180%)`,
             WebkitBackdropFilter: `blur(${blurVal}) saturate(180%)`,
           }}
         >
-          <div className="w-full flex items-center justify-between h-[50px] shrink-0">
+          <div className={`w-full h-full flex items-center ${isExpanded ? "justify-between" : "justify-center"}`}>
+            
             {/* Logo Capsule wrapper */}
             <motion.div
-              animate={{ scale: isScrolled ? 0.95 : 1 }}
-              transition={{ duration: 0.4 }}
+              layout
+              className="relative z-20 flex items-center justify-center shrink-0"
+              animate={{ scale: isExpanded ? (isScrolled ? 0.95 : 1) : 1.15 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             >
+              <AnimatePresence>
+                {!isExpanded && (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: [0.15, 0.22, 0.15] }}
+                    exit={{ opacity: 0 }}
+                    transition={{ 
+                      opacity: { duration: 4, repeat: Infinity, ease: "easeInOut" },
+                      exit: { duration: 0.2 }
+                    }}
+                    className="absolute inset-0 bg-[#C5A572] blur-xl rounded-full z-0 pointer-events-none"
+                  />
+                )}
+              </AnimatePresence>
+
               <Link
                 to="/experience"
-                className="flex items-center justify-center transition-all duration-300 hover:scale-105 group shrink-0 py-1"
+                className="relative z-10 block transition-all duration-300 group py-1"
                 {...hoverProps}
               >
                 <img
@@ -204,112 +248,119 @@ export const Navbar: React.FC = () => {
             </motion.div>
 
             {/* Desktop Navigation Links */}
-            <motion.div 
-              animate={{ gap: `${navGap}px` }}
-              transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-              className="flex items-center"
-            >
-              {navLinks.map((link) => {
-                const isActive = link.id === "portal" ? isPortalActive : activeSection === link.id;
-                const isHoveredItem = hoveredLink === link.name;
-                const { onMouseEnter: cursorEnter, onMouseLeave: cursorLeave } = hoverProps;
-
-                return (
-                  <Magnetic key={link.name}>
-                    <button
-                      onClick={link.action}
-                      onMouseEnter={() => {
-                        setHoveredLink(link.name);
-                        cursorEnter();
-                      }}
-                      onMouseLeave={() => {
-                        setHoveredLink(null);
-                        cursorLeave();
-                      }}
-                      className="text-[9px] uppercase tracking-[0.18em] font-semibold text-text-secondary hover:text-gold transition-colors py-1.5 px-3 rounded-full relative flex items-center"
-                    >
-                      <span className="relative z-10 flex items-center gap-1.5">
-                        {link.name}
-                        {link.id === "portfolio" && (
-                          <AnimatePresence>
-                            {activeSection === "portfolio" && (
-                              <motion.span
-                                initial={{ scale: 0, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                exit={{ scale: 0, opacity: 0 }}
-                                className="px-1.5 py-0.5 text-[8px] font-black bg-gold text-white rounded-full flex items-center justify-center z-10"
-                              >
-                                5
-                              </motion.span>
-                            )}
-                          </AnimatePresence>
-                        )}
-                      </span>
-
-                      {isActive && (
-                        <motion.span
-                          layoutId="activeNavPill"
-                          className="absolute inset-0 bg-gold/8 border border-gold/15 rounded-full"
-                          transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-                        />
-                      )}
-
-                      {!isActive && isHoveredItem && (
-                        <motion.span
-                          layoutId="hoverNavPill"
-                          className="absolute inset-0 bg-gold/4 rounded-full"
-                          transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-                        />
-                      )}
-                    </button>
-                  </Magnetic>
-                );
-              })}
-            </motion.div>
-
-            {/* Desktop Authentication Actions (Login & Sign Up) */}
-            <motion.div
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0, scale: isScrolled ? 0.95 : 1 }}
-              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-              className="shrink-0 flex items-center gap-3.5 md:gap-4 ml-2"
-            >
-              {/* Login Action (Subtle Text Button) */}
-              <Magnetic>
-                <button
-                  onClick={() => navigate("/auth?mode=login")}
-                  onMouseEnter={hoverProps.onMouseEnter}
-                  onMouseLeave={hoverProps.onMouseLeave}
-                  className="bg-transparent text-[#0B3027] hover:text-[#C9A56A] hover:opacity-90 font-medium text-[9.5px] uppercase tracking-[0.18em] px-4 py-1.5 transition-all duration-300 no-underline rounded-full select-none"
-                >
-                  Login
-                </button>
-              </Magnetic>
-
-              {/* Sign Up Action (Primary Luxury CTA) */}
-              <Magnetic>
-                <motion.button
-                  onClick={() => navigate("/auth?mode=signup")}
-                  className="btn-emerald-stone !text-[#C5A572] uppercase tracking-widest font-semibold flex items-center justify-center gap-2 rounded-full border border-forest hover:shadow-[0_4px_16px_rgba(6,41,30,0.12)] select-none relative group overflow-hidden"
-                  style={{ color: "#C5A572" }}
-                  animate={{
-                    paddingLeft: isScrolled ? "14px" : "18px",
-                    paddingRight: isScrolled ? "14px" : "18px",
-                    paddingTop: isScrolled ? "8px" : "10px",
-                    paddingBottom: isScrolled ? "8px" : "10px",
-                    fontSize: isScrolled ? "8.5px" : "9.5px",
+            <AnimatePresence>
+              {isExpanded && (
+                <motion.div 
+                  initial={{ opacity: 0, filter: "blur(10px)", y: -10 }}
+                  animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+                  exit={{ opacity: 0, filter: "blur(10px)", y: -10 }}
+                  transition={{ 
+                    duration: 0.25, 
+                    delay: isExpanded ? 0.12 : 0, 
+                    ease: "easeOut" 
                   }}
-                  whileHover={{ scale: 1.02 }}
-                  transition={{ duration: 0.3 }}
-                  {...buttonHoverProps}
+                  className="flex items-center shrink-0"
                 >
-                  <span className="whitespace-nowrap relative z-10 !text-[#C5A572] font-bold">
-                    Sign Up
-                  </span>
-                  <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform duration-300 mt-0.5 !text-[#C5A572] relative z-10" />
-                </motion.button>
-              </Magnetic>
-            </motion.div>
+                  <div className="flex items-center" style={{ gap: `${navGap}px` }}>
+                    {navLinks.map((link) => {
+                      const isActive = link.id === "portal" ? isPortalActive : activeSection === link.id;
+                      const isHoveredItem = hoveredLink === link.name;
+                      const { onMouseEnter: cursorEnter, onMouseLeave: cursorLeave } = hoverProps;
+
+                      return (
+                        <Magnetic key={link.name}>
+                          <button
+                            onClick={link.action}
+                            onMouseEnter={() => {
+                              setHoveredLink(link.name);
+                              cursorEnter();
+                            }}
+                            onMouseLeave={() => {
+                              setHoveredLink(null);
+                              cursorLeave();
+                            }}
+                            className="text-[9px] uppercase tracking-[0.18em] font-semibold text-text-secondary hover:text-gold transition-colors py-1.5 px-3 rounded-full relative flex items-center whitespace-nowrap"
+                          >
+                            <span className="relative z-10 flex items-center gap-1.5">
+                              {link.name}
+                              {link.id === "portfolio" && (
+                                <AnimatePresence>
+                                  {activeSection === "portfolio" && (
+                                    <motion.span
+                                      initial={{ scale: 0, opacity: 0 }}
+                                      animate={{ scale: 1, opacity: 1 }}
+                                      exit={{ scale: 0, opacity: 0 }}
+                                      className="px-1.5 py-0.5 text-[8px] font-black bg-gold text-white rounded-full flex items-center justify-center z-10"
+                                    >
+                                      5
+                                    </motion.span>
+                                  )}
+                                </AnimatePresence>
+                              )}
+                            </span>
+
+                            {isActive && (
+                              <motion.span
+                                layoutId="activeNavPill"
+                                className="absolute inset-0 bg-gold/8 border border-gold/15 rounded-full"
+                                transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+                              />
+                            )}
+
+                            {!isActive && isHoveredItem && (
+                              <motion.span
+                                layoutId="hoverNavPill"
+                                className="absolute inset-0 bg-gold/4 rounded-full"
+                                transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+                              />
+                            )}
+                          </button>
+                        </Magnetic>
+                      );
+                    })}
+                  </div>
+
+                  {/* Desktop Authentication Actions (Login & Sign Up) */}
+                  <div className="shrink-0 flex items-center gap-3.5 md:gap-4 ml-8">
+                    {/* Login Action */}
+                    <Magnetic>
+                      <button
+                        onClick={() => navigate("/auth?mode=login")}
+                        onMouseEnter={hoverProps.onMouseEnter}
+                        onMouseLeave={hoverProps.onMouseLeave}
+                        className="bg-transparent text-[#0B3027] hover:text-[#C9A56A] hover:opacity-90 font-medium text-[9.5px] uppercase tracking-[0.18em] px-4 py-1.5 transition-all duration-300 no-underline rounded-full select-none whitespace-nowrap"
+                      >
+                        Login
+                      </button>
+                    </Magnetic>
+
+                    {/* Sign Up Action */}
+                    <Magnetic>
+                      <motion.button
+                        onClick={() => navigate("/auth?mode=signup")}
+                        className="btn-emerald-stone !text-[#C5A572] uppercase tracking-widest font-semibold flex items-center justify-center gap-2 rounded-full border border-forest hover:shadow-[0_4px_16px_rgba(6,41,30,0.12)] select-none relative group overflow-hidden whitespace-nowrap"
+                        style={{ color: "#C5A572" }}
+                        animate={{
+                          paddingLeft: isScrolled ? "14px" : "18px",
+                          paddingRight: isScrolled ? "14px" : "18px",
+                          paddingTop: isScrolled ? "8px" : "10px",
+                          paddingBottom: isScrolled ? "8px" : "10px",
+                          fontSize: isScrolled ? "8.5px" : "9.5px",
+                        }}
+                        whileHover={{ scale: 1.02 }}
+                        transition={{ duration: 0.3 }}
+                        {...buttonHoverProps}
+                      >
+                        <span className="whitespace-nowrap relative z-10 !text-[#C5A572] font-bold">
+                          Sign Up
+                        </span>
+                        <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform duration-300 mt-0.5 !text-[#C5A572] relative z-10" />
+                      </motion.button>
+                    </Magnetic>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </motion.nav>
       )}
