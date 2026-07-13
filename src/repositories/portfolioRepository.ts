@@ -188,7 +188,10 @@ export const portfolioRepository = {
         .select('*')
         .order('display_order', { ascending: true });
 
-      if (error || !data) return [];
+      if (error || !data) {
+        console.error('[portfolioRepository] getCategories error:', error);
+        return [];
+      }
       return data as PortfolioCategory[];
     } catch {
       return [];
@@ -304,6 +307,7 @@ export const portfolioRepository = {
       .update({ status })
       .eq('id', id);
 
+    if (error) console.error('[portfolioRepository] updateStatus error:', error);
     return !error;
   },
 
@@ -320,7 +324,10 @@ export const portfolioRepository = {
       .eq('id', id)
       .single();
 
-    if (fetchErr || !source) return null;
+    if (fetchErr || !source) {
+      console.error('[portfolioRepository] cloneProject source fetch error:', fetchErr);
+      return null;
+    }
 
     // Insert cloned project
     const { data: cloned, error: insertErr } = await supabase
@@ -346,7 +353,10 @@ export const portfolioRepository = {
       .select()
       .single();
 
-    if (insertErr || !cloned) return null;
+    if (insertErr || !cloned) {
+      console.error('[portfolioRepository] cloneProject insert error:', insertErr);
+      return null;
+    }
 
     // Clone metrics
     const sourceMetrics = source.portfolio_metrics ?? [];
@@ -404,6 +414,7 @@ export const portfolioRepository = {
       .delete()
       .eq('id', id);
 
+    if (error) console.error('[portfolioRepository] deleteProject error:', error);
     return !error;
   },
 

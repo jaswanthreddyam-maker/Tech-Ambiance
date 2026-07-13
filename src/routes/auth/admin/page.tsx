@@ -8,7 +8,7 @@ import { supabase } from '../../../lib/supabase';
 
 export const AdminAuthPage: React.FC = () => {
   const [email, setEmail] = useState('');
-  const [otp, setOtp] = useState<string[]>(Array(8).fill(''));
+  const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
   const [pin, setPin] = useState<string[]>(Array(6).fill(''));
   const [step, setStep] = useState<'email' | 'otp' | 'create-pin' | 'verify-pin' | 'success'>('email');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -176,7 +176,7 @@ export const AdminAuthPage: React.FC = () => {
     if (type === 'otp') setOtp(newArr);
     else setPin(newArr);
 
-    const maxIdx = type === 'otp' ? 7 : 5;
+    const maxIdx = 5;
     if (value !== '' && index < maxIdx) {
       const nextInput = document.getElementById(`${type}-${index + 1}`);
       nextInput?.focus();
@@ -187,7 +187,7 @@ export const AdminAuthPage: React.FC = () => {
     e.preventDefault();
     const pasted = e.clipboardData.getData('text').replace(/\D/g, '');
     if (!pasted) return;
-    const maxLen = type === 'otp' ? 8 : 6;
+    const maxLen = 6;
     const digits = pasted.slice(0, maxLen).split('');
     const newArr = Array(maxLen).fill('');
     digits.forEach((d, i) => { newArr[i] = d; });

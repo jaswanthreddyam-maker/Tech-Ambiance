@@ -183,61 +183,48 @@ CREATE POLICY "Public can view published project links"
     )
   );
 
+-- 1. Helper function for fast RLS evaluation
+CREATE OR REPLACE FUNCTION public.is_studio_admin()
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM public.user_roles ur
+    JOIN public.roles r ON ur.role_id = r.id
+    WHERE ur.user_id = auth.uid() 
+      AND r.name IN ('OWNER', 'ADMIN', 'DEVELOPER', 'DESIGNER', 'PROJECT_MANAGER')
+  ) OR EXISTS (
+    SELECT 1 FROM auth.users u
+    WHERE u.id = auth.uid() 
+      AND u.email IN ('jaswanthreddyam@gmail.com', 'jeshu0069@gmail.com')
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- Admin CRUD (uses service_role key from repository, bypasses RLS)
--- For authenticated admin access, grant via profiles.role check:
+-- For authenticated admin access, grant via user_roles check:
 CREATE POLICY "Admins can manage portfolio projects"
   ON public.portfolio_projects FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.profiles p
-      WHERE p.id = auth.uid() AND p.role IN ('OWNER', 'ADMIN', 'DEVELOPER', 'DESIGNER', 'PROJECT_MANAGER')
-    )
-  );
+  USING (public.is_studio_admin());
 
 CREATE POLICY "Admins can manage portfolio categories"
   ON public.portfolio_categories FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.profiles p
-      WHERE p.id = auth.uid() AND p.role IN ('OWNER', 'ADMIN', 'DEVELOPER', 'DESIGNER', 'PROJECT_MANAGER')
-    )
-  );
+  USING (public.is_studio_admin());
 
 CREATE POLICY "Admins can manage portfolio project categories"
   ON public.portfolio_project_categories FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.profiles p
-      WHERE p.id = auth.uid() AND p.role IN ('OWNER', 'ADMIN', 'DEVELOPER', 'DESIGNER', 'PROJECT_MANAGER')
-    )
-  );
+  USING (public.is_studio_admin());
 
 CREATE POLICY "Admins can manage portfolio metrics"
   ON public.portfolio_metrics FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.profiles p
-      WHERE p.id = auth.uid() AND p.role IN ('OWNER', 'ADMIN', 'DEVELOPER', 'DESIGNER', 'PROJECT_MANAGER')
-    )
-  );
+  USING (public.is_studio_admin());
 
 CREATE POLICY "Admins can manage portfolio media"
   ON public.portfolio_media FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.profiles p
-      WHERE p.id = auth.uid() AND p.role IN ('OWNER', 'ADMIN', 'DEVELOPER', 'DESIGNER', 'PROJECT_MANAGER')
-    )
-  );
+  USING (public.is_studio_admin());
 
 CREATE POLICY "Admins can manage portfolio project links"
   ON public.portfolio_project_links FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.profiles p
-      WHERE p.id = auth.uid() AND p.role IN ('OWNER', 'ADMIN', 'DEVELOPER', 'DESIGNER', 'PROJECT_MANAGER')
-    )
-  );
+  USING (public.is_studio_admin());
 
 -- ==============================================================================
 -- SEED: Default Categories
