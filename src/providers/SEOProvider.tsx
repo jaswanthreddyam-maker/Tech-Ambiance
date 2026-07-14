@@ -87,12 +87,13 @@ export const SEOProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       "name": "Tech Ambiance",
       "image": "https://techambiance.com/assets/images/logo.png",
       "description": "Premium Digital Brand Experience Agency",
+      "telephone": "+91-81210-22707",
       "address": {
         "@type": "PostalAddress",
-        "addressLocality": "San Francisco",
-        "addressRegion": "CA",
-        "postalCode": "94107",
-        "addressCountry": "US"
+        "addressLocality": "Vijayawada",
+        "addressRegion": "Andhra Pradesh",
+        "postalCode": "520001",
+        "addressCountry": "IN"
       },
       "url": "https://techambiance.com"
     };

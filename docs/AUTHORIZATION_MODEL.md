@@ -1,6 +1,9 @@
-# StudioHQ Authorization Architecture
+# StudioHQ Authorization Framework v1.0 — Architecture Complete (Frozen)
 
 This document serves as the single source of truth for Role-Based Access Control (RBAC) and authorization across the StudioHQ platform. It defines the permission model, UI enforcement strategies, and the migration rollout plan.
+
+**Architecture Status: FROZEN**
+No more architectural changes to the frontend authorization model should be introduced unless there's a critical flaw. Future feature additions must adhere strictly to the registry-driven model defined below.
 
 ---
 
@@ -8,150 +11,75 @@ This document serves as the single source of truth for Role-Based Access Control
 
 1. **Permissions over Roles:** Code should never check for roles (e.g., `role === 'ADMIN'`). Code only checks for explicit permissions (e.g., `can('portfolio:delete')`). Roles are merely a collection of permissions assigned to users in the database.
 2. **Compact JWTs:** The JWT token only stores the user's `organization_id` and assigned `roles`. It does **not** store the full, expanded list of permissions, ensuring tokens remain small even as the system grows to hundreds of permissions.
-3. **Frontend Independence (Crucial): The frontend never owns authorization policy. It only consumes permissions exposed by the authorization layer. The database remains the canonical source of role-to-permission mappings.**
+3. **Frontend Independence (Crucial):** The frontend never owns authorization policy. It only consumes permissions exposed by the authorization layer. The database remains the canonical source of role-to-permission mappings.
 4. **Double Enforcement:** The frontend provides UX enforcement (hiding routes, disabling buttons), while PostgreSQL Row Level Security (RLS) provides actual security enforcement by mapping the JWT's roles to the `role_permissions` table.
-5. **Adaptive UX:** The dashboard and sidebar dynamically adapt to the user's permissions. Users never see empty pages for modules they don't have access to; instead, the UI is tailored specifically to their domain (e.g., Sales sees only CRM).
+5. **Declarative UX Policy:** Every authorization decision in StudioHQ is declarative. Instead of permission logic scattered across pages (`if (can("..."))`), policy is centralized into registries.
 
 ---
 
-## 2. Permission Model
+## 2. Registry-Driven Architecture
 
-Permissions are defined as standard `module:action` string literals. They are grouped logically for easy assignment to roles.
-
-### Permission Definitions & Metadata
-
-To support future admin UIs, audit logs, and documentation, every permission defines explicit metadata.
-
-```ts
-export type PermissionId = 
-  // Portfolio
-  | 'portfolio:read' | 'portfolio:write' | 'portfolio:delete' | 'portfolio:publish'
-  // CRM
-  | 'crm:read' | 'crm:write' | 'crm:delete' | 'crm:export' | 'crm:proposal'
-  // Workspaces
-  | 'workspace:read' | 'workspace:write' | 'workspace:delete' | 'workspace:provision'
-  // Media
-  | 'media:read' | 'media:upload' | 'media:delete'
-  // AI Center
-  | 'ai:scout' | 'ai:generate'
-  // CMS
-  | 'cms:read' | 'cms:edit' | 'cms:publish' | 'cms:rollback'
-  // System
-  | 'system:audit' | 'system:roles' | 'system:users' | 'system:billing';
-
-export interface PermissionMetadata {
-  id: PermissionId;
-  name: string;
-  description: string;
-  module: 'Portfolio' | 'CRM' | 'Workspaces' | 'Media' | 'AI' | 'CMS' | 'System';
-  dangerous?: boolean;
-}
-```
-
-### Permission Groups
-
-Rather than assigning hundreds of individual permissions to a role, we maintain reusable permission groups:
-
-```ts
-export const PortfolioPermissions: PermissionId[] = [
-  'portfolio:read', 'portfolio:write', 'portfolio:delete', 'portfolio:publish'
-];
-
-export const CRMPermissions: PermissionId[] = [
-  'crm:read', 'crm:write', 'crm:delete', 'crm:export', 'crm:proposal'
-];
-
-export const SystemPermissions: PermissionId[] = [
-  'system:audit', 'system:roles', 'system:users', 'system:billing'
-];
-```
-
-### Role-to-Permission Mapping (Database Owned)
-
-**Important:** Role-to-permission mappings are owned entirely by the database. TypeScript defines permission identifiers and metadata only. The frontend requests the permissions for the current user's roles from the backend.
+StudioHQ relies on a **4-Layer Registry System** to enforce permissions and construct the UI dynamically. Every registry satisfies a consistent contract (e.g., `requiredPermission`).
 
 ```text
-Database
-├── roles
-├── permissions
-└── role_permissions
-      ↓
-PermissionProvider
-      ↓
-React Component
+Authentication
+        ↓
+Permission Provider
+        ↓
+Route Registry
+        ↓
+Sidebar Registry
+        ↓
+Widget Registry
+        ↓
+Action Registry
 ```
 
-### Permission Versioning
+### Layer 1: Route Registry (`App.tsx`)
+Entire pages are protected at the routing layer. The `ADMIN_ROUTES` array maps every route to its `requiredPermission`. If unauthorized, `<PermissionGuard>` intercepts and displays a 403 Fallback.
 
-To handle cases where permissions are added or revoked while a user is actively logged in, the system uses a `permissions_version` concept.
-When a user's roles or permissions are updated in the database, their `permissions_version` increments. The frontend can detect this (e.g., via a Realtime subscription or on JWT refresh) and trigger a re-fetch in the `PermissionProvider`, ensuring no stale access is permitted.
+### Layer 2: Sidebar Registry (`StudioHQLayout.tsx`)
+The `ADMIN_SIDEBAR_CONFIG` maps navigation items to their `requiredPermission`. Unauthorized items are completely filtered out, preventing users from seeing dead links. Sections that become empty are automatically hidden.
+
+### Layer 3: Widget Registry (`widgetRegistry.tsx`)
+The dashboard is adaptive. Widgets are registered with a `requiredPermission` and `order`. The dashboard loops over the registry, filters unauthorized widgets, and automatically packs the remaining authorized widgets into a CSS Grid. Error boundaries and independent fetching ensure failures don't cascade.
+
+### Layer 4: Action Registry (`actionRegistry.ts`)
+Interactive elements (buttons, forms) are governed by the `ACTION_REGISTRY`. The generic `<ActionButton actionId="...">` component looks up the configuration to:
+- Verify authorization (disabling or hiding the button).
+- Handle async execution (`isExecuting` states).
+- Render `ConfirmationDialog` for actions marked `requiresConfirmation: true`.
+- Log `console.debug` analytics for the interaction.
 
 ---
 
-## 3. UI Strategy
+## 3. Implementation Patterns
 
-### The `usePermissions` Hook
+From this point onward, every new module should follow the established pattern:
+1. **Define Permission:** Add required identifiers to `PermissionId`.
+2. **Register Route:** Add to `ADMIN_ROUTES`.
+3. **Register Sidebar Entry:** Add to `ADMIN_SIDEBAR_CONFIG`.
+4. **Register Dashboard Widgets:** Add to `DASHBOARD_WIDGETS` (if any).
+5. **Register Actions:** Add entries to `ACTION_REGISTRY`.
 
-The frontend relies entirely on a React Context provider that fetches the user's permissions once upon login and caches them.
-
-```ts
-const { can, canAny, canAll, permissions } = usePermissions();
-
-if (can('portfolio:delete')) {
-  // proceed
-}
-```
-
-### Route Protection
-
-Entire pages are protected at the routing layer.
-
-```tsx
-<PermissionGuard permission="portfolio:read">
-  <PortfolioPage />
-</PermissionGuard>
-```
-
-### Module Registration
-
-Instead of updating sidebar config, routing, and dashboards independently, StudioHQ uses a central **Module Registry**. Adding a new module automatically wires it throughout the application based on permissions.
-
-```ts
-// Conceptual Example
-export const ModuleRegistry = {
-  Portfolio: {
-    label: "Portfolio",
-    route: "/admin/portfolio",
-    permission: "portfolio:read",
-    dashboardWidgets: [PortfolioStatsWidget],
-    sidebarGroup: "AGENCY PRODUCTS"
-  },
-  CRM: {
-    label: "CRM Pipeline",
-    route: "/admin/crm",
-    permission: "crm:read",
-    dashboardWidgets: [PipelineValueWidget],
-    sidebarGroup: "AGENCY PRODUCTS"
-  }
-};
-```
-
-### Component & Action Protection
-
-If an action (like a button) requires a specific permission, it is rendered in a **disabled state with a tooltip** rather than being hidden completely. This improves discoverability.
-
-```tsx
-<button 
-  disabled={!can('portfolio:delete')}
-  title={!can('portfolio:delete') ? "Requires 'portfolio:delete' permission" : ""}
->
-  Delete Project
-</button>
-```
+### Strictly Prohibited Patterns
+- ❌ **Direct Role Checks:** `if (user.role === 'OWNER')` or `role === 'ADMIN'` inside UI feature code. (The only exception is the Auth/Permission Provider backwards-compatibility layer).
+- ❌ **Scattered `can()` Checks:** Calling `can('...')` directly in a component's JSX to conditionally render a button. Use `<ActionButton>` or `<PermissionGuard>` instead.
+- ❌ **Hardcoded Widget Auth:** Wrapping individual dashboard widgets in `<PermissionGate>`. Use the Widget Registry instead.
 
 ---
 
-## 4. Backend Strategy (Supabase RLS)
+## 4. Future Expansion (RC2+)
+
+While the current framework is frozen for RC1, the following registries will be introduced in the future using the exact same contract:
+
+1. **Form Field Registry:** Field-level authorization (e.g., locking the "Billing Email" field based on `system:billing` permission).
+2. **Command Palette Registry:** Filtering `CMD+K` commands based on permissions.
+3. **Search Registry:** Filtering global search results so users only see entities they are authorized to access.
+
+---
+
+## 5. Backend Strategy (Supabase RLS)
 
 ### JWT Claims
 
@@ -173,35 +101,8 @@ The Supabase JWT remains extremely lightweight:
 
 Row Level Security policies use the roles in the JWT to lookup permissions in the database securely and rapidly. By using Postgres Functions or a joined view, RLS evaluates if the user's roles intersect with the roles mapped to a given permission.
 
----
+### Backend Implementation Phases (Pending)
 
-## 5. Migration Rollout Plan
-
-To safely migrate StudioHQ from its current hardcoded `role === 'OWNER'` checks to the enterprise RBAC system, we will execute the following phased rollout:
-
-### Phase A: Architecture Definition
-- Define TypeScript permission types, metadata, and groups.
-- Implement the `usePermissions()` hook with a temporary compatibility layer (e.g., `if (user.role === 'OWNER') return true`).
-- Create `<PermissionGuard />` and `<PermissionGate />` components.
-
-### Phase B: UI Migration
-- Refactor the sidebar to be data-driven based on permissions.
-- Wrap all `/admin/*` routes in `<PermissionGuard>`.
-- Audit all destructive actions (buttons/forms) and implement `disabled={!can(...)}`.
-- Implement adaptive dashboard widgets.
-
-### Phase C: Database Schema
-- Create Postgres tables: `roles`, `permissions`, `role_permissions`, and `user_roles`.
-- Seed the initial permission taxonomy and role mappings.
-
-### Phase D: Auth Integration
-- Set up Supabase Auth Hooks (or user metadata triggers) to securely inject the user's `roles` array into the JWT upon login/refresh.
-- Update the frontend permission provider to fetch the explicit permission list from the database using the assigned roles.
-
-### Phase E: RLS Implementation
-- Rewrite Supabase RLS policies across all tables to evaluate against the database permission tables based on the JWT role array.
-- Write backend pgTAP unit tests to verify access denial.
-
-### Phase F: Finalization
-- Completely remove the temporary compatibility layer from `usePermissions()`.
-- StudioHQ is now fully governed by explicit permissions across both UI and database layers.
+1. **Database Schema:** Create Postgres tables (`roles`, `permissions`, `role_permissions`, `user_roles`).
+2. **Auth Integration:** Set up Supabase Auth Hooks to securely inject the user's `roles` array into the JWT upon login/refresh.
+3. **RLS Implementation:** Rewrite Supabase RLS policies across all tables to evaluate against the database permission tables based on the JWT role array.

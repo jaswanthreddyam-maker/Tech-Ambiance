@@ -109,7 +109,7 @@ export const ContactSection: React.FC = () => {
                 <div className="p-2.5 bg-surface border border-forest/[0.06] rounded-xl text-gold shrink-0 group-hover:border-gold/40 transition-colors">
                   <Phone className="w-4 h-4" />
                 </div>
-                +1 (415) 555-0199
+                +91 81210 22707
               </div>
               <div
                 className="flex items-center gap-4 text-xs font-semibold text-text-primary uppercase tracking-wider select-none group"
@@ -117,7 +117,7 @@ export const ContactSection: React.FC = () => {
                 <div className="p-2.5 bg-surface border border-forest/[0.06] rounded-xl text-gold shrink-0 group-hover:border-gold/40 transition-colors">
                   <MapPin className="w-4 h-4" />
                 </div>
-                Studio Office, San Francisco, CA
+                INDIA / ANDRA PRADESH / VIJAYAWADA
               </div>
             </div>
           </div>

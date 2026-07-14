@@ -212,7 +212,7 @@ export const portfolioRepository = {
         .select(PROJECT_SELECT)
         .order('display_order', { ascending: true });
 
-      if (error || !data) return PORTFOLIO_PROJECTS;
+      if (error || !data || data.length === 0) return PORTFOLIO_PROJECTS;
       return data.map(mapRowToProject);
     } catch {
       return PORTFOLIO_PROJECTS;
