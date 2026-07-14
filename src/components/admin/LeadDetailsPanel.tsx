@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Mail, Phone, Globe, Calendar, DollarSign, Target, FileText, CheckCircle2 } from 'lucide-react';
 import type { CrmLead } from '../../repositories/crmRepository';
 import { workspaceRepository } from '../../repositories/workspaceRepository';
-import { useAuthContext } from '../../auth/AuthProvider';
+import { useAuthContext } from '../../auth/providers/AuthProvider';
 
 interface LeadDetailsPanelProps {
   lead: CrmLead | null;

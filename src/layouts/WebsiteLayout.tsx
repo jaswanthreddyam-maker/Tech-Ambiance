@@ -1,9 +1,9 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import { Navbar } from "../components/navigation/Navbar";
-import { Footer } from "../components/common/Footer";
+import Navbar from "../components/navigation/Navbar";
+import Footer from "../components/common/Footer";
 import { Cursor } from "../components/common/Cursor";
-import { AppCanvas } from "./AppCanvas";
+import AppCanvas from "./AppCanvas";
 
 export const WebsiteLayout: React.FC = () => {
   return (

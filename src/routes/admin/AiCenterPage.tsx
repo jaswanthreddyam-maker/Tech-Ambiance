@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Sparkles } from 'lucide-react';
+import { ActionButton } from '../../components/admin/ActionButton';
 
 export const AiCenterPage: React.FC = () => {
   const [targetUrl, setTargetUrl] = useState('');
@@ -34,12 +35,14 @@ export const AiCenterPage: React.FC = () => {
             className="flex-1 px-5 py-3.5 rounded-2xl bg-[#F8F6F1] border border-[#0B3027]/15 text-sm font-medium text-[#0B3027] focus:outline-none focus:border-[#C9A56A] shadow-inner"
           />
           <div className="relative group">
-            <button
+            <ActionButton
+              actionId="ai.scout"
+              onAction={async () => {}}
               disabled={!isScoutAvailable}
-              className="px-6 py-3.5 rounded-full bg-[#0B3027] text-white font-semibold text-xs shadow-[0_4px_16px_rgba(11,48,39,0.25)] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-6 py-3.5 rounded-full bg-[#0B3027] text-white font-semibold text-xs shadow-[0_4px_16px_rgba(11,48,39,0.25)] transition-all disabled:opacity-40"
             >
               {isScoutAvailable ? 'Execute ScoutAI Scan →' : 'ScoutAI — Coming Soon'}
-            </button>
+            </ActionButton>
             {!isScoutAvailable && (
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-2.5 bg-[#0B3027] text-[#F8F6F1] text-xs rounded-xl shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 border border-[#C9A56A]/30">
                 ScoutAI scanning will become available after the scanning engine is deployed.

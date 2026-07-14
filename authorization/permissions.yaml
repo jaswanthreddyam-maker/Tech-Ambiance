@@ -1,0 +1,155 @@
+permissions:
+  # Dashboard
+  - id: dashboard:read
+    name: View Dashboard
+    description: Can view the overview dashboard
+    module: Dashboard
+  - id: dashboard:export
+    name: Export Dashboard
+    description: Can export executive reports and metrics
+    module: Dashboard
+
+  # Portfolio
+  - id: portfolio:read
+    name: View Portfolio
+    description: Can view portfolio projects
+    module: Portfolio
+  - id: portfolio:write
+    name: Edit Portfolio
+    description: Can create and edit portfolio projects
+    module: Portfolio
+  - id: portfolio:delete
+    name: Delete Portfolio
+    description: Can permanently delete portfolio projects
+    module: Portfolio
+    dangerous: true
+  - id: portfolio:publish
+    name: Publish Portfolio
+    description: Can change project status to published
+    module: Portfolio
+  - id: project:read
+    name: View Projects
+    description: Can view internal operational projects
+    module: Portfolio
+
+  # CRM
+  - id: crm:read
+    name: View CRM
+    description: Can view leads and pipelines
+    module: CRM
+  - id: crm:write
+    name: Edit CRM
+    description: Can update lead status and details
+    module: CRM
+  - id: crm:delete
+    name: Delete Lead
+    description: Can delete leads from pipeline
+    module: CRM
+    dangerous: true
+  - id: crm:export
+    name: Export CRM
+    description: Can export pipeline data to CSV
+    module: CRM
+  - id: crm:proposal
+    name: Generate Proposals
+    description: Can generate interactive SOWs
+    module: CRM
+
+  # Workspaces
+  - id: workspace:read
+    name: View Workspaces
+    description: Can view client workspaces
+    module: Workspaces
+  - id: workspace:write
+    name: Edit Workspaces
+    description: Can edit workspace details and projects
+    module: Workspaces
+  - id: workspace:delete
+    name: Delete Workspaces
+    description: Can delete workspaces
+    module: Workspaces
+    dangerous: true
+  - id: workspace:provision
+    name: Provision Workspace
+    description: Can provision new client environments
+    module: Workspaces
+
+  # Media
+  - id: media:read
+    name: View Media
+    description: Can browse the media vault
+    module: Media
+  - id: media:upload
+    name: Upload Media
+    description: Can upload assets to edge storage
+    module: Media
+  - id: media:delete
+    name: Delete Media
+    description: Can delete assets from edge storage
+    module: Media
+    dangerous: true
+
+  # AI
+  - id: ai:read
+    name: View AI Center
+    description: Can view the AI Center dashboard
+    module: AI
+  - id: ai:scout
+    name: Run ScoutAI
+    description: Can execute autonomous diagnostic scans
+    module: AI
+  - id: ai:generate
+    name: Generate SOW (AI)
+    description: Can use AI to generate Executive Summaries
+    module: AI
+
+  # CMS
+  - id: cms:read
+    name: View CMS
+    description: Can view website drafts and diffs
+    module: CMS
+  - id: cms:edit
+    name: Edit CMS
+    description: Can edit website copy and sections
+    module: CMS
+  - id: cms:publish
+    name: Publish CMS
+    description: Can trigger cache invalidation and publish to edge
+    module: CMS
+    dangerous: true
+  - id: cms:rollback
+    name: Rollback CMS
+    description: Can rollback website to previous snapshot
+    module: CMS
+    dangerous: true
+
+  # System
+  - id: system:read
+    name: View System Settings
+    description: Can view system and workspace settings
+    module: System
+  - id: system:audit
+    name: View Audit Logs
+    description: Can view security audit logs
+    module: System
+  - id: system:roles
+    name: Manage Roles
+    description: Can modify role definitions and assignments
+    module: System
+    dangerous: true
+  - id: system:users
+    name: Manage Users
+    description: Can invite, revoke, or delete studio users
+    module: System
+    dangerous: true
+  - id: system:billing
+    name: Manage Billing
+    description: Can view and modify billing information
+    module: System
+    dangerous: true
+
+  # Analytics
+  - id: analytics:finance
+    name: View Financial Analytics
+    description: Can view revenue and financial metrics
+    module: Analytics

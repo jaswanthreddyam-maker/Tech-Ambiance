@@ -7,9 +7,8 @@ import { AuthLayout } from "./layouts/AuthLayout";
 import { WebsiteLayout } from "./layouts/WebsiteLayout";
 import { ClientLayout } from "./layouts/ClientLayout";
 
-import { AuthGuard } from "./auth/AuthGuard";
-import { AdminGuard } from "./auth/AdminGuard";
-import { Dashboard } from "./auth/permissions";
+import { AuthGuard } from "./auth/guards/AuthGuard";
+import { PermissionGuard } from "./auth/guards/PermissionGuard";
 
 // Tech Ambiance StudioHQ Executive Console (/admin/*)
 import { StudioHQLayout } from "./layouts/StudioHQLayout";
@@ -33,18 +32,7 @@ const PortfolioDetails = React.lazy(() => import("./routes/marketing/PortfolioDe
 const ClientPortal = React.lazy(() => import("./routes/portal/page"));
 const ServicesPage = React.lazy(() => import("./routes/services/page"));
 const NotFoundPage = React.lazy(() => import("./routes/NotFound"));
-const DashboardPage = lazyNamed(() => import("./routes/admin/DashboardPage"), "DashboardPage");
-const WorkspacesPage = lazyNamed(() => import("./routes/admin/WorkspacesPage"), "WorkspacesPage");
-const CrmPipelinePage = lazyNamed(() => import("./routes/admin/CrmPipelinePage"), "CrmPipelinePage");
-const CmsEditorPage = lazyNamed(() => import("./routes/admin/CmsEditorPage"), "CmsEditorPage");
-const AiCenterPage = lazyNamed(() => import("./routes/admin/AiCenterPage"), "AiCenterPage");
-const MediaPage = lazyNamed(() => import("./routes/admin/MediaPage"), "MediaPage");
-const TimelinePage = lazyNamed(() => import("./routes/admin/TimelinePage"), "TimelinePage");
-const StudioTeamPage = lazyNamed(() => import("./routes/admin/components/StudioTeamPage"), "StudioTeamPage");
-const AdminAuthPage = lazyNamed(() => import("./routes/auth/admin/page"), "AdminAuthPage");
-const PortfolioPage = React.lazy(() => import("./routes/portfolio/page"));
-const PortfolioDetailPage = React.lazy(() => import("./routes/portfolio/detail.tsx"));
-const AdminPortfolioPage = lazyNamed(() => import("./routes/admin/PortfolioPage.tsx"), "AdminPortfolioPage");
+// Admin components moved to auth/registry/routes.ts
 const InsightsPage = React.lazy(() => import("./routes/insights/page.tsx"));
 const InsightsDetailPage = React.lazy(() => import("./routes/insights/detail.tsx"));
 
@@ -56,7 +44,11 @@ const RouteFallback: React.FC = () => (
   </div>
 );
 
-export const App: React.FC = () => {
+import { ADMIN_ROUTES } from './auth/registry/routes';
+const AdminAuthPage = lazyNamed(() => import("./routes/auth/admin/page"), "AdminAuthPage");
+const PortfolioPage = React.lazy(() => import("./routes/portfolio/page"));
+const PortfolioDetailPage = React.lazy(() => import("./routes/portfolio/detail.tsx"));
+const App: React.FC = () => {
   const location = useLocation();
 
   return (
@@ -111,25 +103,22 @@ export const App: React.FC = () => {
 
         {/* Tech Ambiance StudioHQ Executive Console (/admin/*) (Protected) */}
         <Route path="/auth/admin" element={<AdminAuthPage />} />
-        <Route
-          path="/admin"
-          element={
-            <AdminGuard requiredPermission={Dashboard.READ}>
-              <StudioHQLayout />
-            </AdminGuard>
-          }
-        >
-          <Route index element={<DashboardPage />} />
-          <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="timeline" element={<TimelinePage />} />
-          <Route path="workspaces" element={<WorkspacesPage />} />
-          <Route path="workspaces/:slug" element={<WorkspacesPage />} />
-          <Route path="crm" element={<CrmPipelinePage />} />
-          <Route path="cms" element={<CmsEditorPage />} />
-          <Route path="ai-center" element={<AiCenterPage />} />
-          <Route path="media" element={<MediaPage />} />
-          <Route path="portfolio" element={<AdminPortfolioPage />} />
-          <Route path="settings" element={<StudioTeamPage />} />
+        <Route path="/admin" element={<StudioHQLayout />}>
+          {ADMIN_ROUTES.map((routeConfig, idx) => {
+            const Component = routeConfig.component;
+            return (
+              <Route 
+                key={idx}
+                index={routeConfig.index}
+                path={routeConfig.path} 
+                element={
+                  <PermissionGuard permission={routeConfig.requiredPermission}>
+                    <Component />
+                  </PermissionGuard>
+                } 
+              />
+            );
+          })}
         </Route>
         </Routes>
       </Suspense>
@@ -138,3 +127,5 @@ export const App: React.FC = () => {
 };
 
 export default App;
+
+

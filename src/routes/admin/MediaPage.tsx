@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Upload, Loader2 } from 'lucide-react';
 import { mediaRepository, type MediaAsset } from '../../repositories/mediaRepository';
+import { ActionButton } from '../../components/admin/ActionButton';
 
 // Default mock assets (shown when no Supabase connection or no uploaded assets)
 const DEFAULT_ASSETS: MediaAsset[] = [
@@ -87,10 +88,11 @@ export const MediaPage: React.FC = () => {
             onChange={handleFileSelected}
             className="hidden"
           />
-          <button
-            onClick={handleUploadClick}
+          <ActionButton
+            actionId="media.upload"
+            onAction={handleUploadClick}
             disabled={isUploading}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0B3027] hover:bg-[#0E3A2F] text-white font-semibold text-xs shadow-[0_4px_16px_rgba(11,48,39,0.25)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0B3027] hover:bg-[#0E3A2F] text-white font-semibold text-xs shadow-[0_4px_16px_rgba(11,48,39,0.25)] transition-all disabled:opacity-50"
           >
             {isUploading ? (
               <>
@@ -103,7 +105,7 @@ export const MediaPage: React.FC = () => {
                 <span>+ Upload Edge Asset</span>
               </>
             )}
-          </button>
+          </ActionButton>
         </div>
       </div>
 

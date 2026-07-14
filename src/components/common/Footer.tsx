@@ -7,7 +7,7 @@ import { Container } from "../layout/Container";
 import { MarbleVeins } from "../ui/MarbleVeins";
 import logoImg from "../../assets/logo.png";
 
-export const Footer: React.FC = () => {
+const Footer: React.FC = () => {
   const { lenis } = useScroll();
   const hoverProps = useCursorHover("pointer");
 
@@ -118,3 +118,4 @@ export const Footer: React.FC = () => {
   );
 };
 export default Footer;
+

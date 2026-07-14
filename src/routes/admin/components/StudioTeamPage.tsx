@@ -6,6 +6,8 @@ import { studioTeamQueries, studioTeamKeys, type StudioTeamQueryFilters } from '
 import { studioTeamCommands } from '../../../repositories/studioTeamCommands';
 import { supabase } from '../../../lib/supabase';
 
+import { ActionButton } from '../../../components/admin/ActionButton';
+
 export const StudioTeamPage: React.FC = () => {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<'members' | 'invitations' | 'permissions'>('members');
@@ -263,14 +265,16 @@ export const StudioTeamPage: React.FC = () => {
                         >
                           <RefreshCw className="w-4 h-4" />
                         </button>
-                        <button 
-                          onClick={() => { if (confirm('Are you sure you want to revoke this invitation?')) revokeMutation.mutate(invite.id); }}
-                          disabled={revokeMutation.isPending}
+                        <ActionButton
+                          actionId="users.manage"
+                          onAction={async () => {
+                            await revokeMutation.mutateAsync(invite.id);
+                          }}
                           className="p-2 text-[#0B3027]/50 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                           title="Revoke Invitation"
                         >
                           <XCircle className="w-4 h-4" />
-                        </button>
+                        </ActionButton>
                       </div>
                     )}
                   </div>

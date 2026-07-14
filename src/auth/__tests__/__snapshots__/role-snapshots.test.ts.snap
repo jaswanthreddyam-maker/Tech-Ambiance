@@ -1,0 +1,148 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Role -> Permission Snapshot Tests > Role 'ADMIN' exact permission mapping 1`] = `
+[
+  "ai:generate",
+  "ai:read",
+  "ai:scout",
+  "cms:edit",
+  "cms:read",
+  "crm:read",
+  "crm:write",
+  "dashboard:read",
+  "media:delete",
+  "media:read",
+  "media:upload",
+  "portfolio:delete",
+  "portfolio:publish",
+  "portfolio:read",
+  "portfolio:write",
+  "system:audit",
+  "system:billing",
+  "system:read",
+  "system:roles",
+  "system:users",
+  "workspace:delete",
+  "workspace:provision",
+  "workspace:read",
+  "workspace:write",
+]
+`;
+
+exports[`Role -> Permission Snapshot Tests > Role 'CLIENT' exact permission mapping 1`] = `
+[
+  "analytics:finance",
+  "media:read",
+  "workspace:read",
+]
+`;
+
+exports[`Role -> Permission Snapshot Tests > Role 'DESIGNER' exact permission mapping 1`] = `
+[
+  "ai:read",
+  "cms:edit",
+  "cms:read",
+  "dashboard:read",
+  "media:delete",
+  "media:read",
+  "media:upload",
+  "portfolio:read",
+  "portfolio:write",
+  "workspace:read",
+  "workspace:write",
+]
+`;
+
+exports[`Role -> Permission Snapshot Tests > Role 'DEVELOPER' exact permission mapping 1`] = `
+[
+  "ai:generate",
+  "ai:read",
+  "ai:scout",
+  "cms:edit",
+  "cms:read",
+  "crm:read",
+  "dashboard:read",
+  "media:read",
+  "portfolio:read",
+  "portfolio:write",
+  "system:audit",
+  "workspace:read",
+  "workspace:write",
+]
+`;
+
+exports[`Role -> Permission Snapshot Tests > Role 'OWNER' exact permission mapping 1`] = `
+[
+  "ai:generate",
+  "ai:read",
+  "ai:scout",
+  "analytics:finance",
+  "cms:edit",
+  "cms:publish",
+  "cms:read",
+  "cms:rollback",
+  "crm:delete",
+  "crm:export",
+  "crm:proposal",
+  "crm:read",
+  "crm:write",
+  "dashboard:export",
+  "dashboard:read",
+  "media:delete",
+  "media:read",
+  "media:upload",
+  "portfolio:delete",
+  "portfolio:publish",
+  "portfolio:read",
+  "portfolio:write",
+  "project:read",
+  "system:audit",
+  "system:billing",
+  "system:read",
+  "system:roles",
+  "system:users",
+  "workspace:delete",
+  "workspace:provision",
+  "workspace:read",
+  "workspace:write",
+]
+`;
+
+exports[`Role -> Permission Snapshot Tests > Role 'PROJECT_MANAGER' exact permission mapping 1`] = `
+[
+  "ai:read",
+  "cms:read",
+  "crm:read",
+  "dashboard:read",
+  "media:read",
+  "portfolio:read",
+  "workspace:read",
+  "workspace:write",
+]
+`;
+
+exports[`Role -> Permission Snapshot Tests > Role 'SALES' exact permission mapping 1`] = `
+[
+  "ai:read",
+  "analytics:finance",
+  "crm:read",
+  "crm:write",
+  "dashboard:read",
+  "media:read",
+  "portfolio:read",
+  "workspace:read",
+]
+`;
+
+exports[`Role -> Permission Snapshot Tests > Role 'STRATEGIST' exact permission mapping 1`] = `
+[
+  "ai:read",
+  "analytics:finance",
+  "cms:read",
+  "crm:read",
+  "dashboard:read",
+  "media:read",
+  "portfolio:read",
+  "workspace:read",
+]
+`;

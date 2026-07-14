@@ -1,24 +1,19 @@
 import React, { useState } from 'react';
-import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, NavLink, Outlet } from 'react-router-dom';
 import {
-  LayoutDashboard,
-  Clock,
-  Briefcase,
-  KanbanSquare,
-  Globe,
-  Sparkles,
-  FolderKanban,
   Search,
-  ShieldCheck,
-  Activity,
-  ExternalLink,
-  Layers,
   LogOut,
+  ExternalLink,
+  Activity,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { CommandPaletteModal } from '../components/admin/CommandPaletteModal';
 import { SessionTimeout } from '../auth/SessionTimeout';
 import { ceoDashboardRepository } from '../repositories/ceoDashboardRepository';
+import { usePermissions } from '../auth/hooks/usePermissions';
+
+import { SIDEBAR_CONFIG } from '../auth/registry/sidebar';
+
 
 export const StudioHQLayout: React.FC = () => {
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
@@ -27,6 +22,7 @@ export const StudioHQLayout: React.FC = () => {
   
   const navigate = useNavigate();
   const location = useLocation();
+  const { can } = usePermissions();
 
   React.useEffect(() => {
     // Fetch global operations health to populate top navbar badges
@@ -98,79 +94,34 @@ export const StudioHQLayout: React.FC = () => {
             </span>
           </div>
 
-          {/* Navigation Groups */}
+          {/* Navigation Groups (Filtered strictly by permission) */}
           <div className="space-y-6">
-            {/* Executive Command */}
-            <div>
-              <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#C9A56A]/75 px-3.5 mb-2">
-                Executive Command
-              </div>
-              <nav className="space-y-1">
-                <NavLink to="/admin/dashboard" className={navLinkClasses}>
-                  <LayoutDashboard className="w-4 h-4" />
-                  <span>CEO Dashboard</span>
-                </NavLink>
-                <NavLink to="/admin/timeline" className={navLinkClasses}>
-                  <Clock className="w-4 h-4" />
-                  <span>Studio Timeline Feed</span>
-                </NavLink>
-              </nav>
-            </div>
+            {SIDEBAR_CONFIG.map((section) => {
+              // 1. Filter items by permission strictly
+              const visibleItems = section.items.filter(item => can(item.requiredPermission));
+              
+              // 2. Hide entire section if it's completely empty
+              if (visibleItems.length === 0) return null;
 
-            {/* Workspaces Engine */}
-            <div>
-              <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#C9A56A]/75 px-3.5 mb-2">
-                Workspaces Engine
-              </div>
-              <nav className="space-y-1">
-                <NavLink to="/admin/workspaces" className={navLinkClasses}>
-                  <Briefcase className="w-4 h-4" />
-                  <span>Client Workspaces</span>
-                </NavLink>
-              </nav>
-            </div>
-
-            {/* Agency Products */}
-            <div>
-              <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#C9A56A]/75 px-3.5 mb-2">
-                Agency Products
-              </div>
-              <nav className="space-y-1">
-                <NavLink to="/admin/crm" className={navLinkClasses}>
-                  <KanbanSquare className="w-4 h-4" />
-                  <span>Sales CRM Pipeline</span>
-                </NavLink>
-                <NavLink to="/admin/cms" className={navLinkClasses}>
-                  <Globe className="w-4 h-4" />
-                  <span>Website Engine (CMS)</span>
-                </NavLink>
-                <NavLink to="/admin/ai-center" className={navLinkClasses}>
-                  <Sparkles className="w-4 h-4" />
-                  <span>AI Center (ScoutAI)</span>
-                </NavLink>
-                <NavLink to="/admin/media" className={navLinkClasses}>
-                  <FolderKanban className="w-4 h-4" />
-                  <span>Universal Media Vault</span>
-                </NavLink>
-                <NavLink to="/admin/portfolio" className={navLinkClasses}>
-                  <Layers className="w-4 h-4" />
-                  <span>Portfolio Manager</span>
-                </NavLink>
-              </nav>
-            </div>
-
-            {/* Core Platform */}
-            <div>
-              <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#C9A56A]/75 px-3.5 mb-2">
-                Core Platform
-              </div>
-              <nav className="space-y-1">
-                <NavLink to="/admin/settings" className={navLinkClasses}>
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>8-Role RBAC & Vaults</span>
-                </NavLink>
-              </nav>
-            </div>
+              return (
+                <div key={section.id}>
+                  <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#C9A56A]/75 px-3.5 mb-2">
+                    {section.title}
+                  </div>
+                  <nav className="space-y-1">
+                    {visibleItems.map(item => {
+                      const Icon = item.icon;
+                      return (
+                        <NavLink key={item.id} to={item.href} className={navLinkClasses}>
+                          <Icon className="w-4 h-4" />
+                          <span>{item.label}</span>
+                        </NavLink>
+                      );
+                    })}
+                  </nav>
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -273,3 +224,4 @@ export const StudioHQLayout: React.FC = () => {
     </SessionTimeout>
   );
 };
+

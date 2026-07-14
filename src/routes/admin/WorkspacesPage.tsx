@@ -27,6 +27,7 @@ import type {
 } from '../../types/studioHQ';
 import { CreateTaskPanel } from '../../components/admin/CreateTaskPanel';
 import { ProvisionClientWizard } from './components/ProvisionClientWizard';
+import { ActionButton } from '../../components/admin/ActionButton';
 
 export const WorkspacesPage: React.FC = () => {
   const location = useLocation();
@@ -239,13 +240,14 @@ export const WorkspacesPage: React.FC = () => {
             Enterprise multi-tenant containers tracking organizations, workspaces, projects, and vault credentials.
           </p>
         </div>
-        <button 
-          onClick={() => setIsWizardOpen(true)}
+        <ActionButton 
+          actionId="workspace.provision"
+          onAction={() => setIsWizardOpen(true)}
           className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0B3027] hover:bg-[#0E3A2F] text-white font-semibold text-xs shadow-[0_4px_16px_rgba(11,48,39,0.25)] transition-all"
         >
           <Plus className="w-4 h-4 text-[#C9A56A]" />
           <span>Activate Client</span>
-        </button>
+        </ActionButton>
       </div>
 
       {/* Organizations Directory */}

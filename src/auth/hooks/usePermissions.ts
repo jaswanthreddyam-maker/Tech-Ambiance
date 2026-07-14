@@ -1,6 +1,6 @@
 import { useContext, useMemo } from 'react';
-import { PermissionContext } from './PermissionProvider';
-import type { PermissionId } from './permissions';
+import { PermissionContext } from '../providers/PermissionProvider';
+import type { PermissionId } from '../registry/permissions';
 
 export const usePermissions = () => {
   const context = useContext(PermissionContext);

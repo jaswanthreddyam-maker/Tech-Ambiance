@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { supabase, isSupabaseConfigured } from "../lib/supabase";
-import { authService } from "./authService";
+import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { authService } from "../authService";
 import type {
   AuthContextState,
   AuthRoleName,
@@ -8,8 +8,8 @@ import type {
   Profile,
   User,
   Workspace,
-} from "./types";
-import type { Permission } from "./permissions";
+} from "../types";
+import type { PermissionId } from "../registry/permissions";
 import type { Session, User as SupabaseAuthUser } from "@supabase/supabase-js";
 
 const AuthContext = createContext<AuthContextState | undefined>(undefined);
@@ -23,7 +23,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [roles, setRoles] = useState<AuthRoleName[]>(["CLIENT"]);
-  const [permissions, setPermissions] = useState<Set<Permission>>(new Set());
+  const [permissions, setPermissions] = useState<Set<PermissionId>>(new Set());
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Backward compatible states
@@ -95,7 +95,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     if (isSupabaseConfigured) {
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        async (_event, newSession) => {
+        async (_event: string, newSession: Session | null) => {
           if (!mounted) return;
 
           setSession(newSession);
@@ -206,12 +206,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     return roles.includes(targetRole);
   };
 
-  const hasPermission = (permission: Permission): boolean => {
+  const hasPermission = (permission: PermissionId): boolean => {
     return permissions.has(permission);
   };
 
-  const can = (permission: Permission): boolean => {
+  const can = (permission: PermissionId): boolean => {
     return permissions.has(permission);
+  };
+
+  const canAny = (permissionsToCheck: PermissionId[]): boolean => {
+    return permissionsToCheck.some((p) => permissions.has(p));
+  };
+
+  const canAll = (permissionsToCheck: PermissionId[]): boolean => {
+    return permissionsToCheck.every((p) => permissions.has(p));
   };
 
   const checkSession = async (): Promise<void> => {
@@ -274,6 +282,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         hasRole,
         hasPermission,
         can,
+        canAny,
+        canAll,
         checkSession,
       }}
     >

@@ -9,6 +9,7 @@ export interface EditorialRevealProps {
 
 const LUXURY_EASE = [0.16, 1, 0.3, 1] as const;
 
+/** @public */
 export const EditorialReveal: React.FC<EditorialRevealProps> = ({
   children,
   className = "",
@@ -75,3 +76,6 @@ export const EditorialReveal: React.FC<EditorialRevealProps> = ({
     </div>
   );
 };
+
+
+

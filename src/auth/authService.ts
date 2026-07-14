@@ -5,8 +5,8 @@ import type {
   Profile,
   Workspace,
 } from "./types";
-import type { Permission } from "./permissions";
-import { resolvePermissions } from "./permissions";
+import type { PermissionId } from './registry/permissions';
+import { resolvePermissions } from "./legacyRoles";
 
 const requireSupabase = () => {
   if (!isSupabaseConfigured) {
@@ -14,7 +14,7 @@ const requireSupabase = () => {
   }
 };
 
-export function computePermissions(roles: AuthRoleName[]): Set<Permission> {
+export function computePermissions(roles: AuthRoleName[]): Set<PermissionId> {
   return resolvePermissions(roles);
 }
 
@@ -210,7 +210,7 @@ export const authService = {
     organization: Organization | null;
     workspace: Workspace | null;
     roles: AuthRoleName[];
-    permissions: Set<Permission>;
+    permissions: Set<PermissionId>;
   }> {
     requireSupabase();
 

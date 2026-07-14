@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useMemo } from 'react';
-import { useAuthContext } from './AuthProvider';
-import type { PermissionId } from './permissions';
+import { useAuthContext } from '../providers/AuthProvider';
+import type { PermissionId } from '../registry/permissions';
 
 export interface PermissionContextState {
   permissions: PermissionId[] | '*';

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, ShieldCheck, ArrowRight, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../../../auth/authService';
-import { useAuth } from '../../../auth/useAuth';
+import { useAuth } from '../../../auth/hooks/useAuth';
 import { supabase } from '../../../lib/supabase';
 
 export const AdminAuthPage: React.FC = () => {

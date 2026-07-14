@@ -1,0 +1,33 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "project": ["src/**/*.{ts,tsx}"],
+  "ignore": [
+    "src/auth/registry/permissions.ts",
+    "src/components/organisms/**",
+    "src/components/ui/**",
+    "src/content/**",
+    "src/design-system/**",
+    "src/mocks/**",
+    "src/motion/**",
+    "src/routes/intro/**",
+    "src/routes/landing/**",
+    "src/routes/marketing/**",
+    "src/routes/services/**",
+    "src/routes/insights/**",
+    "src/routes/auth/**",
+    "src/routes/admin/SettingsPage.tsx",
+    "src/routes/NotFound.tsx",
+    "src/types/**",
+    "src/api/**",
+    "src/repositories/**"
+  ],
+  "ignoreExportsUsedInFile": true,
+  "ignoreDependencies": [
+    "@tanstack/react-query-devtools",
+    "gsap",
+    "js-yaml",
+    "@types/react-router-dom",
+    "autoprefixer",
+    "postcss"
+  ]
+}

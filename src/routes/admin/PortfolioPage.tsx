@@ -4,15 +4,16 @@ import {
   Layers,
   Plus,
   Edit3,
-  Trash2,
   Copy,
   Eye,
-  Send,
   Archive,
+  Trash2,
+  Send,
   FileEdit,
   X,
   Upload,
 } from 'lucide-react';
+import { ActionButton } from '../../components/admin/ActionButton';
 import { portfolioRepository } from '../../repositories/portfolioRepository';
 import type { Project, ProjectStatus } from '../../domain/project/project.types';
 
@@ -37,7 +38,7 @@ function generateSlug(title: string): string {
 
 // ─── Page Component ───────────────────────────────────────────────────────────
 
-export const AdminPortfolioPage: React.FC = () => {
+const AdminPortfolioPage: React.FC = () => {
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<'ALL' | ProjectStatus>('ALL');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -217,15 +218,9 @@ export const AdminPortfolioPage: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to permanently delete this project?')) return;
-    setActionLoading(`delete-${id}`);
-    try {
-      await portfolioRepository.deleteProject(id);
-      queryClient.invalidateQueries({ queryKey: ['admin', 'portfolio'] });
-      queryClient.invalidateQueries({ queryKey: ['portfolio'] });
-    } finally {
-      setActionLoading(null);
-    }
+    await portfolioRepository.deleteProject(id);
+    queryClient.invalidateQueries({ queryKey: ['admin', 'portfolio'] });
+    queryClient.invalidateQueries({ queryKey: ['portfolio'] });
   };
 
   const handleClone = async (id: string) => {
@@ -389,9 +384,9 @@ export const AdminPortfolioPage: React.FC = () => {
                     <div className="flex-1" />
 
                     {project.status === 'DRAFT' && (
-                      <button disabled={!!actionLoading} onClick={() => handleStatusChange(project.id, 'PUBLISHED')} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 transition-all disabled:opacity-50">
-                        <Send className="w-3 h-3" /> {actionLoading === `status-${project.id}` ? '...' : 'Publish'}
-                      </button>
+                      <ActionButton actionId="portfolio.publish" onAction={() => handleStatusChange(project.id, 'PUBLISHED')} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 transition-all">
+                        <Send className="w-3 h-3" /> Publish
+                      </ActionButton>
                     )}
                     {project.status === 'PUBLISHED' && (
                       <button disabled={!!actionLoading} onClick={() => handleStatusChange(project.id, 'ARCHIVED')} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold text-gray-500 bg-gray-50 hover:bg-gray-100 transition-all disabled:opacity-50">
@@ -404,9 +399,9 @@ export const AdminPortfolioPage: React.FC = () => {
                       </button>
                     )}
 
-                    <button disabled={!!actionLoading} onClick={() => handleDelete(project.id)} className="p-1.5 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-all disabled:opacity-50" title="Delete">
-                      {actionLoading === `delete-${project.id}` ? <div className="w-3 h-3 border-2 border-red-400 border-t-transparent rounded-full animate-spin" /> : <Trash2 className="w-3 h-3" />}
-                    </button>
+                    <ActionButton actionId="portfolio.delete" onAction={() => handleDelete(project.id)} className="p-1.5 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-all" title="Delete">
+                      <Trash2 className="w-3 h-3" />
+                    </ActionButton>
                   </div>
                 </div>
               </div>
@@ -628,3 +623,4 @@ export const AdminPortfolioPage: React.FC = () => {
 };
 
 export default AdminPortfolioPage;
+

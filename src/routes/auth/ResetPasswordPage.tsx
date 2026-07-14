@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Lock, Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
-import { useAuth } from "../../auth/useAuth";
+import { useAuth } from "../../auth/hooks/useAuth";
 import { useToast } from "../../providers/ToastProvider";
 import { Logo } from "../../components/atoms/Logo";
 import { MarbleVeins } from "../../components/ui/MarbleVeins";

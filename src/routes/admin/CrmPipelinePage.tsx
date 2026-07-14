@@ -4,6 +4,8 @@ import { crmRepository } from '../../repositories/crmRepository';
 import type { CrmLead } from '../../repositories/crmRepository';
 import { LeadDetailsPanel } from '../../components/admin/LeadDetailsPanel';
 
+import { ActionButton } from '../../components/admin/ActionButton';
+
 export const CrmPipelinePage: React.FC = () => {
   const [leads, setLeads] = useState<CrmLead[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -12,7 +14,6 @@ export const CrmPipelinePage: React.FC = () => {
   const [showProposalForm, setShowProposalForm] = useState(false);
   const [proposalLead, setProposalLead] = useState<CrmLead | null>(null);
   const [proposalData, setProposalData] = useState({ scope_summary: '', total_amount: '', advance_deposit: '' });
-  const [isGenerating, setIsGenerating] = useState(false);
 
   const handleExportCSV = () => {
     setIsExporting(true);
@@ -57,26 +58,19 @@ export const CrmPipelinePage: React.FC = () => {
   };
 
   const handleSubmitProposal = async () => {
-    if (!proposalData.scope_summary.trim() || !proposalData.total_amount) return;
-    setIsGenerating(true);
-    try {
-      const { agencyOsService } = await import('../../api/agencyOsService');
-      await agencyOsService.crm.createProposal({
-        deal_id: proposalLead?.id || '',
-        proposal_number: `SOW-${Date.now().toString(36).toUpperCase()}`,
-        scope_summary: proposalData.scope_summary,
-        total_amount: parseFloat(proposalData.total_amount) || 0,
-        advance_deposit_amount: parseFloat(proposalData.advance_deposit) || 0,
-        expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-      });
-      setShowProposalForm(false);
-      setProposalData({ scope_summary: '', total_amount: '', advance_deposit: '' });
-    } catch (err) {
-      console.error('Failed to create proposal:', err);
-      alert('Failed to create proposal. Check console for details.');
-    } finally {
-      setIsGenerating(false);
-    }
+    if (!selectedLead) return;
+    
+    const { agencyOsService } = await import('../../api/agencyOsService');
+    await agencyOsService.crm.createProposal({
+      deal_id: selectedLead.id,
+      proposal_number: `SOW-${Date.now().toString(36).toUpperCase()}`,
+      scope_summary: proposalData.scope_summary.trim(),
+      total_amount: parseFloat(proposalData.total_amount) || 0,
+      advance_deposit_amount: parseFloat(proposalData.advance_deposit) || 0,
+      expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    });
+    setShowProposalForm(false);
+    setProposalData({ scope_summary: '', total_amount: '', advance_deposit: '' });
   };
 
   // We define the column configuration here for rendering.
@@ -297,13 +291,16 @@ export const CrmPipelinePage: React.FC = () => {
               >
                 Cancel
               </button>
-              <button
-                onClick={handleSubmitProposal}
-                disabled={isGenerating || !proposalData.scope_summary.trim() || !proposalData.total_amount}
-                className="px-6 py-2 bg-[#0B3027] text-white text-sm font-bold rounded-lg hover:bg-[#0E3A2F] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+              <ActionButton
+                actionId="crm.proposal"
+                onAction={async () => {
+                  await handleSubmitProposal();
+                }}
+                disabled={!proposalData.scope_summary.trim() || !proposalData.total_amount}
+                className="px-6 py-2 bg-[#0B3027] text-white text-sm font-bold rounded-lg hover:bg-[#0E3A2F] transition-colors disabled:opacity-50 shadow-md"
               >
-                {isGenerating ? 'Creating...' : 'Create Proposal'}
-              </button>
+                Create Proposal
+              </ActionButton>
             </div>
           </div>
         </div>

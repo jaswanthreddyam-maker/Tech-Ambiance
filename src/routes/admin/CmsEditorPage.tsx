@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
-import {
-  Globe,
-  History,
-  CheckCircle,
-  RotateCcw,
-  Send,
-} from 'lucide-react';
+import { Globe, RotateCcw, Send, History, CheckCircle } from 'lucide-react';
+import { ActionButton } from '../../components/admin/ActionButton';
 
 export const CmsEditorPage: React.FC = () => {
   const [activeSection, setActiveSection] = useState<'hero' | 'services' | 'portfolio'>('hero');
@@ -47,20 +42,22 @@ export const CmsEditorPage: React.FC = () => {
           <span className="px-3.5 py-1.5 rounded-full bg-[#C9A56A]/15 border border-[#C9A56A]/35 text-xs font-mono font-bold text-[#9A7B4F]">
             Status: {publishingStatus}
           </span>
-          <button
-            onClick={handleRollback}
+          <ActionButton
+            actionId="cms.rollback"
+            onAction={handleRollback}
             className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white hover:bg-white/80 border border-[#0B3027]/15 text-xs font-semibold text-[#0B3027] shadow-sm transition-all"
           >
             <RotateCcw className="w-3.5 h-3.5 text-[#C9A56A]" />
             <span>Rollback to v1</span>
-          </button>
-          <button
-            onClick={() => setPublishingStatus('PUBLISHED')}
+          </ActionButton>
+          <ActionButton
+            actionId="cms.publish"
+            onAction={async () => setPublishingStatus('PUBLISHED')}
             className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0B3027] hover:bg-[#0E3A2F] text-white font-semibold text-xs shadow-[0_4px_16px_rgba(11,48,39,0.25)] transition-all"
           >
             <Send className="w-3.5 h-3.5 text-[#C9A56A]" />
             <span>Publish Snapshot (Live Cutover)</span>
-          </button>
+          </ActionButton>
         </div>
       </div>
 

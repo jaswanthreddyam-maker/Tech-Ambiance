@@ -1,7 +1,7 @@
 import React from "react";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from "./AuthProvider";
-import { PermissionProvider } from "../auth/PermissionProvider";
+import { PermissionProvider } from "../auth/providers/PermissionProvider";
 import { ScrollProvider } from "./ScrollProvider";
 import { CursorProvider } from "./CursorProvider";
 import { SEOProvider } from "./SEOProvider";

@@ -9,7 +9,7 @@ import { useAuth } from "../../providers/AuthProvider";
 import { ROUTES } from "../../routes/routes";
 import logoImg from "../../assets/logo.png";
 
-export const Navbar: React.FC = () => {
+const Navbar: React.FC = () => {
   const [scrollY, setScrollY] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -513,3 +513,4 @@ export const Navbar: React.FC = () => {
   );
 };
 export default Navbar;
+

@@ -1,8 +1,8 @@
 import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "./useAuth";
-import type { AuthRoleName } from "./types";
-import type { Permission } from "./permissions";
+import { useAuth } from '../hooks/useAuth';
+import type { AuthRoleName } from "../types";
+import type { PermissionId } from '../registry/permissions';
 import { Loader2 } from "lucide-react";
 
 interface AuthGuardProps {
@@ -10,11 +10,11 @@ interface AuthGuardProps {
   /** Legacy: check if user has any of these roles */
   requiredRole?: AuthRoleName | AuthRoleName[];
   /** Check a single permission */
-  requiredPermission?: Permission;
+  requiredPermission?: PermissionId;
   /** User must have ALL of these permissions */
-  requiredAllPermissions?: Permission[];
+  requiredAllPermissions?: PermissionId[];
   /** User must have at least ONE of these permissions */
-  requiredAnyPermissions?: Permission[];
+  requiredAnyPermissions?: PermissionId[];
 }
 
 export const AuthGuard: React.FC<AuthGuardProps> = ({

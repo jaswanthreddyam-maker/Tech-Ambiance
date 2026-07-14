@@ -15,4 +15,8 @@ export type PortfolioMetric = z.infer<typeof PortfolioMetricSchema>;
 export type PortfolioMedia = z.infer<typeof PortfolioMediaSchema>;
 export type PortfolioLink = z.infer<typeof PortfolioLinkSchema>;
 
+/** @public */
 export type ProjectImpactMetric = NonNullable<Project["businessImpact"]>[0];
+
+
+

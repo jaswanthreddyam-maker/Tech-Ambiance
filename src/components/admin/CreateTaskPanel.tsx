@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { SlideOverPanel } from '../ui/SlideOverPanel';
 import { workspaceRepository } from '../../repositories/workspaceRepository';
-import { useAuthContext } from '../../auth/AuthProvider';
+import { useAuthContext } from '../../auth/providers/AuthProvider';
 import { Calendar, ListTodo, AlertTriangle, User, Hash } from 'lucide-react';
 
 interface CreateTaskPanelProps {
