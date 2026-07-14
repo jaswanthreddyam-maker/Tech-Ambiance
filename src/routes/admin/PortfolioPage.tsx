@@ -42,6 +42,7 @@ export const AdminPortfolioPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<'ALL' | ProjectStatus>('ALL');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   // Form state
   const [formTitle, setFormTitle] = useState('');
@@ -217,20 +218,36 @@ export const AdminPortfolioPage: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to permanently delete this project?')) return;
-    await portfolioRepository.deleteProject(id);
-    queryClient.invalidateQueries({ queryKey: ['admin', 'portfolio'] });
-    queryClient.invalidateQueries({ queryKey: ['portfolio'] });
+    setActionLoading(`delete-${id}`);
+    try {
+      await portfolioRepository.deleteProject(id);
+      queryClient.invalidateQueries({ queryKey: ['admin', 'portfolio'] });
+      queryClient.invalidateQueries({ queryKey: ['portfolio'] });
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   const handleClone = async (id: string) => {
-    await portfolioRepository.cloneProject(id);
-    queryClient.invalidateQueries({ queryKey: ['admin', 'portfolio'] });
+    setActionLoading(`clone-${id}`);
+    try {
+      await portfolioRepository.cloneProject(id);
+      queryClient.invalidateQueries({ queryKey: ['admin', 'portfolio'] });
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   const handleStatusChange = async (id: string, status: ProjectStatus) => {
-    await portfolioRepository.updateStatus(id, status);
-    queryClient.invalidateQueries({ queryKey: ['admin', 'portfolio'] });
-    queryClient.invalidateQueries({ queryKey: ['portfolio'] });
+    if (status === 'ARCHIVED' && !confirm('Are you sure you want to archive this project? It will no longer be visible to the public.')) return;
+    setActionLoading(`status-${id}`);
+    try {
+      await portfolioRepository.updateStatus(id, status);
+      queryClient.invalidateQueries({ queryKey: ['admin', 'portfolio'] });
+      queryClient.invalidateQueries({ queryKey: ['portfolio'] });
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -359,36 +376,36 @@ export const AdminPortfolioPage: React.FC = () => {
 
                   {/* Actions */}
                   <div className="flex items-center gap-1.5 mt-2 pt-3 border-t border-[#0B3027]/[0.06]">
-                    <button onClick={() => openEditDrawer(project)} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold text-[#0B3027]/60 hover:bg-[#0B3027]/[0.04] transition-all" title="Edit">
+                    <button disabled={!!actionLoading} onClick={() => openEditDrawer(project)} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold text-[#0B3027]/60 hover:bg-[#0B3027]/[0.04] transition-all disabled:opacity-50" title="Edit">
                       <Edit3 className="w-3 h-3" /> Edit
                     </button>
-                    <button onClick={() => handleClone(project.id)} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold text-[#0B3027]/60 hover:bg-[#0B3027]/[0.04] transition-all" title="Clone">
-                      <Copy className="w-3 h-3" /> Clone
+                    <button disabled={!!actionLoading} onClick={() => handleClone(project.id)} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold text-[#0B3027]/60 hover:bg-[#0B3027]/[0.04] transition-all disabled:opacity-50" title="Clone">
+                      <Copy className="w-3 h-3" /> {actionLoading === `clone-${project.id}` ? '...' : 'Clone'}
                     </button>
-                    <button onClick={() => window.open(`/portfolio/${project.slug}`, '_blank')} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold text-[#0B3027]/60 hover:bg-[#0B3027]/[0.04] transition-all" title="Preview">
+                    <button disabled={!!actionLoading} onClick={() => window.open(`/portfolio/${project.slug}`, '_blank')} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold text-[#0B3027]/60 hover:bg-[#0B3027]/[0.04] transition-all disabled:opacity-50" title="Preview">
                       <Eye className="w-3 h-3" /> Preview
                     </button>
 
                     <div className="flex-1" />
 
                     {project.status === 'DRAFT' && (
-                      <button onClick={() => handleStatusChange(project.id, 'PUBLISHED')} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 transition-all">
-                        <Send className="w-3 h-3" /> Publish
+                      <button disabled={!!actionLoading} onClick={() => handleStatusChange(project.id, 'PUBLISHED')} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 transition-all disabled:opacity-50">
+                        <Send className="w-3 h-3" /> {actionLoading === `status-${project.id}` ? '...' : 'Publish'}
                       </button>
                     )}
                     {project.status === 'PUBLISHED' && (
-                      <button onClick={() => handleStatusChange(project.id, 'ARCHIVED')} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold text-gray-500 bg-gray-50 hover:bg-gray-100 transition-all">
-                        <Archive className="w-3 h-3" /> Archive
+                      <button disabled={!!actionLoading} onClick={() => handleStatusChange(project.id, 'ARCHIVED')} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold text-gray-500 bg-gray-50 hover:bg-gray-100 transition-all disabled:opacity-50">
+                        <Archive className="w-3 h-3" /> {actionLoading === `status-${project.id}` ? '...' : 'Archive'}
                       </button>
                     )}
                     {project.status === 'ARCHIVED' && (
-                      <button onClick={() => handleStatusChange(project.id, 'DRAFT')} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold text-amber-600 bg-amber-50 hover:bg-amber-100 transition-all">
-                        <FileEdit className="w-3 h-3" /> Revise
+                      <button disabled={!!actionLoading} onClick={() => handleStatusChange(project.id, 'DRAFT')} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold text-amber-600 bg-amber-50 hover:bg-amber-100 transition-all disabled:opacity-50">
+                        <FileEdit className="w-3 h-3" /> {actionLoading === `status-${project.id}` ? '...' : 'Revise'}
                       </button>
                     )}
 
-                    <button onClick={() => handleDelete(project.id)} className="p-1.5 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-all" title="Delete">
-                      <Trash2 className="w-3 h-3" />
+                    <button disabled={!!actionLoading} onClick={() => handleDelete(project.id)} className="p-1.5 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-all disabled:opacity-50" title="Delete">
+                      {actionLoading === `delete-${project.id}` ? <div className="w-3 h-3 border-2 border-red-400 border-t-transparent rounded-full animate-spin" /> : <Trash2 className="w-3 h-3" />}
                     </button>
                   </div>
                 </div>

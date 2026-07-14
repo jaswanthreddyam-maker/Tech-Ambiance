@@ -21,6 +21,7 @@ export const CmsEditorPage: React.FC = () => {
   const previousV1Heading = 'We build digital flagships that command authority.';
 
   const handleRollback = () => {
+    if (!confirm('Are you sure you want to rollback to v1? Any unsaved changes will be lost.')) return;
     setMainHeading(previousV1Heading);
     setPublishingStatus('DRAFT');
   };

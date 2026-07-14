@@ -52,6 +52,52 @@ export const ceoDashboardRepository = {
     return data || [];
   },
 
+  /**
+   * Aggregate all dashboard projections into a single executive report object.
+   * The UI layer only calls this and triggers a download — format logic stays here.
+   */
+  async getExecutiveReport(): Promise<string> {
+    const [finance, delivery, crm, topProjects, health] = await Promise.all([
+      this.getFinanceMetrics(),
+      this.getDeliveryMetrics(),
+      this.getCrmMetrics(),
+      this.getTopProjects(),
+      this.getOperationsHealth(),
+    ]);
+
+    const lines: string[] = [];
+
+    // Header
+    lines.push('Section,Metric,Value');
+
+    // Finance
+    lines.push(`Finance,Monthly Revenue (USD),"${finance?.monthly_revenue?.toLocaleString() ?? 'N/A'}"`);
+    lines.push(`Finance,Cash Collected This Month,"${finance?.cash_collected_this_month?.toLocaleString() ?? 'N/A'}"`);
+    lines.push(`Finance,Overdue Invoice Count,${finance?.overdue_invoice_count ?? 'N/A'}`);
+
+    // CRM
+    lines.push(`CRM,Pipeline Value,"${crm?.pipeline_value?.toLocaleString() ?? 'N/A'}"`);
+    lines.push(`CRM,Open Deals,${crm?.open_deals ?? 'N/A'}`);
+    lines.push(`CRM,Deals Won,${crm?.deals_won ?? 'N/A'}`);
+
+    // Delivery
+    lines.push(`Delivery,Avg Milestone Completion (Days),${delivery?.average_milestone_completion_days ?? 'N/A'}`);
+    lines.push(`Delivery,Active Workspaces,${delivery?.active_workspaces ?? 'N/A'}`);
+    lines.push(`Delivery,Projects At Risk,${delivery?.projects_at_risk ?? 'N/A'}`);
+
+    // Top Projects
+    topProjects.forEach((p: any, idx: number) => {
+      lines.push(`Top Project #${idx + 1},${p.project_name ?? 'Unknown'},Stage: ${p.lifecycle_stage ?? 'N/A'} | Health: ${p.health_status ?? 'N/A'}`);
+    });
+
+    // Operations Health
+    (health || []).forEach((h: any) => {
+      lines.push(`Operations,${h.context_name},Status: ${h.status} | Lag: ${h.outbox_lag ?? 0}`);
+    });
+
+    return lines.join('\n');
+  },
+
   // Realtime Subscriptions
   initializeRealtime(callbacks: {
     onFinanceUpdate?: (payload: any) => void;

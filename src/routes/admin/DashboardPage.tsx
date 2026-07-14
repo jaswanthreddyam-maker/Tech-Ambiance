@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   TrendingUp,
   Briefcase,
@@ -14,12 +15,34 @@ import {
 import { ceoDashboardRepository } from '../../repositories/ceoDashboardRepository';
 
 export const DashboardPage: React.FC = () => {
+  const navigate = useNavigate();
   const [finance, setFinance] = useState<any>(null);
   const [delivery, setDelivery] = useState<any>(null);
   const [crm, setCrm] = useState<any>(null);
   const [topProjects, setTopProjects] = useState<any[]>([]);
   const [timeline, setTimeline] = useState<any[]>([]);
   const [health, setHealth] = useState<any[]>([]);
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExportReport = async () => {
+    setIsExporting(true);
+    try {
+      const csvContent = await ceoDashboardRepository.getExecutiveReport();
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `executive-report-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Failed to export report:', err);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   useEffect(() => {
     // Independent widget loading
@@ -56,10 +79,17 @@ export const DashboardPage: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <button className="px-4 py-2.5 rounded-full bg-white hover:bg-white/90 border border-[#0B3027]/15 text-xs font-semibold text-[#0B3027] shadow-sm transition-all">
-            Export SOW Executive Report
+          <button
+            onClick={handleExportReport}
+            disabled={isExporting}
+            className="px-4 py-2.5 rounded-full bg-white hover:bg-white/90 border border-[#0B3027]/15 text-xs font-semibold text-[#0B3027] shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isExporting ? 'Generating...' : 'Export SOW Executive Report'}
           </button>
-          <button className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0B3027] hover:bg-[#0E3A2F] text-white font-semibold text-xs shadow-[0_4px_16px_rgba(11,48,39,0.25)] transition-all">
+          <button
+            onClick={() => navigate('/admin/workspaces', { state: { openProvisionWizard: true } })}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0B3027] hover:bg-[#0E3A2F] text-white font-semibold text-xs shadow-[0_4px_16px_rgba(11,48,39,0.25)] transition-all"
+          >
             <Plus className="w-4 h-4 text-[#C9A56A]" />
             <span>Provision Client Workspace</span>
           </button>

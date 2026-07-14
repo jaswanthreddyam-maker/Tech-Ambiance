@@ -318,5 +318,36 @@ export const workspaceRepository = {
     }
     
     return data;
+  },
+
+  /**
+   * Create a new project under a workspace.
+   * This is a dedicated Project creation method — distinct from createProjectTask().
+   */
+  async createProject(projectData: {
+    workspace_id: string;
+    name: string;
+    lifecycle_stage?: string;
+    actor_id: string;
+  }) {
+    if (!isSupabaseConfigured) return null;
+
+    const { data, error } = await supabase
+      .from('projects')
+      .insert({
+        workspace_id: projectData.workspace_id,
+        name: projectData.name,
+        lifecycle_stage: projectData.lifecycle_stage || 'DISCOVERY',
+        status: 'ACTIVE',
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating project:', error);
+      throw error;
+    }
+
+    return data;
   }
 };

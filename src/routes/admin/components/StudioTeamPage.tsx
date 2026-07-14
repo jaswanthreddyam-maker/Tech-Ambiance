@@ -264,7 +264,7 @@ export const StudioTeamPage: React.FC = () => {
                           <RefreshCw className="w-4 h-4" />
                         </button>
                         <button 
-                          onClick={() => revokeMutation.mutate(invite.id)}
+                          onClick={() => { if (confirm('Are you sure you want to revoke this invitation?')) revokeMutation.mutate(invite.id); }}
                           disabled={revokeMutation.isPending}
                           className="p-2 text-[#0B3027]/50 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                           title="Revoke Invitation"

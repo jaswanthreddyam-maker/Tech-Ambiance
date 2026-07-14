@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   Briefcase,
   KeyRound,
@@ -28,6 +29,7 @@ import { CreateTaskPanel } from '../../components/admin/CreateTaskPanel';
 import { ProvisionClientWizard } from './components/ProvisionClientWizard';
 
 export const WorkspacesPage: React.FC = () => {
+  const location = useLocation();
   const [organizations, setOrganizations] = useState<OrganizationHierarchy[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [actorId, setActorId] = useState<string>('');
@@ -39,6 +41,11 @@ export const WorkspacesPage: React.FC = () => {
 
   // Wizard State
   const [isWizardOpen, setIsWizardOpen] = useState(false);
+
+  // Add Project State
+  const [addProjectWorkspaceId, setAddProjectWorkspaceId] = useState<string | null>(null);
+  const [newProjectName, setNewProjectName] = useState('');
+  const [isCreatingProject, setIsCreatingProject] = useState(false);
 
   // Project Deep-Dive State
   const [environments, setEnvironments] = useState<ProjectEnvironment[]>([]);
@@ -52,6 +59,16 @@ export const WorkspacesPage: React.FC = () => {
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setActorId(data.user?.id || ''));
   }, []);
+
+  // Read React Router state for auto-opening the wizard from Dashboard
+  useEffect(() => {
+    const state = location.state as { openProvisionWizard?: boolean } | null;
+    if (state?.openProvisionWizard) {
+      setIsWizardOpen(true);
+      // Clear the state so refreshing doesn't re-open
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const fetchOrganizations = async () => {
     setIsLoading(true);
@@ -68,6 +85,26 @@ export const WorkspacesPage: React.FC = () => {
   useEffect(() => {
     fetchOrganizations();
   }, []);
+
+  const handleAddProject = async (workspaceId: string) => {
+    if (!newProjectName.trim() || !actorId) return;
+    setIsCreatingProject(true);
+    try {
+      await workspaceRepository.createProject({
+        workspace_id: workspaceId,
+        name: newProjectName.trim(),
+        actor_id: actorId,
+      });
+      setAddProjectWorkspaceId(null);
+      setNewProjectName('');
+      fetchOrganizations(); // Refresh hierarchy
+    } catch (err) {
+      console.error('Failed to create project:', err);
+      alert('Failed to create project. Check console.');
+    } finally {
+      setIsCreatingProject(false);
+    }
+  };
 
   // Focused Load of Project Data
   useEffect(() => {
@@ -318,9 +355,39 @@ export const WorkspacesPage: React.FC = () => {
                               })}
                               
                               {/* Add Project Button */}
-                              <button className="w-full flex items-center justify-center gap-2 p-2 mt-2 rounded-lg border border-dashed border-[#0B3027]/20 text-[#0B3027]/60 hover:bg-[#0B3027]/5 transition-colors text-xs font-bold">
-                                <Plus className="w-3 h-3" /> Add Project
-                              </button>
+                              {addProjectWorkspaceId === ws.id ? (
+                                <div className="flex items-center gap-2 mt-2">
+                                  <input
+                                    type="text"
+                                    autoFocus
+                                    value={newProjectName}
+                                    onChange={e => setNewProjectName(e.target.value)}
+                                    onKeyDown={e => { if (e.key === 'Enter') handleAddProject(ws.id); if (e.key === 'Escape') { setAddProjectWorkspaceId(null); setNewProjectName(''); } }}
+                                    placeholder="Project name..."
+                                    className="flex-1 px-3 py-1.5 rounded-lg border border-[#0B3027]/15 text-xs bg-white focus:outline-none focus:border-[#C9A56A]"
+                                  />
+                                  <button
+                                    onClick={() => handleAddProject(ws.id)}
+                                    disabled={isCreatingProject || !newProjectName.trim()}
+                                    className="px-3 py-1.5 rounded-lg bg-[#0B3027] text-white text-xs font-bold hover:bg-[#0E3A2F] disabled:opacity-50 transition-colors"
+                                  >
+                                    {isCreatingProject ? '...' : 'Add'}
+                                  </button>
+                                  <button
+                                    onClick={() => { setAddProjectWorkspaceId(null); setNewProjectName(''); }}
+                                    className="px-2 py-1.5 rounded-lg text-[#0B3027]/50 hover:bg-[#0B3027]/5 text-xs font-bold transition-colors"
+                                  >
+                                    ✕
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() => setAddProjectWorkspaceId(ws.id)}
+                                  className="w-full flex items-center justify-center gap-2 p-2 mt-2 rounded-lg border border-dashed border-[#0B3027]/20 text-[#0B3027]/60 hover:bg-[#0B3027]/5 transition-colors text-xs font-bold"
+                                >
+                                  <Plus className="w-3 h-3" /> Add Project
+                                </button>
+                              )}
                             </div>
                           )}
                         </div>
