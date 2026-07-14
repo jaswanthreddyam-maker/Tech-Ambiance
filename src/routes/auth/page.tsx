@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -55,11 +55,20 @@ export const AuthPage: React.FC = () => {
   const [forgotEmail, setForgotEmail] = useState("");
   const [isForgotSubmitting, setIsForgotSubmitting] = useState(false);
 
+  const location = useLocation();
+
+  const getPostAuthRedirect = React.useCallback(() => {
+    if (searchParams.get("redirect") === "consultation" || location.state?.redirect === "consultation") {
+      return "/experience?openConsultation=true";
+    }
+    return location.state?.from?.pathname || "/portal";
+  }, [searchParams, location.state]);
+
   React.useEffect(() => {
     if (isAuthenticated) {
-      navigate("/portal", { replace: true });
+      navigate(getPostAuthRedirect(), { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, getPostAuthRedirect]);
 
   React.useEffect(() => {
     const mode = searchParams.get("mode");
@@ -101,7 +110,7 @@ export const AuthPage: React.FC = () => {
       toast("Welcome Back to Tech Ambiance Portal", "success");
 
       setTimeout(() => {
-        navigate("/portal");
+        navigate(getPostAuthRedirect());
       }, 1000);
     } catch (err: any) {
       toast(
@@ -116,7 +125,10 @@ export const AuthPage: React.FC = () => {
   const onSignup = async (data: SignupFormValues) => {
     setIsSubmitting(true);
     try {
-      const res = await signup(data.email, data.name, data.password);
+      const redirectTo = searchParams.get("redirect") === "consultation" || location.state?.redirect === "consultation"
+        ? `${window.location.origin}/experience?openConsultation=true`
+        : undefined;
+      const res = await signup(data.email, data.name, data.password, redirectTo);
 
       if (res.requiresVerification) {
         setVerificationSentEmail(data.email);
@@ -125,7 +137,7 @@ export const AuthPage: React.FC = () => {
         setIsSuccess(true);
         toast("Portal Environment Created Successfully", "success");
         setTimeout(() => {
-          navigate("/portal");
+          navigate(getPostAuthRedirect());
         }, 1000);
       }
     } catch (err: any) {
@@ -141,7 +153,10 @@ export const AuthPage: React.FC = () => {
   const handleGoogleAuth = async () => {
     setIsSubmitting(true);
     try {
-      await loginWithGoogle();
+      const redirectTo = searchParams.get("redirect") === "consultation" || location.state?.redirect === "consultation"
+        ? `${window.location.origin}/auth/callback?redirect=consultation`
+        : undefined;
+      await loginWithGoogle(redirectTo);
       toast("Redirecting to Google SSO...", "info");
     } catch (err: any) {
       toast(err?.message || "Google Single Sign-On cancelled or failed.", "error");

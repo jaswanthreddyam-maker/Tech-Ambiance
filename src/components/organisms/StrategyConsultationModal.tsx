@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { crmRepository } from "../../repositories/crmRepository";
 import { isSupabaseConfigured } from "../../lib/supabase";
+import { useAuth } from "../../auth/hooks/useAuth";
 
 interface StrategyConsultationModalProps {
   isOpen: boolean;
@@ -89,6 +90,7 @@ export const StrategyConsultationModal: React.FC<StrategyConsultationModalProps>
   onClose,
 }) => {
   const { lenis } = useScroll();
+  const { isAuthenticated, user, profile } = useAuth();
 
   // Step navigation: 1, 2, 3 = Form steps | 4 = Analyzing | 5 = Digital Snapshot
   const [step, setStep] = useState<number>(1);
@@ -123,13 +125,23 @@ export const StrategyConsultationModal: React.FC<StrategyConsultationModalProps>
   // Reset modal state when opened
   useEffect(() => {
     if (isOpen) {
+      if (!isAuthenticated) {
+        onClose();
+        return;
+      }
       setStep(1);
       setAnalysisProgress(0);
       setIsSubmitting(false);
       setSubmitError("");
       setIdempotencyKey(crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(7));
+
+      setFormData((prev) => ({
+        ...prev,
+        name: prev.name || user?.name || profile?.full_name || "",
+        email: prev.email || user?.email || profile?.email || "",
+      }));
     }
-  }, [isOpen]);
+  }, [isOpen, isAuthenticated, user, profile, onClose]);
 
   // Apple / Stripe grade scroll lock: Freeze background page completely while modal is open
   useEffect(() => {

@@ -36,7 +36,12 @@ export const CallbackPage: React.FC = () => {
         }
 
         if (session && active) {
-          navigate("/portal", { replace: true });
+          const params = new URLSearchParams(window.location.search);
+          if (params.get("redirect") === "consultation") {
+            navigate("/experience?openConsultation=true", { replace: true });
+          } else {
+            navigate("/portal", { replace: true });
+          }
         } else if (active) {
           navigate("/auth", { replace: true });
         }

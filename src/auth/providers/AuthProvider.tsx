@@ -147,7 +147,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const signup = async (
     email: string,
     name: string,
-    password: string
+    password: string,
+    redirectTo?: string
   ): Promise<{ success: boolean; requiresVerification: boolean }> => {
     setIsLoading(true);
     try {
@@ -155,7 +156,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         throw new Error("Supabase is not configured. Configure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY before creating accounts.");
       }
 
-      const res = await authService.signUpWithEmail(email, password, name);
+      const res = await authService.signUpWithEmail(email, password, name, redirectTo);
       setIsLoading(false);
       return {
         success: res.success,
@@ -167,11 +168,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const loginWithGoogle = async (): Promise<void> => {
+  const loginWithGoogle = async (redirectTo?: string): Promise<void> => {
     if (!isSupabaseConfigured) {
       throw new Error("Supabase is not configured. Configure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY before using Google sign-in.");
     }
-    await authService.signInWithGoogle();
+    await authService.signInWithGoogle(redirectTo);
   };
 
   const logout = async (): Promise<void> => {

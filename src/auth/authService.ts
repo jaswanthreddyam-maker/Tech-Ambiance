@@ -96,7 +96,7 @@ export const authService = {
   // CLIENT AUTHENTICATION (CLIENT PORTAL)
   // ==============================================================================
 
-  async signUpWithEmail(email: string, password: string, fullName: string) {
+  async signUpWithEmail(email: string, password: string, fullName: string, redirectTo?: string) {
     requireSupabase();
 
     const { data, error } = await supabase.auth.signUp({
@@ -106,7 +106,7 @@ export const authService = {
         data: {
           full_name: fullName,
         },
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: redirectTo || `${window.location.origin}/auth/callback`,
       },
     });
 
@@ -136,13 +136,13 @@ export const authService = {
     return { success: true, user: data.user, session: data.session };
   },
 
-  async signInWithGoogle() {
+  async signInWithGoogle(redirectTo?: string) {
     requireSupabase();
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: redirectTo || `${window.location.origin}/auth/callback`,
         queryParams: {
           access_type: "offline",
           prompt: "consent",

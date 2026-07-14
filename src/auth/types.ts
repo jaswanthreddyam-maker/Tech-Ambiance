@@ -80,8 +80,8 @@ export interface AuthContextState {
   isEmailVerified: boolean;
 
   login: (email: string, password: string, rememberMe?: boolean) => Promise<boolean>;
-  signup: (email: string, name: string, password: string) => Promise<{ success: boolean; requiresVerification: boolean }>;
-  loginWithGoogle: () => Promise<void>;
+  signup: (email: string, name: string, password: string, redirectTo?: string) => Promise<{ success: boolean; requiresVerification: boolean }>;
+  loginWithGoogle: (redirectTo?: string) => Promise<void>;
   logout: () => Promise<void>;
   resetPasswordForEmail: (email: string) => Promise<boolean>;
   updatePassword: (newPassword: string) => Promise<boolean>;
