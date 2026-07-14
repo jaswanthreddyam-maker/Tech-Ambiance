@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Sparkles } from 'lucide-react';
 
 export const AiCenterPage: React.FC = () => {
-  const [targetUrl, setTargetUrl] = useState('https://cafevistaara.com');
+  const [targetUrl, setTargetUrl] = useState('');
 
   // ScoutAI scanning engine is not yet deployed — button is intentionally disabled
   const isScoutAvailable = false;

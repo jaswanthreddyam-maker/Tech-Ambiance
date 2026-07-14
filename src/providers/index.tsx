@@ -1,6 +1,7 @@
 import React from "react";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from "./AuthProvider";
+import { PermissionProvider } from "../auth/PermissionProvider";
 import { ScrollProvider } from "./ScrollProvider";
 import { CursorProvider } from "./CursorProvider";
 import { SEOProvider } from "./SEOProvider";
@@ -22,19 +23,21 @@ export const AppProviders: React.FC<{ children: React.ReactNode }> = ({ children
     <QueryClientProvider client={queryClient}>
       <SEOProvider>
         <AuthProvider>
-        <ScrollProvider>
-          <CursorProvider>
-            <ToastProvider>
-              <MotionProvider>
-                <ConsultationModalProvider>
-                  {children}
-                </ConsultationModalProvider>
-              </MotionProvider>
-            </ToastProvider>
-          </CursorProvider>
-        </ScrollProvider>
-      </AuthProvider>
-    </SEOProvider>
+          <PermissionProvider>
+            <ScrollProvider>
+              <CursorProvider>
+                <ToastProvider>
+                  <MotionProvider>
+                    <ConsultationModalProvider>
+                      {children}
+                    </ConsultationModalProvider>
+                  </MotionProvider>
+                </ToastProvider>
+              </CursorProvider>
+            </ScrollProvider>
+          </PermissionProvider>
+        </AuthProvider>
+      </SEOProvider>
     </QueryClientProvider>
   );
 };
