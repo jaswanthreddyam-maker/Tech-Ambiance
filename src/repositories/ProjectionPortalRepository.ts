@@ -85,9 +85,9 @@ export const ProjectionPortalRepository: IPortalRepository = {
     } as any;
   },
 
-  async getMilestones(_projectId: string): Promise<MilestoneItem[]> {
-    // In a pure read model, milestones might be aggregated into project_projection.
-    return [];
+  async getMilestones(projectId: string): Promise<MilestoneItem[]> {
+    const { RawPortalRepository } = await import('./RawPortalRepository');
+    return RawPortalRepository.getMilestones(projectId);
   },
 
   async getDocuments(projectId: string): Promise<DeliverableFile[]> {
@@ -97,7 +97,10 @@ export const ProjectionPortalRepository: IPortalRepository = {
       .eq('project_id', projectId)
       .order('display_order', { ascending: true });
 
-    if (error || !data) return [];
+    if (error || !data) {
+      const { RawPortalRepository } = await import('./RawPortalRepository');
+      return RawPortalRepository.getDocuments(projectId);
+    }
 
     return data.map(d => ({
       id: d.deliverable_id,
@@ -115,7 +118,10 @@ export const ProjectionPortalRepository: IPortalRepository = {
       .eq('project_id', projectId)
       .order('timestamp', { ascending: false });
 
-    if (error) return [];
+    if (error || !data) {
+      const { RawPortalRepository } = await import('./RawPortalRepository');
+      return RawPortalRepository.getTimeline(projectId);
+    }
 
     return data.map(d => ({
       id: d.id,
@@ -134,7 +140,10 @@ export const ProjectionPortalRepository: IPortalRepository = {
       .select('*')
       .eq('project_id', projectId);
 
-    if (error) return [];
+    if (error || !data) {
+      const { RawPortalRepository } = await import('./RawPortalRepository');
+      return RawPortalRepository.getEnvironments(projectId);
+    }
 
     return data.map(e => ({
       id: e.environment_id,
@@ -151,7 +160,10 @@ export const ProjectionPortalRepository: IPortalRepository = {
       .select('*')
       .eq('project_id', projectId);
 
-    if (error) return [];
+    if (error || !data) {
+      const { RawPortalRepository } = await import('./RawPortalRepository');
+      return RawPortalRepository.getCredentials(projectId);
+    }
 
     return data.map(c => ({
       id: c.credential_id,
@@ -165,11 +177,14 @@ export const ProjectionPortalRepository: IPortalRepository = {
   async getInvoices(): Promise<any[]> {
     // In Phase C7.9B, billing projections might be keyed by organization_id.
     // RLS will filter.
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('portal_billing_projection')
       .select('*');
 
-    if (error) return [];
+    if (error || !data) {
+      const { RawPortalRepository } = await import('./RawPortalRepository');
+      return RawPortalRepository.getInvoices();
+    }
 
     // The current UI relies on individual invoices. For now, we return empty
     // since the projection holds an aggregate. We will likely need a child table
@@ -182,7 +197,10 @@ export const ProjectionPortalRepository: IPortalRepository = {
       .from('portal_home_projection')
       .select('project_id');
 
-    if (error) return [];
+    if (error || !data) {
+      const { RawPortalRepository } = await import('./RawPortalRepository');
+      return RawPortalRepository.getClientProjects();
+    }
 
     return data.map(p => ({
       id: p.project_id
