@@ -22,6 +22,12 @@ export const IntroPage: React.FC = () => {
   }, [setSEO]);
 
   useEffect(() => {
+    // Skip entirely for mobile devices
+    if (window.innerWidth < 768) {
+      navigate("/experience", { replace: true });
+      return;
+    }
+
     // Show skip button after 2 seconds
     const timer = setTimeout(() => {
       setShowSkip(true);
@@ -36,7 +42,7 @@ export const IntroPage: React.FC = () => {
     }
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [navigate]);
 
   const handleTransition = () => {
     if (isTransitioning) return;

@@ -287,7 +287,13 @@ export const LandingPage: React.FC = () => {
 
             {/* Secondary Gold Ghost CTA */}
             <button
-              onClick={() => navigate("/intro")}
+              onClick={() => {
+                if (window.innerWidth < 768) {
+                  navigate("/experience");
+                } else {
+                  navigate("/intro");
+                }
+              }}
               className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full bg-transparent text-forest border border-forest/20 hover:border-gold text-xs font-bold uppercase tracking-[0.2em] transition-all"
               {...buttonHoverProps}
             >
