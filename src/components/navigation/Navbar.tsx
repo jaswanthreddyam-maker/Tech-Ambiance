@@ -22,7 +22,7 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const hoverProps = useCursorHover("pointer");
   const buttonHoverProps = useCursorHover("magnetic");
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
 
   // Track window resizing for JS responsive calculations
   useEffect(() => {
@@ -334,7 +334,7 @@ const Navbar: React.FC = () => {
               )}
             </AnimatePresence>
 
-            {/* Desktop Authentication Actions (Login & Sign Up) */}
+            {/* Desktop Authentication Actions (Login/Sign Up if guest, Portal/Logout if authenticated) */}
             <AnimatePresence>
               {isExpanded && (
                 <motion.div
@@ -348,41 +348,75 @@ const Navbar: React.FC = () => {
                   }}
                   className="shrink-0 flex items-center gap-3.5 md:gap-4 z-10"
                 >
-                    {/* Login Action */}
-                    <Magnetic>
-                      <button
-                        onClick={() => navigate("/auth?mode=login")}
-                        onMouseEnter={hoverProps.onMouseEnter}
-                        onMouseLeave={hoverProps.onMouseLeave}
-                        className="bg-transparent text-[#0B3027] hover:text-[#C9A56A] hover:opacity-90 font-medium text-[9.5px] uppercase tracking-[0.18em] px-4 py-1.5 transition-all duration-300 no-underline rounded-full select-none whitespace-nowrap"
-                      >
-                        Login
-                      </button>
-                    </Magnetic>
+                  {isAuthenticated ? (
+                    <>
+                      {/* Go to Portal */}
+                      <Magnetic>
+                        <button
+                          onClick={() => navigate("/portal")}
+                          onMouseEnter={hoverProps.onMouseEnter}
+                          onMouseLeave={hoverProps.onMouseLeave}
+                          className="bg-transparent text-[#0B3027] hover:text-[#C9A56A] hover:opacity-90 font-medium text-[9.5px] uppercase tracking-[0.18em] px-4 py-1.5 transition-all duration-300 no-underline rounded-full select-none whitespace-nowrap"
+                        >
+                          Portal
+                        </button>
+                      </Magnetic>
 
-                    {/* Sign Up Action */}
-                    <Magnetic>
-                      <motion.button
-                        onClick={() => navigate("/auth?mode=signup")}
-                        className="btn-emerald-stone !text-[#C5A572] uppercase tracking-widest font-semibold flex items-center justify-center gap-2 rounded-full border border-forest hover:shadow-[0_4px_16px_rgba(6,41,30,0.12)] select-none relative group overflow-hidden whitespace-nowrap"
-                        style={{ color: "#C5A572" }}
-                        animate={{
-                          paddingLeft: isScrolled ? "14px" : "18px",
-                          paddingRight: isScrolled ? "14px" : "18px",
-                          paddingTop: isScrolled ? "8px" : "10px",
-                          paddingBottom: isScrolled ? "8px" : "10px",
-                          fontSize: isScrolled ? "8.5px" : "9.5px",
-                        }}
-                        whileHover={{ scale: 1.02 }}
-                        transition={{ duration: 0.3 }}
-                        {...buttonHoverProps}
-                      >
-                        <span className="whitespace-nowrap relative z-10 !text-[#C5A572] font-bold">
-                          Sign Up
-                        </span>
-                        <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform duration-300 mt-0.5 !text-[#C5A572] relative z-10" />
-                      </motion.button>
-                    </Magnetic>
+                      {/* Logout */}
+                      <Magnetic>
+                        <motion.button
+                          onClick={() => logout()}
+                          className="btn-emerald-stone !text-[#C5A572] uppercase tracking-widest font-semibold flex items-center justify-center gap-2 rounded-full border border-forest hover:shadow-[0_4px_16px_rgba(6,41,30,0.12)] select-none relative group overflow-hidden whitespace-nowrap px-4 py-2 text-[9px]"
+                          style={{ color: "#C5A572" }}
+                          whileHover={{ scale: 1.02 }}
+                          transition={{ duration: 0.3 }}
+                          {...buttonHoverProps}
+                        >
+                          <span className="whitespace-nowrap relative z-10 !text-[#C5A572] font-bold">
+                            Logout
+                          </span>
+                        </motion.button>
+                      </Magnetic>
+                    </>
+                  ) : (
+                    <>
+                      {/* Login Action */}
+                      <Magnetic>
+                        <button
+                          onClick={() => navigate("/auth?mode=login")}
+                          onMouseEnter={hoverProps.onMouseEnter}
+                          onMouseLeave={hoverProps.onMouseLeave}
+                          className="bg-transparent text-[#0B3027] hover:text-[#C9A56A] hover:opacity-90 font-medium text-[9.5px] uppercase tracking-[0.18em] px-4 py-1.5 transition-all duration-300 no-underline rounded-full select-none whitespace-nowrap"
+                        >
+                          Login
+                        </button>
+                      </Magnetic>
+
+                      {/* Sign Up Action */}
+                      <Magnetic>
+                        <motion.button
+                          onClick={() => navigate("/auth?mode=signup")}
+                          className="btn-emerald-stone !text-[#C5A572] uppercase tracking-widest font-semibold flex items-center justify-center gap-2 rounded-full border border-forest hover:shadow-[0_4px_16px_rgba(6,41,30,0.12)] select-none relative group overflow-hidden whitespace-nowrap"
+                          style={{ color: "#C5A572" }}
+                          animate={{
+                            paddingLeft: isScrolled ? "14px" : "18px",
+                            paddingRight: isScrolled ? "14px" : "18px",
+                            paddingTop: isScrolled ? "8px" : "10px",
+                            paddingBottom: isScrolled ? "8px" : "10px",
+                            fontSize: isScrolled ? "8.5px" : "9.5px",
+                          }}
+                          whileHover={{ scale: 1.02 }}
+                          transition={{ duration: 0.3 }}
+                          {...buttonHoverProps}
+                        >
+                          <span className="whitespace-nowrap relative z-10 !text-[#C5A572] font-bold">
+                            Sign Up
+                          </span>
+                          <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform duration-300 mt-0.5 !text-[#C5A572] relative z-10" />
+                        </motion.button>
+                      </Magnetic>
+                    </>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>
@@ -411,16 +445,27 @@ const Navbar: React.FC = () => {
             </Link>
           </div>
 
-          {/* Top-Right Standalone Mobile Controls (Sign Up & Hamburger) */}
+          {/* Top-Right Standalone Mobile Controls (Portal/Sign Up & Hamburger) */}
           <div className="fixed top-4 right-4 sm:top-5 sm:right-5 z-[9990] flex items-center gap-2.5">
-            <button
-              onClick={() => navigate("/auth?mode=signup")}
-              className="btn-emerald-stone !text-[#C5A572] uppercase tracking-widest font-semibold flex items-center justify-center gap-1.5 rounded-full border border-forest px-4 py-2.5 text-[9px] shadow-md active:scale-95 transition-all"
-              style={{ color: "#C5A572" }}
-            >
-              <span>Sign Up</span>
-              <ArrowRight className="w-3 h-3" />
-            </button>
+            {isAuthenticated ? (
+              <button
+                onClick={() => navigate("/portal")}
+                className="btn-emerald-stone !text-[#C5A572] uppercase tracking-widest font-semibold flex items-center justify-center gap-1.5 rounded-full border border-forest px-4 py-2.5 text-[9px] shadow-md active:scale-95 transition-all"
+                style={{ color: "#C5A572" }}
+              >
+                <span>Portal</span>
+                <ArrowRight className="w-3 h-3" />
+              </button>
+            ) : (
+              <button
+                onClick={() => navigate("/auth?mode=signup")}
+                className="btn-emerald-stone !text-[#C5A572] uppercase tracking-widest font-semibold flex items-center justify-center gap-1.5 rounded-full border border-forest px-4 py-2.5 text-[9px] shadow-md active:scale-95 transition-all"
+                style={{ color: "#C5A572" }}
+              >
+                <span>Sign Up</span>
+                <ArrowRight className="w-3 h-3" />
+              </button>
+            )}
 
             <button
               onClick={() => setIsMobileMenuOpen(true)}
