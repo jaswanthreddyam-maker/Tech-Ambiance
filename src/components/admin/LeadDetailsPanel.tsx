@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Mail, Phone, Globe, Calendar, DollarSign, Target, FileText, CheckCircle2, UserPlus, AlertTriangle, Link2, Loader2 } from 'lucide-react';
-import type { CrmLead } from '../../repositories/crmRepository';
+import { X, Mail, Phone, Globe, Calendar, DollarSign, Target, FileText, CheckCircle2, UserPlus, AlertTriangle, Link2, Loader2, Trash2 } from 'lucide-react';
+import { crmRepository, type CrmLead } from '../../repositories/crmRepository';
 import { workspaceRepository } from '../../repositories/workspaceRepository';
 import { useAuthContext } from '../../auth/providers/AuthProvider';
 import { useToast } from '../../providers/ToastProvider';
@@ -16,6 +16,7 @@ export const LeadDetailsPanel: React.FC<LeadDetailsPanelProps> = ({ lead, isOpen
   const { authUser } = useAuthContext();
   const { toast } = useToast();
   const [isConverting, setIsConverting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Provision Client Access state
   const [showProvisionForm, setShowProvisionForm] = useState(false);
@@ -37,6 +38,22 @@ export const LeadDetailsPanel: React.FC<LeadDetailsPanelProps> = ({ lead, isOpen
       toast(err.message || 'Failed to convert lead to workspace', "error");
     } finally {
       setIsConverting(false);
+    }
+  };
+
+  const handleDeleteLead = async () => {
+    if (window.confirm(`Are you sure you want to delete lead "${lead.business_name}"? This action cannot be undone.`)) {
+      setIsDeleting(true);
+      try {
+        await crmRepository.deleteLead(lead.id);
+        toast(`Lead ${lead.business_name || 'Client'} deleted successfully.`, 'success');
+        onClose();
+      } catch (err: any) {
+        console.error('Failed to delete lead:', err);
+        toast(err.message || 'Failed to delete lead', 'error');
+      } finally {
+        setIsDeleting(false);
+      }
     }
   };
 
@@ -308,29 +325,40 @@ export const LeadDetailsPanel: React.FC<LeadDetailsPanelProps> = ({ lead, isOpen
             </div>
 
             {/* Footer Actions */}
-            <div className="p-6 border-t border-[#0B3027]/10 bg-white flex items-center justify-end gap-3">
-              <button 
-                onClick={onClose}
-                className="px-5 py-2.5 rounded-full text-xs font-bold text-[#0B3027] hover:bg-[#0B3027]/5 transition-colors"
+            <div className="p-6 border-t border-[#0B3027]/10 bg-white flex items-center justify-between gap-3">
+              <button
+                onClick={handleDeleteLead}
+                disabled={isDeleting}
+                className="px-4 py-2.5 rounded-full text-xs font-bold text-red-500 hover:bg-red-50 transition-colors flex items-center gap-2 disabled:opacity-50"
               >
-                Close
+                <Trash2 className="w-4 h-4" />
+                {isDeleting ? 'Deleting...' : 'Delete'}
               </button>
-              {lead.status !== 'WON' && (
+              
+              <div className="flex items-center gap-3">
                 <button 
-                  onClick={handleWinDeal}
-                  disabled={isConverting}
-                  className="px-5 py-2.5 rounded-full bg-[#0B3027] text-[#F8F6F1] text-xs font-bold shadow-md hover:bg-[#0E3A2F] transition-colors flex items-center gap-2 disabled:opacity-50"
+                  onClick={onClose}
+                  className="px-5 py-2.5 rounded-full text-xs font-bold text-[#0B3027] hover:bg-[#0B3027]/5 transition-colors"
                 >
-                  <CheckCircle2 className="w-4 h-4" />
-                  {isConverting ? 'Provisioning...' : 'Mark as Won & Provision'}
+                  Close
                 </button>
-              )}
-              {isWon && isProvisioned && (
-                <div className="px-5 py-2.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4" />
-                  Fully Provisioned
-                </div>
-              )}
+                {lead.status !== 'WON' && (
+                  <button 
+                    onClick={handleWinDeal}
+                    disabled={isConverting}
+                    className="px-5 py-2.5 rounded-full bg-[#0B3027] text-[#F8F6F1] text-xs font-bold shadow-md hover:bg-[#0E3A2F] transition-colors flex items-center gap-2 disabled:opacity-50"
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    {isConverting ? 'Provisioning...' : 'Mark as Won & Provision'}
+                  </button>
+                )}
+                {isWon && isProvisioned && (
+                  <div className="px-5 py-2.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4" />
+                    Fully Provisioned
+                  </div>
+                )}
+              </div>
             </div>
           </motion.div>
         </>

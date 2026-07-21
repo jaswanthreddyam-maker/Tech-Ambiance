@@ -524,26 +524,53 @@ const Navbar: React.FC = () => {
 
                 {/* Bottom Row: Authentication Controls & Coordinates */}
                 <div className="flex flex-col items-center gap-4 pb-4">
-                  <button
-                    onClick={() => {
-                      navigate("/auth?mode=signup");
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="w-full max-w-xs py-4 rounded-full bg-forest text-gold font-heading font-bold uppercase tracking-[0.22em] text-xs shadow-md flex items-center justify-center gap-2"
-                  >
-                    <span>Sign Up</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
+                  {isAuthenticated ? (
+                    <>
+                      <button
+                        onClick={() => {
+                          navigate("/portal");
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="w-full max-w-xs py-4 rounded-full bg-forest text-gold font-heading font-bold uppercase tracking-[0.22em] text-xs shadow-md flex items-center justify-center gap-2"
+                      >
+                        <span>Portal</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
 
-                  <button
-                    onClick={() => {
-                      navigate("/auth?mode=login");
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="text-xs uppercase tracking-[0.2em] font-semibold text-forest/80 hover:text-gold py-2 px-6 transition-colors"
-                  >
-                    Login
-                  </button>
+                      <button
+                        onClick={() => {
+                          logout();
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="text-xs uppercase tracking-[0.2em] font-semibold text-forest/80 hover:text-gold py-2 px-6 transition-colors"
+                      >
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => {
+                          navigate("/auth?mode=signup");
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="w-full max-w-xs py-4 rounded-full bg-forest text-gold font-heading font-bold uppercase tracking-[0.22em] text-xs shadow-md flex items-center justify-center gap-2"
+                      >
+                        <span>Sign Up</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          navigate("/auth?mode=login");
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="text-xs uppercase tracking-[0.2em] font-semibold text-forest/80 hover:text-gold py-2 px-6 transition-colors"
+                      >
+                        Login
+                      </button>
+                    </>
+                  )}
 
                   <div className="text-[10px] uppercase tracking-[0.24em] font-semibold text-forest/50 mt-2">
                     B2B Digital Flagships • MMXXVI

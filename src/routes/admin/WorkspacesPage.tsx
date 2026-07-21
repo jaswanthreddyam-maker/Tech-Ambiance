@@ -13,7 +13,8 @@ import {
   Building2,
   ChevronDown,
   ChevronRight,
-  FolderOpen
+  FolderOpen,
+  Trash2
 } from 'lucide-react';
 import { workspaceRepository } from '../../repositories/workspaceRepository';
 import { agencyOsService, type LifecycleStage } from '../../api/agencyOsService';
@@ -116,6 +117,18 @@ export const WorkspacesPage: React.FC = () => {
       alert('Failed to create project. Check console.');
     } finally {
       setIsCreatingProject(false);
+    }
+  };
+
+  const handleDeleteOrganization = async (orgId: string, orgName: string) => {
+    if (window.confirm(`Are you sure you want to hard delete the organization "${orgName}"? This will cascade delete all workspaces and projects inside it.`)) {
+      try {
+        await workspaceRepository.deleteOrganization(orgId);
+        fetchOrganizations(); // Refresh hierarchy
+      } catch (err) {
+        console.error('Failed to delete organization:', err);
+        alert('Failed to delete organization. Check console.');
+      }
     }
   };
 
@@ -298,21 +311,33 @@ export const WorkspacesPage: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-6">
-                    <div className="flex gap-2">
-                      <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-[#C9A56A]/10 text-[#0B3027]">
-                        {totalProjects} Projects
-                      </span>
-                      <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-[#C9A56A]/10 text-[#0B3027]">
-                        {totalWorkspaces} Workspaces
-                      </span>
-                      <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-emerald-600/10 text-emerald-800">
-                        ACTIVE
-                      </span>
+                    <div className="flex items-center gap-6">
+                      <div className="flex gap-2">
+                        <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-[#C9A56A]/10 text-[#0B3027]">
+                          {totalProjects} Projects
+                        </span>
+                        <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-[#C9A56A]/10 text-[#0B3027]">
+                          {totalWorkspaces} Workspaces
+                        </span>
+                        <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-emerald-600/10 text-emerald-800">
+                          ACTIVE
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteOrganization(org.id, org.name);
+                          }}
+                          className="p-2 rounded-full hover:bg-red-50 text-red-400 hover:text-red-600 transition-colors group relative"
+                          title="Delete Organization"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                        {isOrgExpanded ? <ChevronDown className="w-5 h-5 text-[#0B3027]/40" /> : <ChevronRight className="w-5 h-5 text-[#0B3027]/40" />}
+                      </div>
                     </div>
-                    {isOrgExpanded ? <ChevronDown className="w-5 h-5 text-[#0B3027]/40" /> : <ChevronRight className="w-5 h-5 text-[#0B3027]/40" />}
                   </div>
-                </div>
 
                 {/* Workspaces Nested List */}
                 {isOrgExpanded && (

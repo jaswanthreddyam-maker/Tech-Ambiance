@@ -389,5 +389,22 @@ export const workspaceRepository = {
     }
 
     return data;
+  },
+
+  /**
+   * Hard delete an organization and cascade delete workspaces, projects, etc.
+   */
+  async deleteOrganization(orgId: string): Promise<void> {
+    if (!isSupabaseConfigured) throw new Error("Supabase is not configured");
+
+    const { error } = await supabase
+      .from('organizations')
+      .delete()
+      .eq('id', orgId);
+
+    if (error) {
+      console.error('Error deleting organization:', error);
+      throw error;
+    }
   }
 };

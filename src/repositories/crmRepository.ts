@@ -150,5 +150,19 @@ export const crmRepository = {
       
     if (error) throw error;
     return data as CrmLead;
+  },
+
+  /**
+   * Hard delete a lead (used for cleanup).
+   */
+  async deleteLead(leadId: string): Promise<void> {
+    if (!isSupabaseConfigured) throw new Error("Supabase is not configured.");
+    
+    const { error } = await supabase
+      .from('lead_consultations')
+      .delete()
+      .eq('id', leadId);
+      
+    if (error) throw error;
   }
 };
