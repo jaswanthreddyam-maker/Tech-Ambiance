@@ -61,7 +61,7 @@ export const ConsultationModalProvider: React.FC<{ children: React.ReactNode }> 
       value={{ isOpen, openConsultationModal, closeConsultationModal }}
     >
       {children}
-      {isOpen && (
+      {isOpen && isAuthenticated && (
         <Suspense fallback={null}>
           <StrategyConsultationModal isOpen={isOpen} onClose={closeConsultationModal} />
         </Suspense>
