@@ -38,7 +38,7 @@ function generateSlug(title: string): string {
 
 // ─── Page Component ───────────────────────────────────────────────────────────
 
-const AdminPortfolioPage: React.FC = () => {
+export const AdminPortfolioPage: React.FC = () => {
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<'ALL' | ProjectStatus>('ALL');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -313,7 +313,7 @@ const AdminPortfolioPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {filteredProjects.map(project => {
             const coverUrl = project.images?.cover || (project.cover_image_path?.startsWith('/') ? project.cover_image_path : '');
-            const statusStyle = STATUS_STYLES[project.status ?? 'DRAFT'];
+            const statusStyle = STATUS_STYLES[project.status ?? 'DRAFT'] || STATUS_STYLES['DRAFT'];
             const projectMetrics = project.metrics ?? [];
 
             return (
@@ -621,6 +621,3 @@ const AdminPortfolioPage: React.FC = () => {
     </div>
   );
 };
-
-export default AdminPortfolioPage;
-
