@@ -24,9 +24,19 @@ export const PortalMobileLayout: React.FC<{ children: React.ReactNode }> = ({ ch
       {isProfileOpen && (
         <div className="fixed inset-0 z-50 flex items-end">
           <div className="absolute inset-0 bg-[#0B3027]/40 backdrop-blur-sm" onClick={() => setIsProfileOpen(false)} />
-          <div className="relative w-full bg-white rounded-t-[var(--portal-sheet-radius)] p-6 pb-[var(--portal-safe-bottom)]">
+          <div className="relative w-full bg-white rounded-t-[var(--portal-sheet-radius)] p-6 pb-[calc(var(--portal-safe-bottom)+20px)]">
             <h3 className="text-xl font-bold font-['Cormorant_Garamond'] mb-4">Profile</h3>
-            <p className="text-sm text-gray-500">More options coming soon...</p>
+            <p className="text-sm text-[#0B3027]/50 mb-6">More options coming in Phase P1.</p>
+            <button 
+              onClick={async () => {
+                const { supabase } = await import('../../../../../lib/supabase');
+                await supabase.auth.signOut();
+                window.location.href = '/auth';
+              }}
+              className="w-full py-3 bg-[#0B3027]/5 text-[#0B3027] rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-[#0B3027]/10 transition-colors"
+            >
+              Sign Out
+            </button>
           </div>
         </div>
       )}
