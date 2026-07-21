@@ -5,7 +5,7 @@ import { useAuth } from "../providers/AuthProvider";
 import { Cursor } from "../components/common/Cursor";
 import { useCursorHover } from "../hooks/useCursorHover";
 import { useIsMobile } from "../hooks/useIsMobile";
-import logoImg from "../assets/logo.webp";
+import logoImg from "../assets/logo-opt.webp";
 
 export const ClientLayout: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();

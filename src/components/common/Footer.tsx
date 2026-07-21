@@ -5,7 +5,7 @@ import { useCursorHover } from "../../hooks/useCursorHover";
 import { ROUTES } from "../../routes/routes";
 import { Container } from "../layout/Container";
 import { MarbleVeins } from "../ui/MarbleVeins";
-import logoImg from "../../assets/logo.webp";
+import logoImg from "../../assets/logo-opt.webp";
 
 const Footer: React.FC = () => {
   const { lenis } = useScroll();

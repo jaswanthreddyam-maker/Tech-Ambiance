@@ -27,7 +27,7 @@ export const SuccessStoriesSection: React.FC = () => {
         className="pointer-events-none absolute top-0 right-0 w-[85%] md:w-[60%] max-w-[800px] h-[360px] md:h-[480px] z-0 flex items-center justify-end overflow-hidden"
       >
         <img
-          src="/images/gold-floral-clean.webp"
+          src="/images/gold-floral-clean-opt.webp"
           alt="Luxury Gold Floral Cracks"
           className="w-full h-full object-contain object-right opacity-55"
         />

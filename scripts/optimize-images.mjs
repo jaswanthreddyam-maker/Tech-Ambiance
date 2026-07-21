@@ -16,19 +16,32 @@ async function optimizeImages() {
 
     const files = fs.readdirSync(dir);
     for (const file of files) {
-      if (file.endsWith('.png') || file.endsWith('.jpg')) {
+      if (file.endsWith('.webp')) {
         const inputPath = path.join(dir, file);
-        const outputPath = path.join(dir, file.replace(/\.(png|jpg)$/, '.webp'));
+        const tempPath = path.join(dir, 'temp-' + file);
         
-        console.log(`Optimizing ${file} -> ${path.basename(outputPath)}`);
+        console.log(`Aggressively optimizing ${file}...`);
         
         try {
-          await sharp(inputPath)
-            .webp({ quality: 80, effort: 6 })
-            .toFile(outputPath);
+          let pipeline = sharp(inputPath);
+          
+          if (file.includes('logo')) {
+            pipeline = pipeline.resize({ width: 256, withoutEnlargement: true });
+          } else if (file.includes('gold-floral-clean')) {
+            pipeline = pipeline.resize({ width: 720, withoutEnlargement: true });
+          } else if (file.includes('cover') || file.includes('landing')) {
+             // For project covers that are heavily cropped vertically by the UI
+             // we increase compression to save bytes without changing dimensions 
+             // since mobile might still need the vertical height.
+          }
+          
+          const buffer = await pipeline
+            .webp({ quality: 60, effort: 6 })
+            .toBuffer();
             
-          console.log(`Successfully converted ${file}`);
-          fs.unlinkSync(inputPath);
+          const optPath = inputPath.replace('.webp', '-opt.webp');
+          fs.writeFileSync(optPath, buffer);
+          console.log(`Successfully hyper-optimized ${file}`);
         } catch (err) {
           console.error(`Error converting ${file}:`, err);
         }

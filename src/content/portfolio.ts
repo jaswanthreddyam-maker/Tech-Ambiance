@@ -59,7 +59,7 @@ export const portfolioData: PortfolioItem[] = [
     results: "3.4x Order Velocity & 0.6s Interactive Checkout",
     liveUrl: "https://go-chicken-rz1f.vercel.app/",
     color: "#C9A56A",
-    imageUrl: "/assets/images/projects/go-chicken-landing.webp",
+    imageUrl: "/assets/images/projects/go-chicken-landing-opt.webp",
     overview: "Go Chicken required an instantaneous mobile ordering architecture capable of handling peak lunch and dinner order surges without latency or checkout friction.",
     challenge: "Most quick-service restaurant apps suffer from multi-step checkout bloat, slow menu rendering, and sluggish payment gateway handoffs.",
     research: "We analyzed user behavior during high-urgency meal ordering. Every millisecond saved at checkout directly increased completed basket conversions by 1.8%.",

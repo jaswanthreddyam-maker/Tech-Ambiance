@@ -44,7 +44,7 @@ export const PORTFOLIO_PROJECTS: Project[] = [
     slug: "restaurant",
     title: "Restaurant",
     description: "Bespoke digital reservation platform and luxury brand showcase for an acclaimed dining destination.",
-    cover_image_path: "/assets/images/projects/restaurant-cover.webp",
+    cover_image_path: "/assets/images/projects/restaurant-cover-opt.webp",
     status: "PUBLISHED",
     featured_rank: 2,
     display_order: 2,
@@ -66,7 +66,7 @@ export const PORTFOLIO_PROJECTS: Project[] = [
     businessImpact: [
       { metric: "Table Bookings", value: "+65%", label: "Direct Reservations" },
     ],
-    images: { cover: "/assets/images/projects/restaurant-cover.webp", gallery: [] },
+    images: { cover: "/assets/images/projects/restaurant-cover-opt.webp", gallery: [] },
     featured: true,
     url: "https://bhavanamrestaurantdemo.netlify.app",
   },
