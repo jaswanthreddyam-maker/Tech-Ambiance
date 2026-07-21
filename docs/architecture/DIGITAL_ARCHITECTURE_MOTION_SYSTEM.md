@@ -44,17 +44,41 @@ export interface SceneObjectContract {
   id: string;
   initialize(ctx: EngineContext): void;
   update(ctx: EngineContext, delta: number): void;
-  resize(ctx: EngineContext, width: number, height: number): void;
+  resize?(ctx: EngineContext, width: number, height: number): void;
   pause?(ctx: EngineContext): void;
   resume?(ctx: EngineContext): void;
   dispose(ctx: EngineContext): void;
   getObject3D(): THREE.Object3D;
+  onEvent?(event: string, data: any): void;
+  serialize?(): Record<string, any>;
+  deserialize?(data: Record<string, any>): void;
 }
 ```
 
 ---
 
-## 4. Decoupled 6-Layer Subsystem Architecture
+## 4. Architecture Decision Records (ADRs)
+
+Key architectural decisions are documented in the repository ADR registry:
+- **[ADR-001: DA-Engine Platform Architecture](file:///d:/Tech%20Ambiance/docs/architecture/adr/ADR-001_DA_ENGINE_ARCHITECTURE.md)** (`ACCEPTED & FROZEN v1.0`)
+
+---
+
+## 5. DA-2A Narrative Acceptance Criteria
+
+**Phase DA-2A is complete when:**
+1. The Hero section visibly assembles from seed nodes into a structural CAD network.
+2. Scroll depth advances the narrative deterministically through Chapter FSM transitions.
+3. Section hovers produce localized, meaningful node responses without affecting unrelated regions.
+4. The 20-second idle sequence executes intentionally without visual distraction.
+5. The narrative is fully compelling using ONLY simple white/gold nodes (`○────○`) and line segments.
+6. The `Shift + D` DA Debug Panel confirms stable 60 FPS timing and expected event propagation.
+
+> **Explicit Exclusion**: Phase DA-2A strictly excludes custom GLSL shaders, bloom, PBR reflections, and metallic caustics (deferred to DA-2B).
+
+---
+
+## 6. Decoupled 6-Layer Subsystem Architecture
 
 ```
                   ┌───────────────────────────────────────────┐

@@ -11,6 +11,9 @@ export interface SceneObjectContract {
   resume?: (ctx: EngineContext) => void;
   dispose: (ctx: EngineContext) => void;
   getObject3D: () => THREE.Object3D;
+  onEvent?: (event: string, data: any) => void;
+  serialize?: () => Record<string, any>;
+  deserialize?: (data: Record<string, any>) => void;
 }
 
 export class SceneRegistry {
