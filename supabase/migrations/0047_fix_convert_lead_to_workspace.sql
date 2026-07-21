@@ -1,11 +1,17 @@
 -- ==============================================================================
 -- MIGRATION: 0047_fix_convert_lead_to_workspace.sql
--- PURPOSE: Refine convert_lead_to_workspace RPC to insert organization_members,
--- handle fallback business names, and ensure admin visibility in /admin/workspaces.
+-- PURPOSE: Refine convert_lead_to_workspace RPC, ensure billing_email column on organizations,
+-- and grant admin membership in organization_members and workspace_members.
+-- Resolves error 42703 ("column 'billing_email' of relation 'organizations' does not exist").
 -- ==============================================================================
 
 BEGIN;
 
+-- 1. Safely ensure billing_email exists on organizations table
+ALTER TABLE public.organizations 
+  ADD COLUMN IF NOT EXISTS billing_email TEXT NULL;
+
+-- 2. Refined convert_lead_to_workspace RPC
 CREATE OR REPLACE FUNCTION public.convert_lead_to_workspace(
   p_lead_id UUID,
   p_admin_user_id UUID
