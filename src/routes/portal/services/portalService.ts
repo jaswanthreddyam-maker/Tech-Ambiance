@@ -17,7 +17,7 @@ import type { MilestoneItem, DeliverableFile, ProjectActivityEvent, ProjectEnvir
 import { QueryClient } from '@tanstack/react-query';
 
 // Feature Flag for C7.9B Cutover
-const USE_PROJECTION_REPOSITORY = false;
+const USE_PROJECTION_REPOSITORY = true;
 
 function getRepository(): IPortalRepository {
   return USE_PROJECTION_REPOSITORY ? ProjectionPortalRepository : RawPortalRepository;

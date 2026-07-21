@@ -1,5 +1,6 @@
+import './deno-shim.ts';
 import { supabase } from '../lib/supabase';
-import { PortalProjectionDispatcher } from '../workers/portal-projections/PortalProjectionDispatcher';
+import { PortalProjectionDispatcher } from '../../supabase/functions/outbox-processor/portal/PortalProjectionDispatcher.ts';
 import { portalService } from '../routes/portal/services/portalService';
 import { RawPortalRepository } from '../repositories/RawPortalRepository';
 import { ProjectionPortalRepository } from '../repositories/ProjectionPortalRepository';

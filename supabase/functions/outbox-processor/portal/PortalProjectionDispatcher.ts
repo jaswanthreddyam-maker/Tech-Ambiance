@@ -1,9 +1,9 @@
-import { FeedProjectionHandler } from './handlers/FeedProjectionHandler';
-import { ActionProjectionHandler } from './handlers/ActionProjectionHandler';
-import { HomeProjectionHandler } from './handlers/HomeProjectionHandler';
-import { ProjectProjectionHandler } from './handlers/ProjectProjectionHandler';
-import { BillingProjectionHandler } from './handlers/BillingProjectionHandler';
-import { ProjectionMetrics } from './ProjectionMetrics';
+import { FeedProjectionHandler } from './handlers/FeedProjectionHandler.ts';
+import { ActionProjectionHandler } from './handlers/ActionProjectionHandler.ts';
+import { HomeProjectionHandler } from './handlers/HomeProjectionHandler.ts';
+import { ProjectProjectionHandler } from './handlers/ProjectProjectionHandler.ts';
+import { BillingProjectionHandler } from './handlers/BillingProjectionHandler.ts';
+import { ProjectionMetrics } from './ProjectionMetrics.ts';
 
 /**
  * Portal Projection Dispatcher

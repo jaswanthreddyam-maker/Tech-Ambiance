@@ -4,6 +4,8 @@ import { createClient } from "@supabase/supabase-js";
 import { EventRouter } from "./router/EventRouter.ts";
 import { StudioInvitationCreatedHandler } from "./handlers/StudioInvitationCreatedHandler.ts";
 import { StudioInvitationSentProjection } from "./handlers/StudioInvitationSentProjection.ts";
+import { PortalProjectionDispatcher } from "./portal/PortalProjectionDispatcher.ts";
+import { RuntimeMetrics } from "./portal/ProjectionMetrics.ts";
 import { DomainEvent } from "./types.ts";
 
 const router = new EventRouter();
@@ -13,6 +15,35 @@ router.register("StudioInvitationCreated", new StudioInvitationCreatedHandler())
 router.register("StudioInvitationSent", new StudioInvitationSentProjection());
 
 serve(async (req: Request) => {
+  if (req.method === "GET" && (new URL(req.url).pathname === "/health" || new URL(req.url).pathname === "/api/v1/portal/health")) {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    
+    const { data: state } = await supabase
+      .from('portal_projection_state')
+      .select('*')
+      .eq('projection_name', 'master')
+      .single();
+
+    return new Response(JSON.stringify({
+      status: "healthy",
+      projection_version: state?.projection_version || "1.0",
+      last_processed_event: state?.last_processed_event || null,
+      last_processed_at: state?.last_processed_at || null,
+      lag_seconds: RuntimeMetrics.portal_projection_lag_seconds,
+      pending_events: 0,
+      rebuild_running: state?.is_rebuild_running || false,
+      rebuild_required: false,
+      failed_handlers: RuntimeMetrics.portal_projection_failures_total > 0 ? ['unknown'] : [],
+      repositories: {
+        active: "projection"
+      }
+    }), {
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+
   if (req.method !== "POST") {
     return new Response("Method not allowed", { status: 405 });
   }
@@ -48,6 +79,9 @@ serve(async (req: Request) => {
     for (const event of (events as DomainEvent[])) {
       try {
         await router.route(event);
+        
+        // Feed into Portal Projections natively
+        await PortalProjectionDispatcher.dispatch(event);
 
         // Mark Success
         await supabase.rpc("complete_domain_event", {
