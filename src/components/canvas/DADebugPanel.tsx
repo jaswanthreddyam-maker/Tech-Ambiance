@@ -6,25 +6,57 @@ interface DADebugPanelProps {
   sceneManager: SceneManager | null;
 }
 
+const CHAPTER_TOPOLOGIES: Record<string, string> = {
+  Awakening: 'Sparse Seed Nodes',
+  Expansion: 'Branching Tree Topology',
+  Capability: '4 Modular Quad Clusters',
+  Execution: 'Directed Linear Pipeline',
+  Proof: 'Rigid Lattice Matrix (3x4)',
+  Convergence: 'Radial Star Topology',
+};
+
+const CHAPTER_SEQUENCE: NarrativeState[] = [
+  'Awakening',
+  'Expansion',
+  'Capability',
+  'Execution',
+  'Proof',
+  'Convergence',
+];
+
 export const DADebugPanel: React.FC<DADebugPanelProps> = ({ sceneManager }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [fps, setFps] = useState(60);
   const [profile, setProfile] = useState<QualityProfile | null>(null);
-  const [narrativeState, setNarrativeState] = useState<NarrativeState | string>('Awakening');
+  const [narrativeState, setNarrativeState] = useState<NarrativeState>('Awakening');
   const [eventLog, setEventLog] = useState<string[]>([]);
 
-  // Toggle overlay on Shift + D
+  // Toggle overlay on Shift + D / Cycle topology on Shift + G
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.shiftKey && (e.key === 'D' || e.key === 'd')) {
         e.preventDefault();
         setIsOpen(prev => !prev);
       }
+
+      if (e.shiftKey && (e.key === 'G' || e.key === 'g')) {
+        e.preventDefault();
+        if (sceneManager) {
+          const currentIdx = CHAPTER_SEQUENCE.indexOf(narrativeState);
+          const nextIdx = (currentIdx + 1) % CHAPTER_SEQUENCE.length;
+          const nextState = CHAPTER_SEQUENCE[nextIdx];
+          
+          // Trigger narrative state shift via event bus or manager
+          const bus = sceneManager.getEventBus();
+          bus.emit('narrative.chapter', { state: nextState, previousState: narrativeState });
+          setNarrativeState(nextState);
+        }
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [sceneManager, narrativeState]);
 
   // Listen to engine metrics
   useEffect(() => {
@@ -97,6 +129,15 @@ export const DADebugPanel: React.FC<DADebugPanelProps> = ({ sceneManager }) => {
           <span className="text-[#FAF7F0]/60">Story Chapter:</span>
           <span className="font-bold text-emerald-300">{narrativeState}</span>
         </div>
+
+        <div className="flex justify-between text-[10px]">
+          <span className="text-[#FAF7F0]/60">Topology:</span>
+          <span className="font-bold text-[#C9A56A]">{CHAPTER_TOPOLOGIES[narrativeState] ?? 'Default'}</span>
+        </div>
+      </div>
+
+      <div className="mt-2 text-[9px] text-[#C9A56A]/50 text-right italic">
+        [Press Shift+G to cycle topology]
       </div>
 
       <div className="mt-3 pt-2 border-t border-[#C9A56A]/15">

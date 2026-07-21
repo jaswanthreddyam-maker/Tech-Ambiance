@@ -183,41 +183,63 @@ export class BlueprintNodes implements SceneObjectContract {
   }
 
   private updateChapterPositions(state: NarrativeState): void {
-    // Deterministic FSM chapter node target shifts
+    // Exaggerated Topological Structure per Chapter
     switch (state) {
       case NarrativeState.Awakening:
-        this.nodes.forEach((n) => n.targetPos.copy(n.basePos));
+        // Sparse Seed Nodes (Minimal 3-point orientation)
+        this.nodes.forEach((n, i) => {
+          if (i < 4) {
+            n.targetPos.copy(n.basePos);
+          } else {
+            n.targetPos.set(n.basePos.x * 0.2, n.basePos.y * 0.2, 0);
+          }
+        });
         break;
+
       case NarrativeState.Expansion:
-        this.nodes.forEach((n) => {
-          n.targetPos.set(n.basePos.x * 1.2, n.basePos.y * 1.1, n.basePos.z + 0.5);
+        // Branching Tree Topology
+        this.nodes.forEach((n, i) => {
+          const depth = Math.floor(i / 3);
+          const col = (i % 3) - 1;
+          n.targetPos.set(col * 2.2 + depth * 0.8, (2 - depth) * 1.5 - 1.0, depth * 0.2);
         });
         break;
+
       case NarrativeState.Capability:
-        // Cluster expansion into 4 capability pillars
+        // 4 Modular Quad Clusters (UI/UX, Systems, Telemetry, Cloud)
         this.nodes.forEach((n, i) => {
-          const angle = (i / this.nodes.length) * Math.PI * 2;
-          n.targetPos.set(Math.cos(angle) * 3.5, Math.sin(angle) * 2.5, 0);
+          const cluster = i % 4;
+          const corner = Math.floor(i / 4);
+          const cx = (cluster % 2 === 0 ? -1 : 1) * 2.8;
+          const cy = (cluster < 2 ? 1 : -1) * 1.8;
+          const ox = (corner % 2 === 0 ? -0.5 : 0.5);
+          const oy = (corner < 2 ? 0.5 : -0.5);
+          n.targetPos.set(cx + ox, cy + oy, 0);
         });
         break;
+
       case NarrativeState.Execution:
-        // Linear pipeline alignment
+        // Directed Linear Pipeline (Left to Right)
         this.nodes.forEach((n, i) => {
-          n.targetPos.set((i - 6) * 0.6, Math.sin(i) * 0.8, 0);
+          n.targetPos.set((i - 5.5) * 0.65, Math.sin(i * 0.8) * 0.4, 0);
         });
         break;
+
       case NarrativeState.Proof:
-        // Rigid golden matrix
+        // Rigid Architectural Lattice Matrix (3x4 Grid)
         this.nodes.forEach((n, i) => {
           const col = (i % 4) - 1.5;
           const row = Math.floor(i / 4) - 1;
-          n.targetPos.set(col * 2.0, row * 1.5, 0);
+          n.targetPos.set(col * 2.0, row * 1.4, 0);
         });
         break;
+
       case NarrativeState.Convergence:
-        // Convergence toward bottom CTA
-        this.nodes.forEach((n) => {
-          n.targetPos.set(0, -3.5, 0);
+        // Radial Star Topology (All converging to bottom CTA)
+        this.nodes.forEach((n, i) => {
+          const angle = (i / this.nodes.length) * Math.PI * 2;
+          const radius = i === 11 ? 0 : 3.0; // Central target node
+          n.targetPos.set(Math.cos(angle) * radius, -2.5 + Math.sin(angle) * (radius * 0.6), 0);
         });
         break;
     }
