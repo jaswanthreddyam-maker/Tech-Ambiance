@@ -232,7 +232,12 @@ export const agencyOsService = {
       visibility: "CLIENT" | "INTERNAL";
     }) {
       requireSupabase();
-      return await supabase.from("timeline_events").insert([payload]).select().single();
+      try {
+        return await supabase.from("timeline_events").insert([payload]).select().single();
+      } catch (err) {
+        console.warn("[agencyOsService] Timeline event skipped:", err);
+        return { data: null, error: err };
+      }
     },
 
     async listClientJourneyEvents(organizationId: string) {
@@ -289,7 +294,20 @@ export const agencyOsService = {
       new_state?: Record<string, any>;
     }) {
       requireSupabase();
-      return await supabase.from("admin_audit_logs").insert([payload]);
+      try {
+        const insertPayload: any = {
+          actor_user_id: payload.actor_user_id,
+          action_type: payload.action_type,
+          target_entity_type: payload.target_entity_type,
+          target_entity_id: payload.target_entity_id,
+          previous_state: payload.old_state || null,
+          new_state: payload.new_state || null,
+        };
+        return await supabase.from("admin_audit_logs").insert([insertPayload]);
+      } catch (err) {
+        console.warn("[agencyOsService] Audit log skipped:", err);
+        return { data: null, error: err };
+      }
     },
   },
 };
