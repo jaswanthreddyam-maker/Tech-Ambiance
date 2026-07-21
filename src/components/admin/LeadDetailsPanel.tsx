@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Mail, Phone, Globe, Calendar, DollarSign, Target, FileText, CheckCircle2 } from 'lucide-react';
+import { X, Mail, Phone, Globe, Calendar, DollarSign, Target, FileText, CheckCircle2, UserPlus, AlertTriangle, Link2, Loader2 } from 'lucide-react';
 import type { CrmLead } from '../../repositories/crmRepository';
 import { workspaceRepository } from '../../repositories/workspaceRepository';
 import { useAuthContext } from '../../auth/providers/AuthProvider';
@@ -16,6 +16,11 @@ export const LeadDetailsPanel: React.FC<LeadDetailsPanelProps> = ({ lead, isOpen
   const { authUser } = useAuthContext();
   const { toast } = useToast();
   const [isConverting, setIsConverting] = useState(false);
+
+  // Provision Client Access state
+  const [showProvisionForm, setShowProvisionForm] = useState(false);
+  const [clientUserId, setClientUserId] = useState('');
+  const [isProvisioning, setIsProvisioning] = useState(false);
 
   if (!lead) return null;
 
@@ -34,6 +39,33 @@ export const LeadDetailsPanel: React.FC<LeadDetailsPanelProps> = ({ lead, isOpen
       setIsConverting(false);
     }
   };
+
+  const handleProvisionClientAccess = async () => {
+    if (!clientUserId.trim()) {
+      toast('Please enter a valid Client User ID (UUID)', 'error');
+      return;
+    }
+
+    setIsProvisioning(true);
+    try {
+      await workspaceRepository.provisionClientAccess(lead.id, clientUserId.trim(), authUser?.id);
+      toast(`Client access provisioned successfully for ${lead.business_name || 'Client'}!`, 'success');
+      setShowProvisionForm(false);
+      setClientUserId('');
+      onClose();
+    } catch (err: any) {
+      console.error('Failed to provision client access:', err);
+      toast(err.message || 'Failed to provision client access', 'error');
+    } finally {
+      setIsProvisioning(false);
+    }
+  };
+
+  // Determine provisioning status display
+  const provisioningStatus = lead.provisioning_status || 'NOT_APPLICABLE';
+  const isWon = lead.status === 'WON';
+  const needsManualLink = isWon && provisioningStatus === 'MANUAL_LINK_REQUIRED';
+  const isProvisioned = provisioningStatus === 'PROVISIONED';
 
   return (
     <AnimatePresence>
@@ -66,6 +98,18 @@ export const LeadDetailsPanel: React.FC<LeadDetailsPanelProps> = ({ lead, isOpen
                   <span className="px-2 py-0.5 rounded-full bg-[#0B3027]/5 text-[10px] font-mono font-bold text-[#0B3027]/70 uppercase">
                     {lead.status}
                   </span>
+                  {/* Provisioning Status Badge */}
+                  {isWon && (
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase ${
+                      isProvisioned 
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+                        : needsManualLink 
+                          ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                          : 'bg-blue-50 text-blue-700 border border-blue-200'
+                    }`}>
+                      {isProvisioned ? '✓ Client Linked' : needsManualLink ? '⚠ Needs Linking' : provisioningStatus}
+                    </span>
+                  )}
                 </div>
                 <h2 className="font-['Cormorant_Garamond'] text-2xl font-bold text-[#0B3027]">
                   {lead.business_name}
@@ -82,6 +126,87 @@ export const LeadDetailsPanel: React.FC<LeadDetailsPanelProps> = ({ lead, isOpen
             {/* Scrollable Content */}
             <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
               
+              {/* ━━━━━ Provision Client Access Banner ━━━━━ */}
+              {needsManualLink && (
+                <section className="space-y-3">
+                  <div className="bg-amber-50 rounded-2xl p-5 border border-amber-200 shadow-sm">
+                    <div className="flex items-start gap-3">
+                      <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 shrink-0" />
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-bold text-amber-800">Client Access Not Provisioned</h4>
+                        <p className="text-xs text-amber-700 leading-relaxed">
+                          This workspace was provisioned but the client user wasn't linked — 
+                          either the lead was submitted before the client had an account, or the account 
+                          was created after conversion. Use the form below to link a client account.
+                        </p>
+                        {!showProvisionForm && (
+                          <button
+                            onClick={() => setShowProvisionForm(true)}
+                            className="mt-2 px-4 py-2 rounded-full bg-[#0B3027] text-[#F8F6F1] text-xs font-bold shadow-sm hover:bg-[#0E3A2F] transition-colors flex items-center gap-2"
+                          >
+                            <UserPlus className="w-3.5 h-3.5" />
+                            Provision Client Access
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Provision Form */}
+                    <AnimatePresence>
+                      {showProvisionForm && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="mt-4 pt-4 border-t border-amber-200 space-y-3 overflow-hidden"
+                        >
+                          <div>
+                            <label className="text-[10px] font-bold uppercase text-amber-800 mb-1 block">
+                              Client User ID (UUID)
+                            </label>
+                            <input
+                              type="text"
+                              value={clientUserId}
+                              onChange={(e) => setClientUserId(e.target.value)}
+                              placeholder="e.g., a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                              className="w-full px-3 py-2 rounded-lg bg-white border border-amber-300 text-sm text-[#0B3027] font-mono placeholder:text-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                            />
+                            <p className="text-[10px] text-amber-600 mt-1">
+                              Find the user ID in Supabase Auth → Users, or from the client's profile.
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={handleProvisionClientAccess}
+                              disabled={isProvisioning || !clientUserId.trim()}
+                              className="px-4 py-2 rounded-full bg-emerald-700 text-white text-xs font-bold shadow-sm hover:bg-emerald-800 transition-colors flex items-center gap-2 disabled:opacity-50"
+                            >
+                              {isProvisioning ? (
+                                <>
+                                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                  Provisioning...
+                                </>
+                              ) : (
+                                <>
+                                  <Link2 className="w-3.5 h-3.5" />
+                                  Link & Provision
+                                </>
+                              )}
+                            </button>
+                            <button
+                              onClick={() => { setShowProvisionForm(false); setClientUserId(''); }}
+                              className="px-4 py-2 rounded-full text-xs font-bold text-amber-800 hover:bg-amber-100 transition-colors"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </section>
+              )}
+
               {/* Contact Info */}
               <section className="space-y-4">
                 <h3 className="text-xs font-mono font-bold uppercase tracking-widest text-[#0B3027]/50">Contact Information</h3>
@@ -113,6 +238,19 @@ export const LeadDetailsPanel: React.FC<LeadDetailsPanelProps> = ({ lead, isOpen
                       <div className="text-sm font-medium text-[#0B3027]">{snapshot.website || snapshot.instagram || 'N/A'}</div>
                     </div>
                   </div>
+
+                  {/* Client Account Linkage Info */}
+                  {lead.user_id && (
+                    <div className="flex items-center gap-3 pt-2 border-t border-[#0B3027]/5">
+                      <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center">
+                        <Link2 className="w-4 h-4 text-emerald-600" />
+                      </div>
+                      <div>
+                        <div className="text-[10px] uppercase font-bold text-[#0B3027]/40">Linked User ID</div>
+                        <div className="text-xs font-mono text-[#0B3027]/70">{lead.user_id}</div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </section>
 
@@ -187,10 +325,10 @@ export const LeadDetailsPanel: React.FC<LeadDetailsPanelProps> = ({ lead, isOpen
                   {isConverting ? 'Provisioning...' : 'Mark as Won & Provision'}
                 </button>
               )}
-              {lead.status === 'WON' && (
+              {isWon && isProvisioned && (
                 <div className="px-5 py-2.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4" />
-                  Workspace Provisioned
+                  Fully Provisioned
                 </div>
               )}
             </div>

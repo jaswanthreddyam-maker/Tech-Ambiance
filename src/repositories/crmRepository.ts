@@ -24,6 +24,8 @@ export interface CrmLead {
   version: number;
   created_at: string;
   updated_at: string;
+  user_id: string | null;
+  provisioning_status: 'NOT_APPLICABLE' | 'PENDING_PROVISION' | 'PROVISIONED' | 'MANUAL_LINK_REQUIRED';
 }
 
 export interface LeadEvent {

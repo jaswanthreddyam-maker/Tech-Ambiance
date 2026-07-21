@@ -55,6 +55,36 @@ export const workspaceRepository = {
   },
 
   /**
+   * Provision Client Access — Manual linking for historical/unlinked leads.
+   * Used by admins to attach an existing user account to a workspace
+   * after the lead was already converted (e.g., client registered late).
+   */
+  async provisionClientAccess(leadId: string, clientUserId: string, adminUserId?: string): Promise<any> {
+    if (!isSupabaseConfigured) {
+      throw new Error("Supabase is not configured.");
+    }
+
+    let effectiveAdminId = adminUserId;
+    if (!effectiveAdminId) {
+      const { data: userData } = await supabase.auth.getUser();
+      effectiveAdminId = userData.user?.id;
+    }
+
+    const { data, error } = await supabase.rpc('provision_client_access', {
+      p_lead_id: leadId,
+      p_client_user_id: clientUserId,
+      p_admin_user_id: effectiveAdminId || null
+    });
+
+    if (error) {
+      console.error('Error provisioning client access:', error);
+      throw error;
+    }
+
+    return data;
+  },
+
+  /**
    * Get active project for a workspace (assuming 1:1 right now for simplicity)
    */
   async getActiveProject(workspaceId: string) {
