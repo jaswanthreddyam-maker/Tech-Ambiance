@@ -2,17 +2,20 @@ import type * as THREE from 'three';
 import type { EventBus } from './EventBus';
 import type { EngineContext } from './types';
 
-export interface SceneObject {
+export interface SceneObjectContract {
   id: string;
-  init?: (ctx: EngineContext) => void;
-  tick?: (ctx: EngineContext, delta: number) => void;
-  getObject3D?: () => THREE.Object3D;
-  destroy?: () => void;
+  initialize: (ctx: EngineContext) => void;
+  update: (ctx: EngineContext, delta: number) => void;
+  resize?: (ctx: EngineContext, width: number, height: number) => void;
+  pause?: (ctx: EngineContext) => void;
+  resume?: (ctx: EngineContext) => void;
+  dispose: (ctx: EngineContext) => void;
+  getObject3D: () => THREE.Object3D;
 }
 
 export class SceneRegistry {
   private _eventBus: EventBus;
-  private objects: Map<string, SceneObject> = new Map();
+  private objects: Map<string, SceneObjectContract> = new Map();
 
   constructor(eventBus: EventBus) {
     this._eventBus = eventBus;
@@ -22,20 +25,18 @@ export class SceneRegistry {
     return this._eventBus;
   }
 
-  public register(object: SceneObject, ctx?: EngineContext): void {
+  public register(object: SceneObjectContract, ctx?: EngineContext): void {
     if (this.objects.has(object.id)) {
       console.warn(`[SceneRegistry] Object "${object.id}" is already registered.`);
       return;
     }
     this.objects.set(object.id, object);
 
-    if (ctx && object.init) {
-      object.init(ctx);
-    }
-
-    if (ctx?.scene && object.getObject3D) {
-      const obj3D = object.getObject3D();
-      ctx.scene.add(obj3D);
+    if (ctx) {
+      object.initialize(ctx);
+      if (ctx.scene) {
+        ctx.scene.add(object.getObject3D());
+      }
     }
   }
 
@@ -43,12 +44,9 @@ export class SceneRegistry {
     const object = this.objects.get(id);
     if (!object) return;
 
-    if (ctx?.scene && object.getObject3D) {
+    if (ctx?.scene) {
       ctx.scene.remove(object.getObject3D());
-    }
-
-    if (object.destroy) {
-      object.destroy();
+      object.dispose(ctx);
     }
 
     this.objects.delete(id);
@@ -56,9 +54,7 @@ export class SceneRegistry {
 
   public tick(ctx: EngineContext, delta: number): void {
     this.objects.forEach(obj => {
-      if (obj.tick) {
-        obj.tick(ctx, delta);
-      }
+      obj.update(ctx, delta);
     });
   }
 

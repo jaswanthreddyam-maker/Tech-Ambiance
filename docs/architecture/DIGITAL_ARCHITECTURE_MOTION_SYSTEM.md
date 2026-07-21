@@ -6,11 +6,21 @@
 
 > **"Not a graphic demo. An engineered digital nervous system."**
 
+> **"Do not make DA-2A beautiful. Make it meaningful."**
+
 Tech Ambiance does not use 3D graphics for passive decoration or visual gimmicks. Every WebGL element, particle, and mathematical line segment rendered by the **Digital Architecture Engine (DA-Engine)** serves as a direct visual expression of our agency's core positioning: **engineering precision expressed through luxury digital architecture**.
 
 ---
 
-## 1. The 8 Design & Motion Principles
+## 1. Phase DA-1 Status: FROZEN
+
+As of July 21, 2026, **Phase DA-1 (Foundation Architecture)** is officially **FROZEN**.
+
+The 6-layer engine subsystem, `EngineContext`, domain `EventBus`, unified Lenis RAF bridge, `PerformanceEngine` quality profiles, `SceneRegistry`, and `DADebugPanel` inspector are certified and locked against structural feature creep.
+
+---
+
+## 2. The 8 Design & Motion Principles
 
 | Principle | Core Directive | Implementation Rule |
 | :--- | :--- | :--- |
@@ -25,9 +35,26 @@ Tech Ambiance does not use 3D graphics for passive decoration or visual gimmicks
 
 ---
 
-## 2. Decoupled 6-Layer Subsystem Architecture
+## 3. Strict Scene Component Contract
 
-To ensure multi-year maintainability and seamless reuse across StudioHQ, ScoutAI, and the Client Portal, the DA-Engine is architected into 6 independent subsystems wired via a shared `EngineContext` and a categorized `EventBus`:
+Every 3D component registered in the `SceneRegistry` MUST satisfy this strict lifecycle contract:
+
+```typescript
+export interface SceneObjectContract {
+  id: string;
+  initialize(ctx: EngineContext): void;
+  update(ctx: EngineContext, delta: number): void;
+  resize(ctx: EngineContext, width: number, height: number): void;
+  pause?(ctx: EngineContext): void;
+  resume?(ctx: EngineContext): void;
+  dispose(ctx: EngineContext): void;
+  getObject3D(): THREE.Object3D;
+}
+```
+
+---
+
+## 4. Decoupled 6-Layer Subsystem Architecture
 
 ```
                   ┌───────────────────────────────────────────┐
@@ -49,59 +76,14 @@ mouse/touch/focus Machine & Scene Voltage &     Pure Render    (Ultra->Minimal),
 events            State Memory    Physics Math  Execution      Context Recovery   Disposal Manager
 ```
 
-### Unidirectional Event & Data Pipeline
-```
-Interaction Event ──> EventBus ──> Narrative FSM ──> Motion Physics ──> Rendering Draw
-```
-
-### Layer Responsibilities
-1. **Interaction Engine**: Normalizes desktop mouse, mobile touch proximity, keyboard focus traversal, and future voice/AI inputs into categorized `interaction.*` events (`interaction.pointer`, `interaction.hover`, `interaction.scroll`).
-2. **Narrative FSM Engine**: Finite State Machine handling 6 story states (`Awakening`, `Expansion`, `Capability`, `Execution`, `Proof`, `Convergence`) and tracking visitor exploration memory (`narrative.chapter`, `narrative.memory`).
-3. **Motion Engine**: Pure renderer-agnostic math library (`Spring()`, `Voltage()`, `Noise()`, `Interpolation()`). Knows nothing about Three.js or DOM objects.
-4. **Rendering Engine**: Pure WebGL layer containing Three.js scene, cameras, instanced geometries, GLSL shaders, and PBR materials. Receives render state, never raw interaction events.
-5. **Performance Engine**: Manages 5 Quality Profiles (`Ultra`, `High`, `Balanced`, `Low`, `Minimal`), DPR scaling, offscreen `IntersectionObserver` pause, and WebGL context loss recovery (`performance.profile`, `performance.pause`).
-6. **Asset Engine**: Owns WebGL resources (shaders, geometry buffers, textures, material cache) and enforces zero-memory-leak disposal lifecycle (`asset.loaded`, `asset.disposed`).
-
 ---
 
-## 3. The Cinematic Story Finite State Machine (FSM)
+## 5. Phased Implementation Series (DA Engine)
 
-```typescript
-export enum NarrativeState {
-  Awakening = 'Awakening',   // Chapter 1: Hero seed assembly (4 initial nodes compute & draw filaments)
-  Expansion = 'Expansion',   // Chapter 2: BuiltFor / Success (Graph expands into space)
-  Capability = 'Capability', // Chapter 3: Services / Showreel (Cluster expansion into 4 core pillars)
-  Execution = 'Execution',   // Chapter 4: Process / Difference (Sequential current propagation)
-  Proof = 'Proof',           // Chapter 5: Portfolio / Proof (Node illumination & journey memory)
-  Convergence = 'Convergence'// Chapter 6: Contact / CTA (All active filaments stream toward CTA)
-}
-```
-
----
-
-## 4. Performance Quality Profiles
-
-The `PerformanceEngine` dynamically resolves one of five quality profiles based on device benchmark capabilities:
-
-| Profile | Target DPR | Geometry Detail | FPS Cap | Shader Quality | Pause Policy |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Ultra** | `min(dpr, 1.5)` | 15,000 vertices | 60 FPS | Full Caustics + Metallic PBR | Off-screen |
-| **High** | `min(dpr, 1.25)` | 10,000 vertices | 60 FPS | Medium Shaders | Off-screen |
-| **Balanced** | `1.0` | 5,000 vertices | 60 FPS | Basic Shaders | Off-screen |
-| **Low** | `1.0` | 2,000 vertices | 30 FPS | Flat Emissive | Off-screen |
-| **Minimal** | `1.0` | 0 (Static Blueprint) | 0 (Static) | Disabled (Vector Fallback) | Always Static |
-
----
-
-## 5. Automated Certification Requirements
-
-1. **Memory Leak Certification**: Automated mount -> unmount lifecycle validation ensuring zero un-disposed WebGL buffers, textures, event listeners, or un-canceled RAF callbacks.
-2. **Context Loss Recovery Certification**: Simulates `WEBGL_lose_context` extension trigger, verifying that the `PerformanceEngine` handles context recovery, re-initializes `AssetEngine` buffers, and seamlessly resumes rendering.
-
----
-
-## 6. Phased Implementation Series (DA Engine)
-
-- **Phase DA-1**: 6-Layer Subsystem Engine, Shared `EngineContext`, Categorized `EventBus`, and Lenis Unified RAF Ticker Integration.
-- **Phase DA-2**: Blueprint Node Engine, Voltage Physics Shaders & 20s Idle Self-Assembly Prototype.
-- **Phase DA-3**: Cinematic Story Narrative Integration, Scene Memory, and Performance/Memory Certification.
+- **Phase DA-1**: Foundation & Certification [`STATUS: FROZEN`]
+- **Phase DA-2A**: Narrative & Structural Blueprint Prototype
+  - Minimal white/gold nodes (`○────○`) and line segments. Zero complex shaders.
+  - Objective: Prove structural assembly narrative, scroll reactivity, and 20s idle self-assembly pacing.
+- **Phase DA-2B**: Shader & Visual Refinement Layer
+  - GLSL voltage propagation, metallic caustics, micro particle dust.
+- **Phase DA-3**: Ecosystem Cross-Integration (StudioHQ, ScoutAI, Client Portal signatures).
