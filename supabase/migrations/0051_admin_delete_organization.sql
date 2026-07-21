@@ -10,7 +10,7 @@ SET search_path = public, pg_temp
 AS $$
 BEGIN
   -- Validate permission: Only system admins can delete organizations
-  IF NOT public.has_permission('system:read') THEN
+  IF NOT public.is_admin_user() THEN
     RAISE EXCEPTION 'Unauthorized: Only system administrators can delete organizations.';
   END IF;
 
