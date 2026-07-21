@@ -22,7 +22,7 @@ export class ProjectionManager {
       .order('created_at', { ascending: true });
 
     if (error || !events) {
-      throw new Error('Failed to fetch events');
+      throw new Error(`Failed to fetch events: ${error?.message || 'No data'}`);
     }
 
     for (const event of events) {

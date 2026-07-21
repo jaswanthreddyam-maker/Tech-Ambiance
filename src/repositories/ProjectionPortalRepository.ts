@@ -64,11 +64,13 @@ export const ProjectionPortalRepository: IPortalRepository = {
       .from('portal_home_projection')
       .select('*')
       .eq('project_id', projectId)
-      .single();
+      .maybeSingle();
 
     if (error || !data) {
-      console.warn('Projection missing for getProject, falling back/returning null', error);
-      return null;
+      console.warn('Projection missing for getProject, falling back to RawPortalRepository');
+      // Fallback to Raw Repository during cutover if projection is not built yet
+      const { RawPortalRepository } = await import('./RawPortalRepository');
+      return RawPortalRepository.getProject(projectId);
     }
 
     // Adapt projection to expected legacy Project format for Builders

@@ -15,7 +15,8 @@ router.register("StudioInvitationCreated", new StudioInvitationCreatedHandler())
 router.register("StudioInvitationSent", new StudioInvitationSentProjection());
 
 serve(async (req: Request) => {
-  if (req.method === "GET" && (new URL(req.url).pathname === "/health" || new URL(req.url).pathname === "/api/v1/portal/health")) {
+  const pathname = new URL(req.url).pathname;
+  if (req.method === "GET" && (pathname.endsWith("/health") || pathname.endsWith("/api/v1/portal/health"))) {
     const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
