@@ -10,14 +10,14 @@ export interface PermissionContextState {
 export const PermissionContext = createContext<PermissionContextState | null>(null);
 
 export const PermissionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { authUser, isLoading: authLoading } = useAuthContext();
+    const { authUser, user, roles, isLoading: authLoading } = useAuthContext();
   const [permissions, setPermissions] = useState<PermissionId[] | '*'>(([]));
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (authLoading) return;
 
-    if (!authUser) {
+    if (!authUser && !user) {
       setPermissions([]);
       setIsLoading(false);
       return;
@@ -26,10 +26,10 @@ export const PermissionProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     // =========================================================================
     // PHASE A: COMPATIBILITY LAYER
     // =========================================================================
-    // Temporarily map the hardcoded 'OWNER' role to a wildcard permission set.
+    // Temporarily map the hardcoded 'OWNER' and 'ADMIN' roles to a wildcard permission set.
     // In Phase D, this will be replaced by fetching actual explicit permissions
     // dynamically based on the user's role assignments via JWT or DB.
-    if (authUser.role === 'OWNER') {
+    if (roles?.includes('OWNER') || roles?.includes('ADMIN') || user?.role === 'owner' || user?.role === 'admin') {
       setPermissions('*');
     } else {
       setPermissions([]); 
