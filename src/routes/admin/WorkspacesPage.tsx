@@ -342,9 +342,7 @@ export const WorkspacesPage: React.FC = () => {
                                       <FolderOpen className={`w-4 h-4 ${isProjActive ? 'text-[#C9A56A]' : 'text-[#0B3027]/40'}`} />
                                       <div>
                                         <div className="text-sm font-bold">{proj.name}</div>
-                                        {proj.template_version && (
-                                          <div className={`text-[10px] font-mono ${isProjActive ? 'text-white/60' : 'text-[#0B3027]/50'}`}>v{proj.template_version} Template</div>
-                                        )}
+
                                       </div>
                                     </div>
                                     <span className={`px-2 py-0.5 rounded-full text-[9px] font-mono font-bold ${

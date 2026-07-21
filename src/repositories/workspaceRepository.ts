@@ -271,8 +271,7 @@ export const workspaceRepository = {
             id,
             name,
             lifecycle_stage,
-            status,
-            template_version
+            status
           )
         )
       `)
