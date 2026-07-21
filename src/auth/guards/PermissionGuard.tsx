@@ -14,7 +14,7 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
   permission, 
   children 
 }) => {
-  const { authUser, isLoading: authLoading } = useAuthContext();
+  const { authUser, isLoading: authLoading, logout } = useAuthContext();
   const { can, isLoading: permsLoading } = usePermissions();
 
   const isLoading = authLoading || permsLoading;
@@ -48,12 +48,29 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
             <span className="text-[#0B3027]/60">Required Permission:</span>
             <code className="text-[#C9A56A] font-mono font-medium">{permission}</code>
           </div>
-          <Link 
-            to="/admin" 
-            className="bg-[#0B3027] text-[#F8F6F1] px-6 py-3 rounded-xl font-medium hover:bg-[#0B3027]/90 transition-all w-full"
-          >
-            Return to Dashboard
-          </Link>
+          {permission === 'dashboard:read' ? (
+            <div className="flex gap-4 w-full">
+              <Link 
+                to="/" 
+                className="bg-[#0B3027]/10 text-[#0B3027] px-6 py-3 rounded-xl font-medium hover:bg-[#0B3027]/20 transition-all flex-1"
+              >
+                Return to Site
+              </Link>
+              <button
+                onClick={() => logout()}
+                className="bg-[#0B3027] text-[#F8F6F1] px-6 py-3 rounded-xl font-medium hover:bg-[#0B3027]/90 transition-all flex-1"
+              >
+                Sign Out
+              </button>
+            </div>
+          ) : (
+            <Link 
+              to="/admin" 
+              className="bg-[#0B3027] text-[#F8F6F1] px-6 py-3 rounded-xl font-medium hover:bg-[#0B3027]/90 transition-all w-full"
+            >
+              Return to Dashboard
+            </Link>
+          )}
         </div>
       </div>
     );
