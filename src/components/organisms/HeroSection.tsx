@@ -33,7 +33,7 @@ const SHOWCASE_PROJECTS: ShowcaseProject[] = [
     description: "A complete digital transformation focusing on organic reservations and an immersive brand experience.",
     live: true,
     accent: "from-[#C5A572]/25 via-[#06291E]/80 to-[#06291E]",
-    image: "/assets/images/projects/coffee-mine-cover.png"
+    image: "/assets/images/projects/coffee-mine-cover.webp"
   },
   {
     id: "coffea",
@@ -43,7 +43,7 @@ const SHOWCASE_PROJECTS: ShowcaseProject[] = [
     description: "Bespoke sensory e-commerce flagship crafted with calm stone-inspired architecture and rapid edge checkout.",
     live: true,
     accent: "from-[#D8C090]/30 via-[#06291E]/85 to-[#06291E]",
-    image: "/assets/images/projects/cafe-cover-hero.png"
+    image: "/assets/images/projects/cafe-cover-hero.webp"
   },
   {
     id: "kubera",
@@ -53,7 +53,7 @@ const SHOWCASE_PROJECTS: ShowcaseProject[] = [
     description: "Architectural table booking and immersive culinary lookbook engineered for zero layout shift.",
     live: true,
     accent: "from-[#E0C896]/25 via-[#06291E]/85 to-[#06291E]",
-    image: "/assets/images/projects/gym-bolt-cover.png"
+    image: "/assets/images/projects/gym-bolt-cover.webp"
   },
   {
     id: "technews",
@@ -63,7 +63,7 @@ const SHOWCASE_PROJECTS: ShowcaseProject[] = [
     description: "High-scale editorial publishing platform delivering sub-40ms global edge readership across 4.8M readers.",
     live: true,
     accent: "from-[#FAF7F0]/25 via-[#06291E]/85 to-[#06291E]",
-    image: "/assets/images/projects/tech-news-cover.png"
+    image: "/assets/images/projects/tech-news-cover.webp"
   },
   {
     id: "scoutai",
@@ -82,7 +82,7 @@ const SHOWCASE_PROJECTS: ShowcaseProject[] = [
     description: "Custom real-time dispatch and streamlined mobile-first ordering flagship engineered for extreme reliability.",
     live: true,
     accent: "from-[#C5A572]/25 via-[#06291E]/85 to-[#06291E]",
-    image: "/assets/images/projects/go-chicken-cover-hero.png"
+    image: "/assets/images/projects/go-chicken-cover-hero.webp"
   }
 ];
 

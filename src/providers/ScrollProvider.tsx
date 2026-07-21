@@ -11,33 +11,47 @@ export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
-    // Initialize Lenis
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Apple-like smooth easing
-      orientation: "vertical",
-      gestureOrientation: "vertical",
-      smoothWheel: true,
-      wheelMultiplier: 1.0,
-      touchMultiplier: 1.5,
-      infinite: false,
+    let animationFrameId: number;
+
+    // Delay initialization until after first paint to prevent forced reflows
+    const initLenis = () => {
+      const lenis = new Lenis({
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Apple-like smooth easing
+        orientation: "vertical",
+        gestureOrientation: "vertical",
+        smoothWheel: true,
+        wheelMultiplier: 1.0,
+        touchMultiplier: 1.5,
+        infinite: false,
+      });
+
+      lenisRef.current = lenis;
+
+      // RAF (Request Animation Frame) loop
+      function raf(time: number) {
+        lenis.raf(time);
+        animationFrameId = requestAnimationFrame(raf);
+      }
+      animationFrameId = requestAnimationFrame(raf);
+      
+      // Disable scrollbar default jumpiness if needed
+      window.scrollTo(0, 0);
+    };
+
+    // Double RAF ensures we are past the first paint
+    requestAnimationFrame(() => {
+      requestAnimationFrame(initLenis);
     });
 
-    lenisRef.current = lenis;
-
-    // RAF (Request Animation Frame) loop
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
-
-    // Disable scrollbar default jumpiness if needed
-    window.scrollTo(0, 0);
-
     return () => {
-      lenis.destroy();
-      lenisRef.current = null;
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+      if (lenisRef.current) {
+        lenisRef.current.destroy();
+        lenisRef.current = null;
+      }
     };
   }, []);
 

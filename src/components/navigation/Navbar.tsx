@@ -7,7 +7,7 @@ import { useCursorHover } from "../../hooks/useCursorHover";
 import { Magnetic } from "../atoms/Magnetic";
 import { useAuth } from "../../providers/AuthProvider";
 import { ROUTES } from "../../routes/routes";
-import logoImg from "../../assets/logo.png";
+import logoImg from "../../assets/logo.webp";
 
 const Navbar: React.FC = () => {
   const [scrollY, setScrollY] = useState(0);

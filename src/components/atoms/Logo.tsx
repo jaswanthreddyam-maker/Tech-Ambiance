@@ -1,5 +1,5 @@
 import React from "react";
-import logoImg from "../../assets/logo.png";
+import logoImg from "../../assets/logo.webp";
 
 interface LogoProps {
   size?: "sm" | "md" | "lg" | "xl";
