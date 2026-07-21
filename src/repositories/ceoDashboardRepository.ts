@@ -107,20 +107,35 @@ export const ceoDashboardRepository = {
   }) {
     if (!isSupabaseConfigured) return null;
     
-    return supabase.channel('dashboard-projections')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'finance_dashboard_projection' }, payload => {
-        if (callbacks.onFinanceUpdate) callbacks.onFinanceUpdate(payload.new);
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'delivery_dashboard_projection' }, payload => {
-        if (callbacks.onDeliveryUpdate) callbacks.onDeliveryUpdate(payload.new);
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'crm_dashboard_projection' }, payload => {
-        if (callbacks.onCrmUpdate) callbacks.onCrmUpdate(payload.new);
-      })
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'studio_activity_projection' }, payload => {
-        if (callbacks.onTimelineUpdate) callbacks.onTimelineUpdate(payload.new);
-      })
-      .subscribe();
+    // Create a unique channel for each widget to prevent subscription conflicts
+    const channelId = `dashboard-projections-${Math.random().toString(36).substring(2, 9)}`;
+    const channel = supabase.channel(channelId);
+
+    if (callbacks.onFinanceUpdate) {
+      channel.on('postgres_changes', { event: '*', schema: 'public', table: 'finance_dashboard_projection' }, payload => {
+        callbacks.onFinanceUpdate!(payload.new);
+      });
+    }
+
+    if (callbacks.onDeliveryUpdate) {
+      channel.on('postgres_changes', { event: '*', schema: 'public', table: 'delivery_dashboard_projection' }, payload => {
+        callbacks.onDeliveryUpdate!(payload.new);
+      });
+    }
+
+    if (callbacks.onCrmUpdate) {
+      channel.on('postgres_changes', { event: '*', schema: 'public', table: 'crm_dashboard_projection' }, payload => {
+        callbacks.onCrmUpdate!(payload.new);
+      });
+    }
+
+    if (callbacks.onTimelineUpdate) {
+      channel.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'studio_activity_projection' }, payload => {
+        callbacks.onTimelineUpdate!(payload.new);
+      });
+    }
+
+    return channel.subscribe();
   },
 
   disposeRealtime(channel: any) {
