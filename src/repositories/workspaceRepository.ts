@@ -244,7 +244,6 @@ export const workspaceRepository = {
       .select('*')
       .eq('project_id', projectId)
       .is('archived_at', null)
-      .order('category', { ascending: true })
       .order('name', { ascending: true });
 
     if (error) {

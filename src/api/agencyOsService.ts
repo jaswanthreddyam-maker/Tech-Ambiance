@@ -286,7 +286,7 @@ export const agencyOsService = {
   // --------------------------------------------------------------------------
   audit: {
     async logAdminAction(payload: {
-      actor_user_id: string;
+      actor_user_id?: string;
       action_type: string;
       target_entity_type: string;
       target_entity_id: string;
@@ -295,8 +295,14 @@ export const agencyOsService = {
     }) {
       requireSupabase();
       try {
+        let effectiveActorId = payload.actor_user_id;
+        if (!effectiveActorId) {
+          const { data } = await supabase.auth.getUser();
+          effectiveActorId = data?.user?.id;
+        }
+
         const insertPayload: any = {
-          actor_user_id: payload.actor_user_id,
+          actor_user_id: effectiveActorId || null,
           action_type: payload.action_type,
           target_entity_type: payload.target_entity_type,
           target_entity_id: payload.target_entity_id,
