@@ -2,7 +2,7 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { MOBILE_ROUTE_CONFIG } from '../../../registry/mobileRouteConfig';
 import { motion } from 'framer-motion';
-import { useConsultationModal } from '../../../../providers/ConsultationModalProvider';
+import { useConsultationModal } from '../../../../../providers/ConsultationModalProvider';
 
 export const FloatingCTA: React.FC = () => {
   const location = useLocation();
