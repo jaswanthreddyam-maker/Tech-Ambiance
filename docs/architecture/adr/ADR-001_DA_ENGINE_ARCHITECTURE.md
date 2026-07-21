@@ -22,3 +22,9 @@ We engineered the **Digital Architecture Engine (DA-Engine)** as an event-driven
 - **Positive**: 3D rendering becomes the result of state rather than an isolated graphic demo. Bundle overhead is isolated to dynamic chunks (`+45 KiB`), and execution pauses automatically offscreen.
 - **Positive**: The engine can be reused across StudioHQ, ScoutAI, and Client Portal without modifying foundation code.
 - **Trade-off**: Requires strict discipline during feature additions. Structural changes to DA-1 require formal ADR justification.
+
+## Future Reconsideration
+This ADR should be revisited if:
+1. React officially supports an alternative rendering architecture that materially simplifies the bridge.
+2. WebGPU reaches full cross-browser production adoption with >98% desktop/mobile compatibility.
+3. Multiple product variants require fundamentally conflicting narrative models.

@@ -61,18 +61,20 @@ export interface SceneObjectContract {
 
 Key architectural decisions are documented in the repository ADR registry:
 - **[ADR-001: DA-Engine Platform Architecture](file:///d:/Tech%20Ambiance/docs/architecture/adr/ADR-001_DA_ENGINE_ARCHITECTURE.md)** (`ACCEPTED & FROZEN v1.0`)
+- **[ADR-002: Narrative Engine FSM Model](file:///d:/Tech%20Ambiance/docs/architecture/adr/ADR-002_NARRATIVE_ENGINE_FSM.md)** (`ACCEPTED & FROZEN v1.0`)
 
 ---
 
 ## 5. DA-2A Narrative Acceptance Criteria
 
 **Phase DA-2A is complete when:**
-1. The Hero section visibly assembles from seed nodes into a structural CAD network.
-2. Scroll depth advances the narrative deterministically through Chapter FSM transitions.
-3. Section hovers produce localized, meaningful node responses without affecting unrelated regions.
-4. The 20-second idle sequence executes intentionally without visual distraction.
-5. The narrative is fully compelling using ONLY simple white/gold nodes (`○────○`) and line segments.
-6. The `Shift + D` DA Debug Panel confirms stable 60 FPS timing and expected event propagation.
+1. A first-time visitor can intuitively perceive the progression from emergence to convergence without reading explanatory text.
+2. The Hero section visibly assembles from seed nodes into a structural CAD network.
+3. Scroll depth advances the narrative deterministically through Chapter FSM transitions.
+4. Section hovers produce localized, meaningful node responses without affecting unrelated regions.
+5. The 20-second idle sequence executes intentionally without visual distraction.
+6. The narrative is fully compelling using ONLY simple white/gold nodes (`○────○`) and line segments.
+7. The `Shift + D` DA Debug Panel confirms stable 60 FPS timing and expected event propagation.
 
 > **Explicit Exclusion**: Phase DA-2A strictly excludes custom GLSL shaders, bloom, PBR reflections, and metallic caustics (deferred to DA-2B).
 

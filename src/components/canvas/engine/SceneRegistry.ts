@@ -3,7 +3,7 @@ import type { EventBus } from './EventBus';
 import type { EngineContext } from './types';
 
 export interface SceneObjectContract {
-  id: string;
+  readonly id: string;
   initialize: (ctx: EngineContext) => void;
   update: (ctx: EngineContext, delta: number) => void;
   resize?: (ctx: EngineContext, width: number, height: number) => void;
