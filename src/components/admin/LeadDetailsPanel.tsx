@@ -4,6 +4,7 @@ import { X, Mail, Phone, Globe, Calendar, DollarSign, Target, FileText, CheckCir
 import type { CrmLead } from '../../repositories/crmRepository';
 import { workspaceRepository } from '../../repositories/workspaceRepository';
 import { useAuthContext } from '../../auth/providers/AuthProvider';
+import { useToast } from '../../providers/ToastProvider';
 
 interface LeadDetailsPanelProps {
   lead: CrmLead | null;
@@ -13,6 +14,7 @@ interface LeadDetailsPanelProps {
 
 export const LeadDetailsPanel: React.FC<LeadDetailsPanelProps> = ({ lead, isOpen, onClose }) => {
   const { authUser } = useAuthContext();
+  const { toast } = useToast();
   const [isConverting, setIsConverting] = useState(false);
 
   if (!lead) return null;
@@ -24,10 +26,11 @@ export const LeadDetailsPanel: React.FC<LeadDetailsPanelProps> = ({ lead, isOpen
     setIsConverting(true);
     try {
       await workspaceRepository.convertLeadToWorkspace(lead.id, authUser.id);
+      toast(`Client workspace and project provisioned for ${lead.business_name || 'Client'}!`, "success");
       onClose();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to convert lead:', err);
-      alert('Failed to convert lead to workspace');
+      toast(err.message || 'Failed to convert lead to workspace', "error");
     } finally {
       setIsConverting(false);
     }

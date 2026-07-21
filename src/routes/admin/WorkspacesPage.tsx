@@ -85,6 +85,18 @@ export const WorkspacesPage: React.FC = () => {
 
   useEffect(() => {
     fetchOrganizations();
+
+    // Subscribe to Realtime changes on organizations, workspaces, and projects
+    const channel = supabase
+      .channel('workspaces_page_hierarchy_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'organizations' }, () => fetchOrganizations())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'workspaces' }, () => fetchOrganizations())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, () => fetchOrganizations())
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const handleAddProject = async (workspaceId: string) => {
