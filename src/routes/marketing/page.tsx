@@ -2,32 +2,26 @@ import React, { useEffect } from "react";
 import { m } from "framer-motion";
 import { useSEO } from "../../providers/SEOProvider";
 
-// Section components
+// Initial Bundle Components
 import { HeroSection } from "../../components/organisms/HeroSection";
 import { BuiltForSection } from "../../components/organisms/BuiltForSection";
 import { SuccessStoriesSection } from "../../components/organisms/SuccessStoriesSection";
-import { ShowreelSection } from "../../components/organisms/ShowreelSection";
-import { ServicesSection } from "../../components/organisms/ServicesSection";
-import { PortfolioSection } from "../../components/organisms/PortfolioSection";
-import { DifferenceSection } from "../../components/organisms/DifferenceSection";
-import { ProcessSection } from "../../components/organisms/ProcessSection";
-import { TeamSection } from "../../components/organisms/TeamSection";
-import { TestimonialsSection } from "../../components/organisms/TestimonialsSection";
-import { ContactSection } from "../../components/organisms/ContactSection";
-import { GoldenLightningVeins } from "../../components/ui/GoldenLightningVeins";
+import { LazyLoadChunk } from "../../components/layout/LazyLoadChunk";
+
+// Lazy Loaded Chunks
+const ChunkA = React.lazy(() => import("./chunks/ChunkA"));
+const ChunkB = React.lazy(() => import("./chunks/ChunkB"));
+const ChunkC = React.lazy(() => import("./chunks/ChunkC"));
 
 export const MarketingPage: React.FC = () => {
   const { setSEO } = useSEO();
 
   useEffect(() => {
-    // Dynamic metadata setting for Tech Ambiance Marketing Home
     setSEO({
       title: "Tech Ambiance | Premium Digital Brand Experience Agency",
       description: "We build modern websites, powerful SEO, scalable web applications, and luxury digital brand experiences. Apple + Framer + Linear inspired studio.",
       keywords: "digital agency, luxury branding, web design, react development, SEO optimization, SaaS application developer, brand studio",
     });
-
-    // Reset window scroll position on mount
     window.scrollTo(0, 0);
   }, [setSEO]);
 
@@ -42,17 +36,18 @@ export const MarketingPage: React.FC = () => {
       <HeroSection />
       <BuiltForSection />
       <SuccessStoriesSection />
-      <ShowreelSection />
-      <ServicesSection />
-      <PortfolioSection />
-      <DifferenceSection />
-      <ProcessSection />
-      <TeamSection />
-      <TestimonialsSection />
-      <ContactSection />
-      <div className="relative overflow-hidden w-full h-36 pointer-events-none -mt-16 z-0">
-        <GoldenLightningVeins variant="footer" />
-      </div>
+      
+      <LazyLoadChunk height="min-h-[150vh]">
+        <ChunkA />
+      </LazyLoadChunk>
+
+      <LazyLoadChunk height="min-h-[150vh]">
+        <ChunkB />
+      </LazyLoadChunk>
+
+      <LazyLoadChunk height="min-h-[100vh]">
+        <ChunkC />
+      </LazyLoadChunk>
     </m.div>
   );
 };

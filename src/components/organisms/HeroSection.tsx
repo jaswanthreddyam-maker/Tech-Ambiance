@@ -289,6 +289,7 @@ export const HeroSection: React.FC = () => {
                     <img 
                       src={activeProject.image} 
                       alt={activeProject.title}
+                      fetchPriority={currentIndex === 0 ? "high" : "auto"}
                       className="absolute inset-0 w-full h-full object-cover pointer-events-none" 
                     />
                   )}
@@ -356,18 +357,22 @@ export const HeroSection: React.FC = () => {
           </m.div>
 
           {/* Elegant Subtle Pagination Dots Below Mockup */}
-          <div className="w-full flex items-center justify-center gap-2 mt-4 select-none">
+          <div className="w-full flex items-center justify-center gap-1 mt-4 select-none">
             {SHOWCASE_PROJECTS.map((proj, idx) => (
               <button
                 key={proj.id}
                 onClick={() => setIndexDirectly(idx)}
                 aria-label={`Go to ${proj.title}`}
-                className={`h-1.5 rounded-full transition-all duration-500 ${
-                  idx === currentIndex
-                    ? "w-6 bg-[#C9A56A] shadow-sm"
-                    : "w-1.5 bg-forest/20 hover:bg-[#C9A56A]/60"
-                }`}
-              />
+                className="p-3 flex items-center justify-center relative group"
+              >
+                <div
+                  className={`h-1.5 rounded-full transition-all duration-500 ${
+                    idx === currentIndex
+                      ? "w-6 bg-[#C9A56A] shadow-sm"
+                      : "w-1.5 bg-forest/20 group-hover:bg-[#C9A56A]/60"
+                  }`}
+                />
+              </button>
             ))}
           </div>
         </m.div>

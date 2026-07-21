@@ -47,7 +47,7 @@ export const ServicesSection: React.FC = () => {
                 <div className="flex flex-col gap-6">
                   {/* Top: Title & Desc */}
                   <div className="flex flex-col gap-3">
-                    <Heading level={4} className="text-forest mb-0">
+                    <Heading level={3} className="text-forest mb-0">
                       {service.title}
                     </Heading>
                     <Text size="sm" className="text-text-secondary m-0">
@@ -77,7 +77,7 @@ export const ServicesSection: React.FC = () => {
           className="mt-14 flex flex-col items-center gap-6 p-8 md:p-12 border border-forest/[0.04] rounded-card bg-surface shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_20px_50px_rgba(6,41,30,0.02)]"
         >
           <div className="flex flex-col items-center text-center gap-2">
-            <Heading level={4} className="text-text-primary m-0">Tailored pricing for every project.</Heading>
+            <Heading level={3} className="text-text-primary m-0">Tailored pricing for every project.</Heading>
             <Text size="sm" className="text-text-secondary max-w-md m-0">Custom proposal based on your business goals and specific technical requirements.</Text>
           </div>
           <Button 
