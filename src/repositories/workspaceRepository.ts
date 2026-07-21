@@ -262,7 +262,6 @@ export const workspaceRepository = {
       .select(`
         id,
         name,
-        business_category,
         workspaces (
           id,
           name,
@@ -285,7 +284,6 @@ export const workspaceRepository = {
     return data.map((org: any) => ({
       id: org.id,
       name: org.name,
-      business_category: org.business_category,
       primary_contact_name: org.workspaces?.[0]?.primary_contact_name,
       workspaces: org.workspaces || []
     })) as OrganizationHierarchy[];
