@@ -1257,3 +1257,5 @@ export const StrategyConsultationModal: React.FC<StrategyConsultationModalProps>
     </AnimatePresence>
   );
 };
+
+export default StrategyConsultationModal;

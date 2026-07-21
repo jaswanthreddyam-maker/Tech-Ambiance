@@ -4,11 +4,7 @@ import { useAuth } from "../auth/hooks/useAuth";
 import { useToast } from "./ToastProvider";
 
 // Lazy load the huge modal to avoid pulling Supabase and forms into the initial marketing bundle
-const StrategyConsultationModal = React.lazy(() => 
-  import("../components/organisms/StrategyConsultationModal").then(module => ({
-    default: module.StrategyConsultationModal
-  }))
-);
+const StrategyConsultationModal = React.lazy(() => import("../components/organisms/StrategyConsultationModal"));
 
 interface ConsultationModalContextType {
   isOpen: boolean;
