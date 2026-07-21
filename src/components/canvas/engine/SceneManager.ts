@@ -1,0 +1,102 @@
+import { EventBus } from './EventBus';
+import { PerformanceEngine } from './PerformanceEngine';
+import { InteractionEngine } from './InteractionEngine';
+import { MotionEngine } from './MotionEngine';
+import { NarrativeEngine } from './NarrativeEngine';
+import { AssetEngine } from './AssetEngine';
+import { RenderingEngine } from './RenderingEngine';
+import type { EngineContext } from './types';
+
+export class SceneManager {
+  private eventBus: EventBus;
+  private performanceEngine: PerformanceEngine;
+  private interactionEngine: InteractionEngine;
+  private motionEngine: MotionEngine;
+  private narrativeEngine: NarrativeEngine;
+  private assetEngine: AssetEngine;
+  private renderingEngine: RenderingEngine;
+
+  private isPaused: boolean = false;
+
+  constructor() {
+    this.eventBus = new EventBus();
+    this.performanceEngine = new PerformanceEngine(this.eventBus);
+    this.interactionEngine = new InteractionEngine(this.eventBus);
+    this.motionEngine = new MotionEngine();
+    this.narrativeEngine = new NarrativeEngine(this.eventBus);
+    this.assetEngine = new AssetEngine(this.eventBus);
+    this.renderingEngine = new RenderingEngine(this.eventBus, this.assetEngine);
+
+    // Listen to pause events
+    this.eventBus.on('performance.pause', ({ isPaused }) => {
+      this.isPaused = isPaused;
+    });
+  }
+
+  public getMotionEngine(): MotionEngine {
+    return this.motionEngine;
+  }
+
+  public boot(container: HTMLElement, canvas: HTMLCanvasElement): void {
+    // 1. Boot performance benchmarking & quality profiles
+    this.performanceEngine.boot(container);
+
+    // 2. Boot input event normalization
+    this.interactionEngine.boot(container);
+
+    // 3. Boot narrative story state machine & idle timer
+    this.narrativeEngine.boot();
+
+    // 4. Boot WebGL rendering engine
+    const profile = this.performanceEngine.getProfile();
+    this.renderingEngine.boot(container, canvas, profile);
+  }
+
+  public tick(time: number, delta: number, scrollVelocity: number = 0): void {
+    if (this.isPaused) return;
+
+    const profile = this.performanceEngine.getProfile();
+    if (profile.staticFallback) return;
+
+    this.renderingEngine.render(time, delta, scrollVelocity);
+  }
+
+  public updateScroll(offset: number, velocity: number): void {
+    this.interactionEngine.updateScroll(offset, velocity);
+  }
+
+  public resize(width: number, height: number): void {
+    const profile = this.performanceEngine.getProfile();
+    this.renderingEngine.resize(width, height, profile.maxDpr);
+  }
+
+  public getEventBus(): EventBus {
+    return this.eventBus;
+  }
+
+  public getEngineContext(container: HTMLElement, canvas: HTMLCanvasElement): EngineContext {
+    return {
+      container,
+      canvas,
+      renderer: this.renderingEngine.getRenderer(),
+      camera: this.renderingEngine.getCamera(),
+      scene: this.renderingEngine.getScene(),
+      viewport: this.renderingEngine.getViewport(),
+      interactionState: this.interactionEngine.getState(),
+      narrativeState: this.narrativeEngine.getState(),
+      visitedChapters: this.narrativeEngine.getVisitedChapters(),
+      qualityProfile: this.performanceEngine.getProfile(),
+      isPaused: this.isPaused,
+      isReducedMotion: this.performanceEngine.checkIsReducedMotion(),
+    };
+  }
+
+  public destroy(): void {
+    this.renderingEngine.destroy();
+    this.assetEngine.destroy();
+    this.narrativeEngine.destroy();
+    this.interactionEngine.destroy();
+    this.performanceEngine.destroy();
+    this.eventBus.clear();
+  }
+}

@@ -1,14 +1,31 @@
 import React, { createContext, useContext, useEffect, useRef } from "react";
 import Lenis from "lenis";
 
+export type ScrollTickerCallback = (time: number, delta: number, velocity: number) => void;
+
 interface ScrollContextType {
   lenis: Lenis | null;
+  registerTicker: (id: string, callback: ScrollTickerCallback) => void;
+  unregisterTicker: (id: string) => void;
 }
 
-const ScrollContext = createContext<ScrollContextType>({ lenis: null });
+const ScrollContext = createContext<ScrollContextType>({ 
+  lenis: null,
+  registerTicker: () => {},
+  unregisterTicker: () => {},
+});
 
 export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const lenisRef = useRef<Lenis | null>(null);
+  const tickersRef = useRef<Map<string, ScrollTickerCallback>>(new Map());
+
+  const registerTicker = (id: string, callback: ScrollTickerCallback) => {
+    tickersRef.current.set(id, callback);
+  };
+
+  const unregisterTicker = (id: string) => {
+    tickersRef.current.delete(id);
+  };
 
   useEffect(() => {
     let animationFrameId: number;
@@ -32,9 +49,25 @@ export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
       lenisRef.current = lenis;
 
-      // RAF (Request Animation Frame) loop
+      let lastTime = performance.now();
+
+      // Unified RAF (Request Animation Frame) loop driving both Lenis and WebGL DA-Engine
       function raf(time: number) {
+        const delta = Math.min((time - lastTime) / 1000, 0.1);
+        lastTime = time;
+        const velocity = lenis.velocity || 0;
+
         lenis.raf(time);
+
+        // Execute all registered WebGL / SceneManager tickers in the SAME RAF dispatch
+        tickersRef.current.forEach((cb) => {
+          try {
+            cb(time, delta, velocity);
+          } catch (e) {
+            console.error('[ScrollProvider] Ticker error:', e);
+          }
+        });
+
         animationFrameId = requestAnimationFrame(raf);
       }
       animationFrameId = requestAnimationFrame(raf);
@@ -56,11 +89,12 @@ export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         lenisRef.current.destroy();
         lenisRef.current = null;
       }
+      tickersRef.current.clear();
     };
   }, []);
 
   return (
-    <ScrollContext.Provider value={{ lenis: lenisRef.current }}>
+    <ScrollContext.Provider value={{ lenis: lenisRef.current, registerTicker, unregisterTicker }}>
       {children}
     </ScrollContext.Provider>
   );
