@@ -1,0 +1,12 @@
+# Tech Ambiance
+
+Tech Ambiance is a Premium Digital Brand Experience Agency building modern websites, powerful SEO, scalable web applications, and luxury digital brand experiences.
+
+## Core Links
+- [Home](https://techambiance.com/)
+- [Portfolio](https://techambiance.com/portfolio)
+- [Services](https://techambiance.com/services)
+- [Insights](https://techambiance.com/insights)
+
+## System Architecture
+This site is a React/Vite Single Page Application using TailwindCSS, Framer Motion, and Lenis for smooth scrolling. It interfaces with Supabase for backend services.
