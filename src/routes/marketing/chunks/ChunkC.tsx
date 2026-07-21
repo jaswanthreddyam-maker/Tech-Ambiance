@@ -1,4 +1,4 @@
-import React from "react";
+
 import { TeamSection } from "../../../components/organisms/TeamSection";
 import { ContactSection } from "../../../components/organisms/ContactSection";
 import { GoldenLightningVeins } from "../../../components/ui/GoldenLightningVeins";
