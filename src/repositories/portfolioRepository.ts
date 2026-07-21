@@ -113,7 +113,7 @@ export const portfolioRepository = {
         .eq('status', 'PUBLISHED')
         .order('display_order', { ascending: true });
 
-      if (error || !data || data.length === 0) {
+      if (error || !data) {
         console.warn('[portfolioRepository] Supabase fetch failed, using fallback:', error?.message);
         return PORTFOLIO_PROJECTS;
       }
@@ -166,7 +166,7 @@ export const portfolioRepository = {
         .not('featured_rank', 'is', null)
         .order('featured_rank', { ascending: true });
 
-      if (error || !data || data.length === 0) {
+      if (error || !data) {
         return PORTFOLIO_PROJECTS.filter(p => p.featured);
       }
 
@@ -212,7 +212,7 @@ export const portfolioRepository = {
         .select(PROJECT_SELECT)
         .order('display_order', { ascending: true });
 
-      if (error || !data || data.length === 0) return PORTFOLIO_PROJECTS;
+      if (error || !data) return PORTFOLIO_PROJECTS;
       return data.map(mapRowToProject);
     } catch {
       return PORTFOLIO_PROJECTS;

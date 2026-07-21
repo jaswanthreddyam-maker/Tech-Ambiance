@@ -51,17 +51,18 @@ export const PortalLayout: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <div className="min-h-screen bg-[#FDFBF7] flex flex-col">
       {/* Enterprise Project Switcher Header */}
-      <header className="sticky top-0 z-50 bg-[#FDFBF7]/80 backdrop-blur-xl border-b border-[#0B3027]/10 px-8 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-8">
-          <div className="font-['Cormorant_Garamond'] font-bold text-2xl text-[#0B3027] flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-[#C9A56A]" />
-            StudioHQ Portal
+      <header className="sticky top-0 z-50 bg-[#FDFBF7]/80 backdrop-blur-xl border-b border-[#0B3027]/10 px-4 sm:px-8 py-3 sm:py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
+        <div className="flex w-full items-center justify-between">
+          <div className="font-['Cormorant_Garamond'] font-bold text-xl sm:text-2xl text-[#0B3027] flex items-center gap-1.5 sm:gap-2">
+            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-[#C9A56A]" />
+            <span className="hidden sm:inline">StudioHQ Portal</span>
+            <span className="sm:hidden">StudioHQ</span>
           </div>
           
           <div className="relative">
             <button 
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center gap-3 px-4 py-2 rounded-xl hover:bg-[#0B3027]/5 transition-colors border border-transparent hover:border-[#0B3027]/10"
+              className="flex items-center gap-2 sm:gap-3 px-2 sm:px-4 py-2 rounded-xl hover:bg-[#0B3027]/5 transition-colors border border-transparent hover:border-[#0B3027]/10"
             >
               <div className="text-left">
                 <div className="text-[10px] font-mono text-[#0B3027]/50 uppercase tracking-widest">{organizationName}</div>
@@ -118,7 +119,7 @@ export const PortalLayout: React.FC<{ children: React.ReactNode }> = ({ children
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-4 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           {children}
         </div>
