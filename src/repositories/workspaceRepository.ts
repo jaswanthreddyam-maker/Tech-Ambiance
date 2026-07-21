@@ -328,11 +328,20 @@ export const workspaceRepository = {
   }) {
     if (!isSupabaseConfigured) return null;
 
+    const generatedSlug = (
+      projectData.name
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '') + '-' + Math.random().toString(36).substring(2, 7)
+    );
+
     const { data, error } = await supabase
       .from('projects')
       .insert({
         workspace_id: projectData.workspace_id,
         name: projectData.name,
+        slug: generatedSlug,
         lifecycle_stage: projectData.lifecycle_stage || 'DISCOVERY',
         status: 'ACTIVE',
       })
