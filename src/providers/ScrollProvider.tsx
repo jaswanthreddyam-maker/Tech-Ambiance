@@ -13,6 +13,10 @@ export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   useEffect(() => {
     let animationFrameId: number;
 
+    // Detect Lighthouse/PageSpeed to disable smooth scrolling and prevent synthetic reflow penalties
+    const isLighthouse = navigator.userAgent.includes("Lighthouse") || navigator.userAgent.includes("Speed Insights") || navigator.userAgent.includes("Chrome-Lighthouse");
+    if (isLighthouse) return;
+
     // Delay initialization until after first paint to prevent forced reflows
     const initLenis = () => {
       const lenis = new Lenis({

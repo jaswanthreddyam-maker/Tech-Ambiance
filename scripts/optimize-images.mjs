@@ -16,7 +16,7 @@ async function optimizeImages() {
 
     const files = fs.readdirSync(dir);
     for (const file of files) {
-      if (file.endsWith('.webp')) {
+      if (file.endsWith('.webp') && !file.includes('-opt') && !file.includes('temp-')) {
         const inputPath = path.join(dir, file);
         const tempPath = path.join(dir, 'temp-' + file);
         
@@ -30,9 +30,7 @@ async function optimizeImages() {
           } else if (file.includes('gold-floral-clean')) {
             pipeline = pipeline.resize({ width: 720, withoutEnlargement: true });
           } else if (file.includes('cover') || file.includes('landing')) {
-             // For project covers that are heavily cropped vertically by the UI
-             // we increase compression to save bytes without changing dimensions 
-             // since mobile might still need the vertical height.
+             pipeline = pipeline.resize({ width: 700, withoutEnlargement: true });
           }
           
           const buffer = await pipeline
