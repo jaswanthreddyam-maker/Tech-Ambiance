@@ -18,6 +18,8 @@ interface EdgeData {
   progress: number; // 0 to 1 for line drawing
 }
 
+import { voltageVertexShader, voltageFragmentShader } from '../shaders/voltageShader';
+
 export class BlueprintNodes implements SceneObjectContract {
   public readonly id = 'blueprint-nodes';
 
@@ -25,7 +27,7 @@ export class BlueprintNodes implements SceneObjectContract {
   private nodeMesh: THREE.InstancedMesh | null = null;
   private lineSegments: THREE.LineSegments | null = null;
   private lineGeometry: THREE.BufferGeometry | null = null;
-  private lineMaterial: THREE.LineBasicMaterial | null = null;
+  private lineMaterial: THREE.ShaderMaterial | null = null;
   private nodeMaterial: THREE.MeshBasicMaterial | null = null;
 
   private nodes: NodeData[] = [];
@@ -86,15 +88,31 @@ export class BlueprintNodes implements SceneObjectContract {
     this.nodeMesh = new THREE.InstancedMesh(sphereGeo, this.nodeMaterial, this.nodes.length);
     this.group.add(this.nodeMesh);
 
-    // 3. Create LineSegments for Filaments
+    // 3. Create LineSegments with GLSL Voltage Shader
     this.lineGeometry = new THREE.BufferGeometry();
     const positions = new Float32Array(this.edges.length * 6);
+    const progressAttr = new Float32Array(this.edges.length * 2);
+
+    for (let i = 0; i < this.edges.length; i++) {
+      progressAttr[i * 2] = 0.0;
+      progressAttr[i * 2 + 1] = 1.0;
+    }
+
     this.lineGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    this.lineMaterial = new THREE.LineBasicMaterial({
-      color: 0xc9a56a,
+    this.lineGeometry.setAttribute('aProgress', new THREE.BufferAttribute(progressAttr, 1));
+
+    this.lineMaterial = new THREE.ShaderMaterial({
+      vertexShader: voltageVertexShader,
+      fragmentShader: voltageFragmentShader,
+      uniforms: {
+        uTime: { value: 0 },
+        uColor: { value: new THREE.Color(0xc9a56a) },
+        uVoltagePulse: { value: 0 },
+      },
       transparent: true,
-      opacity: 0.45,
+      depthWrite: false,
     });
+
     this.lineSegments = new THREE.LineSegments(this.lineGeometry, this.lineMaterial);
     this.group.add(this.lineSegments);
 
@@ -122,6 +140,9 @@ export class BlueprintNodes implements SceneObjectContract {
     }
 
     const time = performance.now() / 1000;
+    if (this.lineMaterial) {
+      this.lineMaterial.uniforms.uTime.value = time;
+    }
     const dummy = new THREE.Object3D();
 
     // 2. Update Node Positions with spring inertia & 0.2% organic phase noise

@@ -9,6 +9,7 @@ import { SceneRegistry } from './SceneRegistry';
 import type { EngineContext } from './types';
 
 import { BlueprintNodes } from '../objects/BlueprintNodes';
+import { ParticleDust } from '../objects/ParticleDust';
 
 export class SceneManager {
   private eventBus: EventBus;
@@ -60,9 +61,10 @@ export class SceneManager {
     const profile = this.performanceEngine.getProfile();
     this.renderingEngine.boot(container, canvas, profile);
 
-    // 5. Register Phase DA-2A BlueprintNodes object in SceneRegistry
+    // 5. Register Phase DA-2A & DA-2B objects in SceneRegistry
     const ctx = this.getEngineContext(container, canvas);
     this.sceneRegistry.register(new BlueprintNodes(), ctx);
+    this.sceneRegistry.register(new ParticleDust(), ctx);
   }
 
   public tick(time: number, delta: number, scrollVelocity: number = 0): void {
