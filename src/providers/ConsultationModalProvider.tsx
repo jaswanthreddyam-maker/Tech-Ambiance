@@ -1,8 +1,14 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, Suspense } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { StrategyConsultationModal } from "../components/organisms/StrategyConsultationModal";
 import { useAuth } from "../auth/hooks/useAuth";
 import { useToast } from "./ToastProvider";
+
+// Lazy load the huge modal to avoid pulling Supabase and forms into the initial marketing bundle
+const StrategyConsultationModal = React.lazy(() => 
+  import("../components/organisms/StrategyConsultationModal").then(module => ({
+    default: module.StrategyConsultationModal
+  }))
+);
 
 interface ConsultationModalContextType {
   isOpen: boolean;
@@ -59,7 +65,11 @@ export const ConsultationModalProvider: React.FC<{ children: React.ReactNode }> 
       value={{ isOpen, openConsultationModal, closeConsultationModal }}
     >
       {children}
-      <StrategyConsultationModal isOpen={isOpen} onClose={closeConsultationModal} />
+      {isOpen && (
+        <Suspense fallback={null}>
+          <StrategyConsultationModal isOpen={isOpen} onClose={closeConsultationModal} />
+        </Suspense>
+      )}
     </ConsultationModalContext.Provider>
   );
 };

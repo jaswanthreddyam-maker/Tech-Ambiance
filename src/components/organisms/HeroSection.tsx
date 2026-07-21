@@ -254,7 +254,7 @@ export const HeroSection: React.FC = () => {
                 initial={{ opacity: 0, y: -2 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
-                className="text-[9px] tracking-[0.08em] text-text-secondary/80 font-sans bg-forest/[0.03] px-4 py-0.5 rounded-full border border-forest/[0.05] truncate max-w-[210px]"
+                className="text-[9px] tracking-[0.08em] text-forest/70 font-medium font-sans bg-forest/[0.05] px-4 py-0.5 rounded-full border border-forest/[0.08] truncate max-w-[210px]"
               >
                 {activeProject.url}
               </m.span>
@@ -321,7 +321,7 @@ export const HeroSection: React.FC = () => {
                     <span className="text-[#C9A56A] text-[9px] uppercase tracking-widest font-bold">
                       {activeProject.category}
                     </span>
-                    <Heading level={3} className="text-[#FAF7F0] m-0 leading-tight">
+                    <Heading level={2} className="text-[#FAF7F0] m-0 leading-tight">
                       {activeProject.title}
                     </Heading>
                     <Text size="sm" className="text-[#FAF7F0]/80 max-w-[90%] m-0 line-clamp-2">
