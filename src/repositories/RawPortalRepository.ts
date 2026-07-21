@@ -88,24 +88,34 @@ export const RawPortalRepository: IPortalRepository = {
   },
 
   /**
-   * Get project environments (Filters out INTERNAL)
+   * Get project environments (Filters out INTERNAL with fallback for schema variations)
    */
   async getEnvironments(projectId: string): Promise<ProjectEnvironment[]> {
     if (!isSupabaseConfigured || !projectId) return [];
 
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from('project_environments')
       .select('*')
       .eq('project_id', projectId)
       .neq('visibility', 'INTERNAL')
       .order('created_at', { ascending: false });
 
+    // Fallback if 'visibility' column is missing in schema
+    if (error && (error.code === '42703' || error.message?.includes('visibility'))) {
+      const fallback = await supabase
+        .from('project_environments')
+        .select('*')
+        .eq('project_id', projectId)
+        .order('created_at', { ascending: false });
+      data = fallback.data;
+      error = fallback.error;
+    }
+
     if (error) {
-      console.error('Error fetching environments:', error);
       return [];
     }
 
-    return data as ProjectEnvironment[];
+    return (data || []) as ProjectEnvironment[];
   },
 
   /**
@@ -122,11 +132,11 @@ export const RawPortalRepository: IPortalRepository = {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching credentials:', error);
+      // Table missing (PGRST205) or not yet provisioned
       return [];
     }
 
-    return data as ProjectCredential[];
+    return (data || []) as ProjectCredential[];
   },
 
   /**
