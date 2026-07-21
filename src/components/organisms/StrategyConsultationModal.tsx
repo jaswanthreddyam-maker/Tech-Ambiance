@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useScroll } from "../../providers/ScrollProvider";
 import {
@@ -122,11 +123,14 @@ export const StrategyConsultationModal: React.FC<StrategyConsultationModalProps>
   const [submitError, setSubmitError] = useState("");
   const [idempotencyKey, setIdempotencyKey] = useState("");
 
+  const navigate = useNavigate();
+
   // Reset modal state when opened
   useEffect(() => {
     if (isOpen) {
       if (!isAuthenticated) {
         onClose();
+        navigate("/auth?mode=signup&redirect=consultation");
         return;
       }
       setStep(1);
@@ -141,7 +145,7 @@ export const StrategyConsultationModal: React.FC<StrategyConsultationModalProps>
         email: prev.email || user?.email || profile?.email || "",
       }));
     }
-  }, [isOpen, isAuthenticated, user, profile, onClose]);
+  }, [isOpen, isAuthenticated, user, profile, onClose, navigate]);
 
   // Apple / Stripe grade scroll lock: Freeze background page completely while modal is open
   useEffect(() => {

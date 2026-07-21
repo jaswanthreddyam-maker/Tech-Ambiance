@@ -3,8 +3,10 @@ import { m } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useNavigate } from "react-router-dom";
 import { Mail, Phone, MapPin, Loader2, ArrowRight, ChevronDown } from "lucide-react";
 import { useToast } from "../../providers/ToastProvider";
+import { useAuth } from "../../auth/hooks/useAuth";
 import { Section } from "../layout/Section";
 import { Container } from "../layout/Container";
 import { Heading, Text } from "../ui/Typography";
@@ -24,6 +26,8 @@ type ContactFormValues = z.infer<typeof contactSchema>;
 
 export const ContactSection: React.FC = () => {
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -43,6 +47,11 @@ export const ContactSection: React.FC = () => {
   const selectedProjectType = watch("projectType");
 
   const onSubmit = async (data: ContactFormValues) => {
+    if (!isAuthenticated) {
+      toast("Please sign in or create an account to submit an inquiry or book a consultation.", "info");
+      navigate("/auth?mode=signup&redirect=consultation");
+      return;
+    }
     setIsSubmitting(true);
     // Simulate luxury API submission delay (1.5s)
     await new Promise((resolve) => setTimeout(resolve, 1500));
