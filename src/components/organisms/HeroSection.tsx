@@ -114,7 +114,7 @@ const slideVariants: Variants = {
   })
 };
 
-const AmbientCanvas = React.lazy(() => import("../canvas/AmbientCanvas"));
+
 
 export const HeroSection: React.FC = () => {
   const navigate = useNavigate();
@@ -153,10 +153,7 @@ export const HeroSection: React.FC = () => {
       <div className="absolute top-1/4 left-1/4 w-[300px] h-[300px] bg-gold/5 rounded-full filter blur-[100px] animate-pulse pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-gold/3 rounded-full filter blur-[120px] animate-pulse pointer-events-none" />
 
-      {/* DA-Engine Ambient 3D WebGL Canvas Layer */}
-      <React.Suspense fallback={null}>
-        <AmbientCanvas />
-      </React.Suspense>
+
 
       {/* Exquisitely crafted champagne-gold lightning veins */}
       <GoldenLightningVeins variant="hero" />
