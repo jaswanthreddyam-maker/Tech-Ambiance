@@ -82,9 +82,9 @@ export class BlueprintNodes implements SceneObjectContract {
       { fromIndex: 10, toIndex: 11, progress: 0 },
     ];
 
-    // 2. Create InstancedMesh for Nodes
+    // 2. Create InstancedMesh for Nodes (Emerald Green)
     const sphereGeo = new THREE.SphereGeometry(1, 16, 16);
-    this.nodeMaterial = new THREE.MeshBasicMaterial({ color: 0xc9a56a });
+    this.nodeMaterial = new THREE.MeshBasicMaterial({ color: 0x0b3027 });
     this.nodeMesh = new THREE.InstancedMesh(sphereGeo, this.nodeMaterial, this.nodes.length);
     this.group.add(this.nodeMesh);
 
