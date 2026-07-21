@@ -8,6 +8,8 @@ import { RenderingEngine } from './RenderingEngine';
 import { SceneRegistry } from './SceneRegistry';
 import type { EngineContext } from './types';
 
+import { BlueprintNodes } from '../objects/BlueprintNodes';
+
 export class SceneManager {
   private eventBus: EventBus;
   private performanceEngine: PerformanceEngine;
@@ -57,6 +59,10 @@ export class SceneManager {
     // 4. Boot WebGL rendering engine
     const profile = this.performanceEngine.getProfile();
     this.renderingEngine.boot(container, canvas, profile);
+
+    // 5. Register Phase DA-2A BlueprintNodes object in SceneRegistry
+    const ctx = this.getEngineContext(container, canvas);
+    this.sceneRegistry.register(new BlueprintNodes(), ctx);
   }
 
   public tick(time: number, delta: number, scrollVelocity: number = 0): void {
@@ -64,6 +70,14 @@ export class SceneManager {
 
     const profile = this.performanceEngine.getProfile();
     if (profile.staticFallback) return;
+
+    // Update modular scene objects in registry
+    const container = this.renderingEngine.getRenderer()?.domElement.parentElement;
+    const canvas = this.renderingEngine.getRenderer()?.domElement;
+    if (container && canvas) {
+      const ctx = this.getEngineContext(container, canvas);
+      this.sceneRegistry.tick(ctx, delta);
+    }
 
     this.renderingEngine.render(time, delta, scrollVelocity);
   }
