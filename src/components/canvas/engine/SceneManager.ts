@@ -5,6 +5,7 @@ import { MotionEngine } from './MotionEngine';
 import { NarrativeEngine } from './NarrativeEngine';
 import { AssetEngine } from './AssetEngine';
 import { RenderingEngine } from './RenderingEngine';
+import { SceneRegistry } from './SceneRegistry';
 import type { EngineContext } from './types';
 
 export class SceneManager {
@@ -15,6 +16,7 @@ export class SceneManager {
   private narrativeEngine: NarrativeEngine;
   private assetEngine: AssetEngine;
   private renderingEngine: RenderingEngine;
+  private sceneRegistry: SceneRegistry;
 
   private isPaused: boolean = false;
 
@@ -26,11 +28,16 @@ export class SceneManager {
     this.narrativeEngine = new NarrativeEngine(this.eventBus);
     this.assetEngine = new AssetEngine(this.eventBus);
     this.renderingEngine = new RenderingEngine(this.eventBus, this.assetEngine);
+    this.sceneRegistry = new SceneRegistry(this.eventBus);
 
     // Listen to pause events
     this.eventBus.on('performance.pause', ({ isPaused }) => {
       this.isPaused = isPaused;
     });
+  }
+
+  public getSceneRegistry(): SceneRegistry {
+    return this.sceneRegistry;
   }
 
   public getMotionEngine(): MotionEngine {
