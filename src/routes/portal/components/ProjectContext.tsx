@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { portalRepository } from '../../../repositories/portalRepository';
+import { portalService } from '../services/portalService';
 
 interface ProjectContextType {
   activeProjectId: string | null;
@@ -9,17 +9,14 @@ interface ProjectContextType {
   isLoading: boolean;
 }
 
-const ProjectContext = createContext<ProjectContextType>({
-  activeProjectId: null,
-  setActiveProjectId: () => {},
-  projects: [],
-  isLoading: true,
-});
+const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
 export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { data: projects = [], isLoading } = useQuery({
-    queryKey: ['clientProjects'],
-    queryFn: portalRepository.getClientProjects
+    queryKey: ['portal', 'projects'],
+    queryFn: async () => {
+      return await portalService.getClientProjects() || [];
+    }
   });
 
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
@@ -37,4 +34,10 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
   );
 };
 
-export const useProjectContext = () => useContext(ProjectContext);
+export const useProjectContext = () => {
+  const context = useContext(ProjectContext);
+  if (context === undefined) {
+    throw new Error('useProjectContext must be used within a ProjectProvider');
+  }
+  return context;
+};

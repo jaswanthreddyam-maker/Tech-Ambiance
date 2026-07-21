@@ -8,8 +8,9 @@ import type {
   DeliverableFile
 } from '../types/studioHQ';
 import type { QueryClient } from '@tanstack/react-query';
+import type { IPortalRepository } from './IPortalRepository';
 
-export const portalRepository = {
+export const RawPortalRepository: IPortalRepository = {
   /**
    * Get all projects for the currently authenticated client
    */
@@ -36,6 +37,14 @@ export const portalRepository = {
     }
 
     return data;
+  },
+
+  /**
+   * Get a single project
+   */
+  async getProject(projectId: string) {
+    const projects = await this.getClientProjects();
+    return projects.find((p: any) => p.id === projectId) || null;
   },
 
   /**
@@ -142,7 +151,28 @@ export const portalRepository = {
   },
 
   /**
-   * Watch for realtime changes on the project and invalidate React Query cache
+   * Get invoices for the authenticated client.
+   * No organizationId parameter — RLS filters by organization_members.user_id = auth.uid()
+   */
+  async getInvoices() {
+    if (!isSupabaseConfigured) return [];
+
+    const { data, error } = await supabase
+      .from('invoices')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching invoices:', error);
+      return [];
+    }
+
+    return data || [];
+  },
+
+  /**
+   * Watch for realtime changes on the project and invalidate React Query cache.
+   * Each table change invalidates only its own portalQueryKeys entry (granular).
    */
   watchPortal(projectId: string, queryClient: QueryClient) {
     if (!isSupabaseConfigured || !projectId) return () => {};
@@ -150,20 +180,26 @@ export const portalRepository = {
     const channel = supabase
       .channel(`portal_${projectId}_changes`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'projects', filter: `id=eq.${projectId}` }, () => {
-        queryClient.invalidateQueries({ queryKey: ['clientProjects'] });
+        queryClient.invalidateQueries({ queryKey: ['portal', 'projects'] });
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'milestones', filter: `project_id=eq.${projectId}` }, () => {
-        queryClient.invalidateQueries({ queryKey: ['milestones', projectId] });
-        queryClient.invalidateQueries({ queryKey: ['clientProjects'] }); // because progress depends on milestones
+        queryClient.invalidateQueries({ queryKey: ['portal', 'milestones', projectId] });
+        queryClient.invalidateQueries({ queryKey: ['portal', 'projects'] }); // progress depends on milestones
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'deliverable_files', filter: `project_id=eq.${projectId}` }, () => {
+        queryClient.invalidateQueries({ queryKey: ['portal', 'documents', projectId] });
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'project_environments', filter: `project_id=eq.${projectId}` }, () => {
-        queryClient.invalidateQueries({ queryKey: ['environments', projectId] });
+        queryClient.invalidateQueries({ queryKey: ['portal', 'environments', projectId] });
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'project_credentials', filter: `project_id=eq.${projectId}` }, () => {
-        queryClient.invalidateQueries({ queryKey: ['credentials', projectId] });
+        queryClient.invalidateQueries({ queryKey: ['portal', 'credentials', projectId] });
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'project_activity_projection', filter: `project_id=eq.${projectId}` }, () => {
-        queryClient.invalidateQueries({ queryKey: ['timeline', projectId] });
+        queryClient.invalidateQueries({ queryKey: ['portal', 'timeline', projectId] });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'invoices' }, () => {
+        queryClient.invalidateQueries({ queryKey: ['portal', 'billing'] });
       })
       .subscribe();
 
@@ -172,3 +208,4 @@ export const portalRepository = {
     };
   }
 };
+

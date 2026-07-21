@@ -11,7 +11,8 @@
     "verify:architecture": "tsx scripts/verify-architecture.ts && tsx scripts/verify-registry-immutability.ts",
     "test:snapshots": "vitest run",
     "analyze": "knip",
-    "certify": "npm run build && npm run verify:architecture && npm run test:snapshots && npm run analyze"
+    "certify": "npm run build && npm run verify:architecture && npm run test:snapshots && npm run analyze",
+    "certify:portal": "npm run build && tsx src/scripts/portal-certify.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
@@ -19,6 +20,7 @@
     "@tanstack/react-query": "^5.101.2",
     "@tanstack/react-query-devtools": "^5.101.2",
     "clsx": "^2.1.1",
+    "date-fns": "^4.4.0",
     "framer-motion": "^12.42.2",
     "gsap": "^3.15.0",
     "js-yaml": "^5.2.1",
