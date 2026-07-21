@@ -4,6 +4,7 @@ import { LayoutDashboard, LogOut, ExternalLink } from "lucide-react";
 import { useAuth } from "../providers/AuthProvider";
 import { Cursor } from "../components/common/Cursor";
 import { useCursorHover } from "../hooks/useCursorHover";
+import { useIsMobile } from "../hooks/useIsMobile";
 import logoImg from "../assets/logo.png";
 
 export const ClientLayout: React.FC = () => {
@@ -12,6 +13,7 @@ export const ClientLayout: React.FC = () => {
   const location = useLocation();
   const hoverProps = useCursorHover("pointer");
   const logoutHoverProps = useCursorHover("pointer");
+  const isMobile = useIsMobile();
 
   React.useEffect(() => {
     // Basic Route Guard: redirect to auth if not logged in
@@ -25,6 +27,18 @@ export const ClientLayout: React.FC = () => {
   const sidebarLinks = [
     { name: "Overview", path: "/portal", icon: LayoutDashboard },
   ];
+
+  if (isMobile) {
+    return (
+      <div className="min-h-screen bg-bg-primary text-text-primary flex flex-col relative w-full overflow-x-hidden">
+        <div className="paper-texture" />
+        <Cursor />
+        <div className="flex-1 flex flex-col min-w-0 w-full z-10 relative">
+          <Outlet />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-bg-primary text-text-primary flex relative">
