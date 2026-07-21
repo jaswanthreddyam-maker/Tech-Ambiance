@@ -219,7 +219,7 @@ export const authService = {
       .from("profiles")
       .select("*")
       .eq("id", userId)
-      .single();
+      .maybeSingle();
 
     const profile = profileData as Profile | null;
 
@@ -260,7 +260,7 @@ export const authService = {
         .from("organizations")
         .select("*")
         .eq("id", profile.active_organization_id)
-        .single();
+        .maybeSingle();
       organization = orgData as Organization | null;
     }
 
@@ -271,7 +271,7 @@ export const authService = {
         .from("workspaces")
         .select("*")
         .eq("id", profile.active_workspace_id)
-        .single();
+        .maybeSingle();
       workspace = wsData as Workspace | null;
     }
 

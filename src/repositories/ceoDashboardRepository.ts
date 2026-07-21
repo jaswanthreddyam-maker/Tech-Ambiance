@@ -4,21 +4,21 @@ export const ceoDashboardRepository = {
   // Independent Fetches for Widgets
   async getFinanceMetrics() {
     if (!isSupabaseConfigured) return null;
-    const { data, error } = await supabase.from('finance_dashboard_projection').select('*').eq('id', 1).single();
+    const { data, error } = await supabase.from('finance_dashboard_projection').select('*').eq('id', 1).maybeSingle();
     if (error && error.code !== 'PGRST116') console.error('Finance error:', error);
     return data;
   },
 
   async getDeliveryMetrics() {
     if (!isSupabaseConfigured) return null;
-    const { data, error } = await supabase.from('delivery_dashboard_projection').select('*').eq('id', 1).single();
+    const { data, error } = await supabase.from('delivery_dashboard_projection').select('*').eq('id', 1).maybeSingle();
     if (error && error.code !== 'PGRST116') console.error('Delivery error:', error);
     return data;
   },
 
   async getCrmMetrics() {
     if (!isSupabaseConfigured) return null;
-    const { data, error } = await supabase.from('crm_dashboard_projection').select('*').eq('id', 1).single();
+    const { data, error } = await supabase.from('crm_dashboard_projection').select('*').eq('id', 1).maybeSingle();
     if (error && error.code !== 'PGRST116') console.error('CRM error:', error);
     return data;
   },

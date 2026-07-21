@@ -123,7 +123,7 @@ export const crmRepository = {
       .eq('id', leadId)
       .eq('version', currentVersion)
       .select()
-      .single();
+      .maybeSingle();
       
     if (error) throw error;
     return data as CrmLead;
@@ -144,7 +144,7 @@ export const crmRepository = {
       .eq('id', leadId)
       .eq('version', currentVersion)
       .select()
-      .single();
+      .maybeSingle();
       
     if (error) throw error;
     return data as CrmLead;

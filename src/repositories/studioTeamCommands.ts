@@ -12,7 +12,7 @@ export const studioTeamCommands = {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Not authenticated");
     
-    const { data: profile } = await supabase.from('profiles').select('active_organization_id').eq('id', user.id).single();
+    const { data: profile } = await supabase.from('profiles').select('active_organization_id').eq('id', user.id).maybeSingle();
     
     let orgId = profile?.active_organization_id;
     if (!orgId) {
