@@ -294,7 +294,6 @@ export const workspaceRepository = {
     const { data, error } = await supabase
       .from('project_templates')
       .select('*')
-      .eq('is_active', true)
       .order('name');
     if (error) throw error;
     return data as ProjectTemplate[];
