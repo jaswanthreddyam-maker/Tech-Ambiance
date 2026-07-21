@@ -30,14 +30,20 @@ export const workspaceRepository = {
   /**
    * Convert a Won lead into a Workspace.
    */
-  async convertLeadToWorkspace(leadId: string, adminUserId: string): Promise<{ success: boolean; workspace_id: string; project_id: string }> {
+  async convertLeadToWorkspace(leadId: string, adminUserId?: string): Promise<{ success: boolean; workspace_id: string; project_id: string }> {
     if (!isSupabaseConfigured) {
       throw new Error("Supabase is not configured.");
     }
     
+    let effectiveAdminId = adminUserId;
+    if (!effectiveAdminId) {
+      const { data: userData } = await supabase.auth.getUser();
+      effectiveAdminId = userData.user?.id;
+    }
+    
     const { data, error } = await supabase.rpc('convert_lead_to_workspace', {
       p_lead_id: leadId,
-      p_admin_user_id: adminUserId
+      p_admin_user_id: effectiveAdminId || null
     });
     
     if (error) {

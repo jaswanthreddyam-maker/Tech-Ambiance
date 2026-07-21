@@ -22,10 +22,9 @@ export const LeadDetailsPanel: React.FC<LeadDetailsPanelProps> = ({ lead, isOpen
   const snapshot = lead.consultation_snapshot || {};
 
   const handleWinDeal = async () => {
-    if (!authUser) return;
     setIsConverting(true);
     try {
-      await workspaceRepository.convertLeadToWorkspace(lead.id, authUser.id);
+      await workspaceRepository.convertLeadToWorkspace(lead.id, authUser?.id);
       toast(`Client workspace and project provisioned for ${lead.business_name || 'Client'}!`, "success");
       onClose();
     } catch (err: any) {
