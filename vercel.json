@@ -12,6 +12,30 @@
   "headers": [
     {
       "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "techambiance.com"
+        }
+      ],
+      "headers": [
+        { "key": "x-robots-tag", "value": "index, follow" }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": ".*\\.vercel\\.app"
+        }
+      ],
+      "headers": [
+        { "key": "x-robots-tag", "value": "noindex, nofollow" }
+      ]
+    },
+    {
+      "source": "/(.*)",
       "headers": [
         { "key": "X-Frame-Options", "value": "DENY" },
         { "key": "X-Content-Type-Options", "value": "nosniff" },
