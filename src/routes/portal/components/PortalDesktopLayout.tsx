@@ -4,7 +4,7 @@ import { ChevronDown, Sparkles, Building2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useConsultationModal } from '../../../providers/ConsultationModalProvider';
 
-export const PortalLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const PortalDesktopLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { projects, isLoading, activeProjectId, setActiveProjectId } = useProjectContext();
   const { openConsultationModal } = useConsultationModal();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);

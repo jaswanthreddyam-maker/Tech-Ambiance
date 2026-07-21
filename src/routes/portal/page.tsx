@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ProjectProvider, useProjectContext } from "./components/ProjectContext";
-import { PortalLayout } from "./components/PortalLayout";
+
 import { Overview } from "./components/Overview";
 import { Milestones } from "./components/Milestones";
 import { Documents } from "./components/Documents";
@@ -12,9 +12,15 @@ import { Billing } from "./components/Billing";
 import { Health } from "./components/Health";
 import { portalRepository } from "../../repositories/portalRepository";
 
+import { Outlet } from "react-router-dom";
+import { useIsMobile } from "../../hooks/useIsMobile";
+import { PortalDesktopLayout } from "./components/PortalDesktopLayout";
+import { PortalMobileLayout } from "./components/mobile/layout/PortalMobileLayout";
+
 const PortalDashboard: React.FC = () => {
   const { activeProjectId } = useProjectContext();
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (activeProjectId) {
@@ -23,8 +29,16 @@ const PortalDashboard: React.FC = () => {
     }
   }, [activeProjectId, queryClient]);
 
+  if (isMobile) {
+    return (
+      <PortalMobileLayout>
+        <Outlet />
+      </PortalMobileLayout>
+    );
+  }
+
   return (
-    <PortalLayout>
+    <PortalDesktopLayout>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
           <Overview />
@@ -39,7 +53,7 @@ const PortalDashboard: React.FC = () => {
           <Billing />
         </div>
       </div>
-    </PortalLayout>
+    </PortalDesktopLayout>
   );
 };
 

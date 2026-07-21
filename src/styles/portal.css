@@ -1,0 +1,33 @@
+/* Client Portal Specific Design Tokens */
+
+:root {
+  /* Layout Geometry */
+  --portal-bottom-nav-height: 80px;
+  --portal-header-height: 60px;
+  --portal-fab-size: 56px;
+  --portal-sheet-radius: 24px;
+  
+  /* Safe Areas for Mobile */
+  --portal-safe-bottom: env(safe-area-inset-bottom);
+  --portal-safe-top: env(safe-area-inset-top);
+}
+
+/* Base Mobile Shell Utilities */
+.portal-mobile-shell {
+  min-height: 100vh;
+  /* Ensure padding for safe areas on mobile devices */
+  padding-bottom: calc(var(--portal-bottom-nav-height) + var(--portal-safe-bottom));
+  padding-top: var(--portal-safe-top);
+  background-color: var(--color-bg-primary);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Hide scrollbar for portal mobile scroll areas but keep functionality */
+.portal-no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.portal-no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}

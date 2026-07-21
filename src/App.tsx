@@ -32,6 +32,10 @@ const PortfolioDetails = React.lazy(() => import("./routes/marketing/PortfolioDe
 const ClientPortal = React.lazy(() => import("./routes/portal/page"));
 const ServicesPage = React.lazy(() => import("./routes/services/page"));
 const NotFoundPage = React.lazy(() => import("./routes/NotFound"));
+
+const MobileHome = React.lazy(() => import("./routes/portal/components/mobile/pages/MobileHome").then(m => ({ default: m.MobileHome })));
+const MobileProject = React.lazy(() => import("./routes/portal/components/mobile/pages/MobileProject").then(m => ({ default: m.MobileProject })));
+const MobileUpdates = React.lazy(() => import("./routes/portal/components/mobile/pages/MobileUpdates").then(m => ({ default: m.MobileUpdates })));
 // Admin components moved to auth/registry/routes.ts
 const InsightsPage = React.lazy(() => import("./routes/insights/page.tsx"));
 const InsightsDetailPage = React.lazy(() => import("./routes/insights/detail.tsx"));
@@ -98,7 +102,11 @@ const App: React.FC = () => {
             </AuthGuard>
           }
         >
-          <Route path="/portal" element={<ClientPortal />} />
+          <Route path="/portal" element={<ClientPortal />}>
+            <Route index element={<MobileHome />} />
+            <Route path="project" element={<MobileProject />} />
+            <Route path="updates" element={<MobileUpdates />} />
+          </Route>
         </Route>
 
         {/* Tech Ambiance StudioHQ Executive Console (/admin/*) (Protected) */}
