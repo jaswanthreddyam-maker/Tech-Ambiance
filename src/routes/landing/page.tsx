@@ -7,6 +7,8 @@ import { MarbleVeins } from "../../components/ui/MarbleVeins";
 import { useCursorHover } from "../../hooks/useCursorHover";
 import { useSEO } from "../../providers/SEOProvider";
 import { useConsultationModal } from "../../providers/ConsultationModalProvider";
+import { StudioWorld } from "../../components/canvas/StudioWorld";
+import { AudioToggle } from "../../components/ui/AudioToggle";
 
 // Interactive Safari Browser Preview Projects
 interface PreviewProject {
@@ -91,39 +93,42 @@ export const LandingPage: React.FC = () => {
   const activeProject = PREVIEW_PROJECTS[activeProjectIdx];
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-8 md:px-12 pt-6 pb-24 text-forest select-none">
-      
-      {/* ========================================================
-          1. TOP EDITORIAL NAVBAR (LOGO | SERVICES | WORK | PROCESS | PORTAL | LET'S TALK)
-      ======================================================== */}
-      <motion.header
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.0, ease: [0.19, 1, 0.22, 1] }}
-        className="flex items-center justify-between border-b border-forest/[0.1] pb-5 mb-14 md:mb-20"
-      >
-        {/* Left Logo */}
-        <div className="flex items-center gap-4 cursor-pointer" onClick={() => navigate("/landing")}>
-          <Logo size="md" />
-        </div>
+    <StudioWorld>
+      <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-8 md:px-12 pt-6 pb-24 text-forest select-none">
+        
+        {/* ========================================================
+            1. TOP EDITORIAL NAVBAR (LOGO | SERVICES | WORK | PROCESS | PORTAL | LET'S TALK)
+        ======================================================== */}
+        <motion.header
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.0, ease: [0.19, 1, 0.22, 1] }}
+          className="flex items-center justify-between border-b border-forest/[0.1] pb-5 mb-14 md:mb-20"
+        >
+          {/* Left Logo */}
+          <div className="flex items-center gap-4 cursor-pointer" onClick={() => navigate("/landing")}>
+            <Logo size="md" />
+          </div>
 
-        {/* Center Navigation Links (Minimal Luxury Agency) */}
-        <nav className="hidden md:flex items-center gap-9 text-[11px] uppercase tracking-[0.24em] font-bold text-forest/70">
-          <a href="#services" className="hover:text-gold transition-colors">Services</a>
-          <a href="#work" className="hover:text-gold transition-colors">Work</a>
-          <a href="#process" className="hover:text-gold transition-colors">Process</a>
-          <button onClick={() => navigate("/auth")} className="hover:text-gold transition-colors">Portal</button>
-        </nav>
+          {/* Center Navigation Links (Minimal Luxury Agency) */}
+          <nav className="hidden md:flex items-center gap-9 text-[11px] uppercase tracking-[0.24em] font-bold text-forest/70">
+            <a href="#services" className="hover:text-gold transition-colors">Services</a>
+            <a href="#work" className="hover:text-gold transition-colors">Work</a>
+            <a href="#process" className="hover:text-gold transition-colors">Process</a>
+            <button onClick={() => navigate("/auth")} className="hover:text-gold transition-colors">Portal</button>
+          </nav>
 
-        {/* Right Action: Desktop Authentication Actions OR Mobile Sign Up + Hamburger */}
-        <div className="flex items-center gap-3.5 md:gap-4">
-          {/* Desktop Login Button */}
-          <button
-            onClick={() => navigate("/auth?mode=login")}
-            className="hidden md:inline-flex bg-transparent text-[#0B3027] hover:text-[#C9A56A] hover:opacity-90 font-medium text-[10px] uppercase tracking-[0.18em] px-3.5 py-1.5 transition-all duration-300 no-underline rounded-full select-none"
-          >
-            Login
-          </button>
+          {/* Right Action: Desktop Authentication Actions + Audio Toggle OR Mobile Sign Up + Hamburger */}
+          <div className="flex items-center gap-3.5 md:gap-4">
+            <AudioToggle />
+
+            {/* Desktop Login Button */}
+            <button
+              onClick={() => navigate("/auth?mode=login")}
+              className="hidden md:inline-flex bg-transparent text-[#0B3027] hover:text-[#C9A56A] hover:opacity-90 font-medium text-[10px] uppercase tracking-[0.18em] px-3.5 py-1.5 transition-all duration-300 no-underline rounded-full select-none"
+            >
+              Login
+            </button>
 
           {/* Sign Up Primary Luxury CTA (Desktop + Mobile) */}
           <button
@@ -493,75 +498,84 @@ export const LandingPage: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Card 01 */}
-          <div className="group relative bg-white/80 border border-forest/10 hover:border-gold p-8 md:p-10 rounded-3xl shadow-sm hover:shadow-premium transition-all duration-500 flex flex-col justify-between">
-            <div>
+          <div className="group relative bg-[#06291E]/90 border border-gold/30 hover:border-gold p-8 md:p-10 rounded-3xl shadow-premium backdrop-blur-md transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_24px_50px_rgba(197,165,114,0.2)] flex flex-col justify-between overflow-hidden">
+            <div className="absolute inset-0 opacity-15 pointer-events-none group-hover:opacity-30 transition-opacity">
+              <MarbleVeins />
+            </div>
+            <div className="relative z-10">
               <div className="flex items-center justify-between mb-8">
                 <span className="font-heading font-black text-5xl text-gold/40 group-hover:text-gold transition-colors">
                   01
                 </span>
-                <Layers className="w-6 h-6 text-forest/40 group-hover:text-gold transition-colors" />
+                <Layers className="w-6 h-6 text-gold/60 group-hover:text-gold transition-colors" />
               </div>
 
-              <h3 className="font-heading font-bold text-2xl text-forest mb-4 tracking-tight">
+              <h3 className="font-heading font-bold text-2xl text-ivory mb-4 tracking-tight">
                 Digital Products
               </h3>
 
-              <p className="text-xs sm:text-sm text-text-secondary leading-relaxed font-light mb-8">
+              <p className="text-xs sm:text-sm text-ivory/70 leading-relaxed font-light mb-8">
                 Engineering resilient SaaS architectures, interactive web software, and custom platforms built for high performance and strict operational reliability.
               </p>
             </div>
 
-            <div className="border-t border-forest/10 pt-4 flex items-center justify-between text-[10px] uppercase tracking-widest font-bold text-forest">
+            <div className="relative z-10 border-t border-gold/20 pt-4 flex items-center justify-between text-[10px] uppercase tracking-widest font-bold text-gold">
               <span>Full-Stack Engineering</span>
               <ArrowRight className="w-3.5 h-3.5 text-gold group-hover:translate-x-1 transition-transform" />
             </div>
           </div>
 
           {/* Card 02 */}
-          <div className="group relative bg-white/80 border border-forest/10 hover:border-gold p-8 md:p-10 rounded-3xl shadow-sm hover:shadow-premium transition-all duration-500 flex flex-col justify-between">
-            <div>
+          <div className="group relative bg-[#06291E]/90 border border-gold/30 hover:border-gold p-8 md:p-10 rounded-3xl shadow-premium backdrop-blur-md transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_24px_50px_rgba(197,165,114,0.2)] flex flex-col justify-between overflow-hidden">
+            <div className="absolute inset-0 opacity-15 pointer-events-none group-hover:opacity-30 transition-opacity">
+              <MarbleVeins />
+            </div>
+            <div className="relative z-10">
               <div className="flex items-center justify-between mb-8">
                 <span className="font-heading font-black text-5xl text-gold/40 group-hover:text-gold transition-colors">
                   02
                 </span>
-                <Globe className="w-6 h-6 text-forest/40 group-hover:text-gold transition-colors" />
+                <Globe className="w-6 h-6 text-gold/60 group-hover:text-gold transition-colors" />
               </div>
 
-              <h3 className="font-heading font-bold text-2xl text-forest mb-4 tracking-tight">
+              <h3 className="font-heading font-bold text-2xl text-ivory mb-4 tracking-tight">
                 Brand Websites
               </h3>
 
-              <p className="text-xs sm:text-sm text-text-secondary leading-relaxed font-light mb-8">
+              <p className="text-xs sm:text-sm text-ivory/70 leading-relaxed font-light mb-8">
                 Architecting luxury editorial flagships that merge bespoke visual storytelling with sub-second page load speeds and precision technical SEO.
               </p>
             </div>
 
-            <div className="border-t border-forest/10 pt-4 flex items-center justify-between text-[10px] uppercase tracking-widest font-bold text-forest">
+            <div className="relative z-10 border-t border-gold/20 pt-4 flex items-center justify-between text-[10px] uppercase tracking-widest font-bold text-gold">
               <span>Editorial Flagships</span>
               <ArrowRight className="w-3.5 h-3.5 text-gold group-hover:translate-x-1 transition-transform" />
             </div>
           </div>
 
           {/* Card 03 */}
-          <div className="group relative bg-white/80 border border-forest/10 hover:border-gold p-8 md:p-10 rounded-3xl shadow-sm hover:shadow-premium transition-all duration-500 flex flex-col justify-between">
-            <div>
+          <div className="group relative bg-[#06291E]/90 border border-gold/30 hover:border-gold p-8 md:p-10 rounded-3xl shadow-premium backdrop-blur-md transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_24px_50px_rgba(197,165,114,0.2)] flex flex-col justify-between overflow-hidden">
+            <div className="absolute inset-0 opacity-15 pointer-events-none group-hover:opacity-30 transition-opacity">
+              <MarbleVeins />
+            </div>
+            <div className="relative z-10">
               <div className="flex items-center justify-between mb-8">
                 <span className="font-heading font-black text-5xl text-gold/40 group-hover:text-gold transition-colors">
                   03
                 </span>
-                <Cpu className="w-6 h-6 text-forest/40 group-hover:text-gold transition-colors" />
+                <Cpu className="w-6 h-6 text-gold/60 group-hover:text-gold transition-colors" />
               </div>
 
-              <h3 className="font-heading font-bold text-2xl text-forest mb-4 tracking-tight">
+              <h3 className="font-heading font-bold text-2xl text-ivory mb-4 tracking-tight">
                 AI Systems
               </h3>
 
-              <p className="text-xs sm:text-sm text-text-secondary leading-relaxed font-light mb-8">
+              <p className="text-xs sm:text-sm text-ivory/70 leading-relaxed font-light mb-8">
                 Integrating autonomous agents, custom LLM pipelines, and executive intelligence dashboards directly into your core enterprise stack.
               </p>
             </div>
 
-            <div className="border-t border-forest/10 pt-4 flex items-center justify-between text-[10px] uppercase tracking-widest font-bold text-forest">
+            <div className="relative z-10 border-t border-gold/20 pt-4 flex items-center justify-between text-[10px] uppercase tracking-widest font-bold text-gold">
               <span>Autonomous Intelligence</span>
               <ArrowRight className="w-3.5 h-3.5 text-gold group-hover:translate-x-1 transition-transform" />
             </div>
@@ -633,6 +647,7 @@ export const LandingPage: React.FC = () => {
       </footer>
 
     </div>
+    </StudioWorld>
   );
 };
 export default LandingPage;

@@ -236,11 +236,12 @@ export const HeroSection: React.FC = () => {
             OUR PROJECTS
           </m.div>
 
-          {/* Floating Browser Mockup Wrapper (GPU Accelerated 3-5px float animation) */}
+          {/* 3D Mounted Platform Browser Mockup Wrapper */}
           <m.div
-            animate={{ y: [0, -4, 0] }}
-            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-            className="w-full flex flex-col border border-forest/[0.08] rounded-2xl overflow-hidden bg-[#FAF7F0] shadow-[0_30px_65px_rgba(6,41,30,0.08)] group relative"
+            animate={{ y: [0, -3, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            className="w-full flex flex-col border border-gold/30 rounded-2xl overflow-hidden bg-forest/90 shadow-[0_32px_80px_rgba(6,41,30,0.45)] backdrop-blur-md group relative hover:border-gold/60 transition-all duration-500 transform hover:[transform:rotateY(3deg)_rotateX(-2deg)_translateZ(10px)]"
+            style={{ transformStyle: "preserve-3d" }}
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
           >
