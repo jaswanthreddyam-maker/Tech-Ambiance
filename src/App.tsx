@@ -52,6 +52,9 @@ import { ADMIN_ROUTES } from './auth/registry/routes';
 const AdminAuthPage = lazyNamed(() => import("./routes/auth/admin/page"), "AdminAuthPage");
 const PortfolioPage = React.lazy(() => import("./routes/portfolio/page"));
 const PortfolioDetailPage = React.lazy(() => import("./routes/portfolio/detail.tsx"));
+const PeoplePage = React.lazy(() => import("./routes/people/page.tsx"));
+const CraftsmanDetailPage = React.lazy(() => import("./routes/people/detail.tsx"));
+
 const App: React.FC = () => {
   const location = useLocation();
 
@@ -85,6 +88,10 @@ const App: React.FC = () => {
           <Route path="/experience/case-studies/:id" element={<PortfolioDetails />} />
           <Route path="/portfolio" element={<PortfolioPage />} />
           <Route path="/portfolio/:slug" element={<PortfolioDetailPage />} />
+          <Route path="/people" element={<PeoplePage />} />
+          <Route path="/people/:slug" element={<CraftsmanDetailPage />} />
+          <Route path="/team" element={<Navigate to="/people" replace />} />
+          <Route path="/team/:slug" element={<CraftsmanDetailPage />} />
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/insights" element={<InsightsPage />} />
           <Route path="/insights/:slug" element={<InsightsDetailPage />} />

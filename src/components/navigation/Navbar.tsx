@@ -116,6 +116,7 @@ const Navbar: React.FC = () => {
   const navLinks = [
     { name: "Services", id: "services", action: () => navigate(ROUTES.services), desktop: true },
     { name: "Portfolio", id: "portfolio", action: () => navigate(ROUTES.portfolio), desktop: true },
+    { name: "Craftsmen", id: "people", action: () => navigate("/people"), desktop: true },
     { name: "Process", id: "process", action: () => handleNavClick("process"), desktop: true },
     { name: "Blueprint", id: "insights", action: () => navigate(ROUTES.insights), desktop: true },
     { name: "Portal", id: "portal", action: () => navigate(isAuthenticated ? ROUTES.portal : "/auth"), desktop: true },

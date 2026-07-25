@@ -263,10 +263,17 @@ export const TeamSection: React.FC = () => {
                               <GithubIcon className="w-4 h-4" />
                             </a>
                           )}
-                          <span className="ml-auto inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.18em] font-semibold text-text-muted group/lead cursor-pointer hover:text-gold transition-colors">
-                            Leadership{" "}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const slug = member.name.toLowerCase().replace(/\s+/g, '-');
+                              navigate(`/people/${slug}`);
+                            }}
+                            className="ml-auto inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.18em] font-semibold text-forest group/lead cursor-pointer hover:text-gold transition-colors"
+                          >
+                            <span>View Craftsman Profile</span>
                             <ArrowUpRight className="w-3.5 h-3.5 text-gold transition-transform duration-300 group-hover/lead:rotate-45 group-hover/lead:translate-x-0.5" />
-                          </span>
+                          </button>
                         </m.div>
                       </m.div>
 

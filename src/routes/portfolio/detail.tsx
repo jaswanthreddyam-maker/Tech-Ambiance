@@ -330,6 +330,80 @@ const PortfolioDetailPage: React.FC = () => {
         </section>
       )}
 
+      {/* ── Project Contributors Panel ─────────────────────────────────── */}
+      {project.contributors && project.contributors.length > 0 && (
+        <section className="max-w-5xl mx-auto px-8 md:px-14 pb-14 md:pb-20 border-t border-[#0B3027]/10 pt-12">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <span className="text-[10px] uppercase tracking-[0.24em] font-bold text-[#C9A56A] block mb-1">
+                Craftsmanship & Attribution
+              </span>
+              <h3 className="font-['Cormorant_Garamond'] text-2xl font-bold text-[#0B3027]">
+                Project Contributors
+              </h3>
+            </div>
+            <Link
+              to="/people"
+              className="text-[10px] uppercase tracking-widest font-bold text-[#0B3027] hover:text-[#C9A56A] transition-colors"
+            >
+              View Full Roster →
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {project.contributors.map((contributor, idx) => {
+              const initials = contributor.full_name
+                ? contributor.full_name.split(' ').map(n => n[0]).join('').toUpperCase()
+                : 'TA';
+
+              return (
+                <m.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: idx * 0.1 }}
+                  onClick={() => navigate(`/people/${contributor.craftsman_slug}`)}
+                  className="group bg-white p-5 rounded-2xl border border-[#0B3027]/10 hover:border-[#C9A56A] shadow-sm hover:shadow-md transition-all duration-300 flex items-center gap-4 cursor-pointer"
+                >
+                  {/* Contributor Avatar */}
+                  <div className="w-12 h-12 rounded-full overflow-hidden bg-[#0B3027]/5 border border-[#0B3027]/15 flex items-center justify-center shrink-0">
+                    {contributor.avatar_url ? (
+                      <img
+                        src={contributor.avatar_url}
+                        alt={contributor.full_name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                        onError={(e) => {
+                          (e.target as HTMLElement).style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-[#0B3027] text-[#C9A56A] font-bold text-xs flex items-center justify-center">
+                        {initials}
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    {contributor.is_lead && (
+                      <span className="text-[8px] uppercase tracking-widest font-bold text-[#C9A56A] block">
+                        Project Lead
+                      </span>
+                    )}
+                    <h4 className="font-bold text-sm text-[#0B3027] group-hover:text-[#C9A56A] transition-colors leading-tight">
+                      {contributor.full_name}
+                    </h4>
+                    <p className="text-[10px] uppercase tracking-wider font-semibold text-[#0B3027]/60">
+                      {contributor.role_name}
+                    </p>
+                  </div>
+                </m.div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       {/* ── Footer CTA ───────────────────────────────────────────────── */}
       <section className="bg-[#0B3027] border-t border-[#C9A56A]/10">
         <div className="max-w-4xl mx-auto px-8 md:px-14 py-16 md:py-24 text-center">
