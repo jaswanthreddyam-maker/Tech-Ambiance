@@ -93,7 +93,7 @@ export const CraftsmanDetailPage: React.FC = () => {
                 </div>
               )}
               <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-forest text-gold text-[10px] uppercase tracking-widest font-bold border border-gold/40">
-                {craftsman.member_type || 'EMPLOYEE'}
+                {craftsman.member_type || 'FOUNDER'}
               </div>
             </div>
           </m.div>

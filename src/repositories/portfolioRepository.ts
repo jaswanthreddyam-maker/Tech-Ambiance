@@ -270,12 +270,12 @@ export const portfolioRepository = {
       }
 
       if (!data || data.length === 0) {
-        return PORTFOLIO_PROJECTS.map((p) => mapRowToDTO({ ...p, status: 'PUBLISHED' }));
+        return [];
       }
 
       return data.map(mapRowToDTO);
     } catch {
-      return PORTFOLIO_PROJECTS.map((p) => mapRowToDTO({ ...p, status: 'PUBLISHED' }));
+      return [];
     }
   },
 

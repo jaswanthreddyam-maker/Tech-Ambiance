@@ -153,8 +153,8 @@ export const PeoplePage: React.FC = () => {
                         {initials}
                       </div>
                     )}
-                    <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-forest/90 text-gold text-[9px] uppercase tracking-widest font-bold border border-gold/30">
-                      {craftsman.member_type || 'EMPLOYEE'}
+                    <div className="absolute top-3 right-3 px-3 py-1 rounded-full bg-forest text-gold text-[9px] uppercase tracking-widest font-bold border border-gold/40 shadow-sm">
+                      {craftsman.member_type || 'FOUNDER'}
                     </div>
                   </div>
 

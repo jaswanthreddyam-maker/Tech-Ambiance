@@ -1,6 +1,6 @@
 import type { PortfolioCategory, PortfolioMetric, PortfolioMedia, PortfolioLink } from '../project/project.types';
 
-export type ContributorMemberType = 'EMPLOYEE' | 'CONTRACTOR' | 'PARTNER' | 'EXTERNAL';
+export type ContributorMemberType = 'FOUNDER' | 'EMPLOYEE' | 'CONTRACTOR' | 'PARTNER' | 'EXTERNAL';
 export type AssignmentVisibility = 'PUBLIC' | 'PRIVATE';
 
 export interface ContributorSummaryDTO {
