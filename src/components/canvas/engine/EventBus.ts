@@ -13,15 +13,6 @@ export interface EventMap {
   'narrative.chapter': { state: NarrativeState; previousState: NarrativeState };
   'narrative.memory': { visitedChapters: NarrativeState[] };
   'narrative.idle': { durationSeconds: number; selfAssemblyActive: boolean };
-  'narrative.focus.changed': { sectionId: string; breakpoint: any };
-
-  // World Simulation domain
-  'wind.updated': any;
-  'world.simulation.tick': { state: any };
-  'world.lifecycle': { state: string };
-
-  // Audio domain
-  'audio.state.changed': { active: boolean };
 
   // Performance domain
   'performance.profile': { profile: QualityProfile };

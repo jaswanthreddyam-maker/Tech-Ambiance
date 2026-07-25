@@ -8,8 +8,6 @@ import { BuiltForSection } from "../../components/organisms/BuiltForSection";
 import { SuccessStoriesSection } from "../../components/organisms/SuccessStoriesSection";
 import { LazyLoadChunk } from "../../components/layout/LazyLoadChunk";
 
-import { StudioWorld } from "../../components/canvas/StudioWorld";
-
 // Lazy Loaded Chunks
 const ChunkA = React.lazy(() => import("./chunks/ChunkA"));
 const ChunkB = React.lazy(() => import("./chunks/ChunkB"));
@@ -28,31 +26,29 @@ export const MarketingPage: React.FC = () => {
   }, [setSEO]);
 
   return (
-    <StudioWorld>
-      <m.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.8 }}
-        className="w-full flex flex-col"
-      >
-        <HeroSection />
-        <BuiltForSection />
-        <SuccessStoriesSection />
-        
-        <LazyLoadChunk height="min-h-[150vh]">
-          <ChunkA />
-        </LazyLoadChunk>
+    <m.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.8 }}
+      className="w-full flex flex-col"
+    >
+      <HeroSection />
+      <BuiltForSection />
+      <SuccessStoriesSection />
+      
+      <LazyLoadChunk height="min-h-[150vh]">
+        <ChunkA />
+      </LazyLoadChunk>
 
-        <LazyLoadChunk height="min-h-[150vh]">
-          <ChunkB />
-        </LazyLoadChunk>
+      <LazyLoadChunk height="min-h-[150vh]">
+        <ChunkB />
+      </LazyLoadChunk>
 
-        <LazyLoadChunk height="min-h-[100vh]">
-          <ChunkC />
-        </LazyLoadChunk>
-      </m.div>
-    </StudioWorld>
+      <LazyLoadChunk height="min-h-[100vh]">
+        <ChunkC />
+      </LazyLoadChunk>
+    </m.div>
   );
 };
 export default MarketingPage;
