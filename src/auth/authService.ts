@@ -225,7 +225,7 @@ export const authService = {
     const profileRes = await withTimeout(
       supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
       2500,
-      { data: null, error: null }
+      { data: null, error: null } as any
     );
     const profile = (profileRes.data as Profile | null);
 
@@ -233,7 +233,7 @@ export const authService = {
     const roleRes = await withTimeout(
       supabase.from("user_roles").select("roles(name)").eq("user_id", userId),
       2500,
-      { data: null, error: null }
+      { data: null, error: null } as any
     );
     const roleData = roleRes.data;
 
@@ -267,7 +267,7 @@ export const authService = {
       const orgRes = await withTimeout(
         supabase.from("organizations").select("*").eq("id", profile.active_organization_id).maybeSingle(),
         2500,
-        { data: null, error: null }
+        { data: null, error: null } as any
       );
       organization = orgRes.data as Organization | null;
     }
@@ -278,7 +278,7 @@ export const authService = {
       const wsRes = await withTimeout(
         supabase.from("workspaces").select("*").eq("id", profile.active_workspace_id).maybeSingle(),
         2500,
-        { data: null, error: null }
+        { data: null, error: null } as any
       );
       workspace = wsRes.data as Workspace | null;
     }
