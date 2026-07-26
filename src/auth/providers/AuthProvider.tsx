@@ -71,6 +71,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         return;
       }
 
+      // Safety timeout: Guarantee that auth loading resolves within 3 seconds
+      const safetyTimeout = setTimeout(() => {
+        if (mounted) {
+          setIsLoading(false);
+        }
+      }, 3000);
+
       try {
         const { data: { session: currentSession } } = await supabase.auth.getSession();
         if (mounted) {
@@ -87,6 +94,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       } catch (err) {
         console.error("[Enterprise Auth] Session init error:", err);
       } finally {
+        clearTimeout(safetyTimeout);
         if (mounted) setIsLoading(false);
       }
     }

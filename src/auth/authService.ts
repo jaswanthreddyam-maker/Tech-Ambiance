@@ -214,20 +214,28 @@ export const authService = {
   }> {
     requireSupabase();
 
-    // 1. Fetch profile
-    const { data: profileData } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", userId)
-      .maybeSingle();
+    const withTimeout = <T,>(promise: PromiseLike<T>, ms: number, fallback: T): Promise<T> => {
+      return Promise.race([
+        Promise.resolve(promise),
+        new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms))
+      ]);
+    };
 
-    const profile = profileData as Profile | null;
+    // 1. Fetch profile with 2.5s safety timeout
+    const profileRes = await withTimeout(
+      supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
+      2500,
+      { data: null, error: null }
+    );
+    const profile = (profileRes.data as Profile | null);
 
-    // 2. Fetch roles
-    const { data: roleData } = await supabase
-      .from("user_roles")
-      .select("roles(name)")
-      .eq("user_id", userId);
+    // 2. Fetch roles with 2.5s safety timeout
+    const roleRes = await withTimeout(
+      supabase.from("user_roles").select("roles(name)").eq("user_id", userId),
+      2500,
+      { data: null, error: null }
+    );
+    const roleData = roleRes.data;
 
     const roles: AuthRoleName[] = [];
     if (roleData) {
@@ -256,23 +264,23 @@ export const authService = {
     // 3. Fetch Organization
     let organization: Organization | null = null;
     if (profile?.active_organization_id) {
-      const { data: orgData } = await supabase
-        .from("organizations")
-        .select("*")
-        .eq("id", profile.active_organization_id)
-        .maybeSingle();
-      organization = orgData as Organization | null;
+      const orgRes = await withTimeout(
+        supabase.from("organizations").select("*").eq("id", profile.active_organization_id).maybeSingle(),
+        2500,
+        { data: null, error: null }
+      );
+      organization = orgRes.data as Organization | null;
     }
 
     // 4. Fetch Workspace
     let workspace: Workspace | null = null;
     if (profile?.active_workspace_id) {
-      const { data: wsData } = await supabase
-        .from("workspaces")
-        .select("*")
-        .eq("id", profile.active_workspace_id)
-        .maybeSingle();
-      workspace = wsData as Workspace | null;
+      const wsRes = await withTimeout(
+        supabase.from("workspaces").select("*").eq("id", profile.active_workspace_id).maybeSingle(),
+        2500,
+        { data: null, error: null }
+      );
+      workspace = wsRes.data as Workspace | null;
     }
 
     const permissions = computePermissions(roles);
