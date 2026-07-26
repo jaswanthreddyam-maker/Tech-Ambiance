@@ -24,44 +24,67 @@ export const SuccessStoriesSection: React.FC = () => {
   const cardWidth = 360;
   const radius = Math.max(340, Math.round((cardWidth / 2) / Math.tan(Math.PI / N)));
 
-  // Carousel State
-  const [activeIndex, setActiveIndex] = useState(0);
+  // Continuous rotation angle in degrees
+  const [rotationAngle, setRotationAngle] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
 
   const dragStartX = useRef(0);
   const pauseTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
 
-  // Computed current 3D rotation angle
-  const targetRotation = -activeIndex * stepAngle;
-  const currentRotation = targetRotation + dragOffset;
+  // Compute active card index dynamically from rotation angle
+  const activeIndex = (Math.round((-rotationAngle % 360 + 360) % 360 / stepAngle)) % N;
+  const currentRotation = rotationAngle + dragOffset;
 
-  const handleNext = useCallback(() => {
-    setActiveIndex((prev) => (prev + 1) % N);
-  }, [N]);
+  // Slow continuous rotation loop (~3.5° / second)
+  useEffect(() => {
+    if (isPaused || isDragging || shouldReduceMotion) return;
 
-  const handlePrev = useCallback(() => {
-    setActiveIndex((prev) => (prev - 1 + N) % N);
-  }, [N]);
+    let lastTime = performance.now();
+    const rotate = (time: number) => {
+      const delta = (time - lastTime) / 1000;
+      lastTime = time;
+      // 3.5 degrees per second slow, calm, elegant drift
+      setRotationAngle((prev) => prev - delta * 3.5);
+      animationFrameRef.current = requestAnimationFrame(rotate);
+    };
 
-  // Pause auto-rotation on user interaction and resume after 5 seconds of inactivity
+    animationFrameRef.current = requestAnimationFrame(rotate);
+
+    return () => {
+      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+    };
+  }, [isPaused, isDragging, shouldReduceMotion]);
+
+  // Pause continuous rotation on user interaction and resume after 4s
   const triggerPause = useCallback(() => {
     setIsPaused(true);
     if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
     pauseTimerRef.current = setTimeout(() => {
       setIsPaused(false);
-    }, 5000);
+    }, 4000);
   }, []);
 
-  // Auto-rotate every 4.5s if not paused & reduced-motion is off
-  useEffect(() => {
-    if (isPaused || shouldReduceMotion) return;
-    const timer = setInterval(() => {
-      handleNext();
-    }, 4500);
-    return () => clearInterval(timer);
-  }, [isPaused, shouldReduceMotion, handleNext]);
+  // Target card rotation on button or card click
+  const rotateToCard = (targetIdx: number) => {
+    triggerPause();
+    // Calculate shortest angular rotation path
+    const currentBase = Math.round(rotationAngle / 360) * 360;
+    const targetBaseAngle = currentBase - targetIdx * stepAngle;
+    setRotationAngle(targetBaseAngle);
+  };
+
+  const handleNext = useCallback(() => {
+    triggerPause();
+    setRotationAngle((prev) => prev - stepAngle);
+  }, [stepAngle, triggerPause]);
+
+  const handlePrev = useCallback(() => {
+    triggerPause();
+    setRotationAngle((prev) => prev + stepAngle);
+  }, [stepAngle, triggerPause]);
 
   // Drag Gesture Handlers
   const handlePointerDown = (e: React.PointerEvent) => {
@@ -74,7 +97,6 @@ export const SuccessStoriesSection: React.FC = () => {
   const handlePointerMove = (e: React.PointerEvent) => {
     if (!isDragging) return;
     const deltaX = e.clientX - dragStartX.current;
-    // Map drag distance to angular rotation (sensitivity factor 0.35)
     setDragOffset(deltaX * 0.35);
   };
 
@@ -83,21 +105,15 @@ export const SuccessStoriesSection: React.FC = () => {
     setIsDragging(false);
     (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
 
-    // Calculate nearest card index based on drag offset
-    const indexShift = Math.round(-dragOffset / stepAngle);
-    if (indexShift !== 0) {
-      setActiveIndex((prev) => (prev + indexShift + N * 10) % N);
-    }
+    setRotationAngle((prev) => prev + dragOffset);
     setDragOffset(0);
   };
 
   // Keyboard navigation handler
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowRight') {
-      triggerPause();
       handleNext();
     } else if (e.key === 'ArrowLeft') {
-      triggerPause();
       handlePrev();
     }
   };
@@ -179,6 +195,7 @@ export const SuccessStoriesSection: React.FC = () => {
             aria-label="Success Stories 3D Carousel"
             onKeyDown={handleKeyDown}
             onMouseEnter={triggerPause}
+            onMouseLeave={() => setIsPaused(false)}
             onFocus={triggerPause}
             className="hidden md:flex flex-col items-center relative w-full py-8 focus-visible:outline-none"
           >
@@ -200,7 +217,7 @@ export const SuccessStoriesSection: React.FC = () => {
                 style={{
                   transformStyle: 'preserve-3d',
                   transform: `rotateY(${currentRotation}deg)`,
-                  transition: isDragging || shouldReduceMotion ? 'none' : 'transform 0.8s cubic-bezier(0.22, 1, 0.36, 1)',
+                  transition: isDragging || !isPaused ? 'none' : 'transform 0.8s cubic-bezier(0.22, 1, 0.36, 1)',
                 }}
               >
                 {stories.map((story, idx) => {
@@ -210,20 +227,19 @@ export const SuccessStoriesSection: React.FC = () => {
                   const diff = ((rawDiff + 540) % 360) - 180;
                   const absDiff = Math.abs(diff);
 
-                  const isFront = absDiff < 15;
+                  const isFront = absDiff < 18;
                   const isBack = absDiff > 130;
 
                   // Opacity and scale based on angle offset
                   const opacity = isBack ? 0 : Math.max(0.35, 1 - absDiff / 140);
-                  const scale = isFront ? 1 : Math.max(0.84, 1 - absDiff / 600);
+                  const scale = isFront ? 1 : Math.max(0.85, 1 - absDiff / 600);
 
                   return (
                     <div
                       key={story.slug}
                       onClick={() => {
                         if (!isFront) {
-                          triggerPause();
-                          setActiveIndex(idx);
+                          rotateToCard(idx);
                         }
                       }}
                       style={{
@@ -232,7 +248,7 @@ export const SuccessStoriesSection: React.FC = () => {
                         transformStyle: 'preserve-3d',
                         transform: `rotateY(${cardBaseAngle}deg) translateZ(${radius}px) scale(${scale})`,
                         opacity,
-                        transition: isDragging ? 'none' : 'all 0.8s cubic-bezier(0.22, 1, 0.36, 1)',
+                        transition: isDragging || !isPaused ? 'none' : 'all 0.8s cubic-bezier(0.22, 1, 0.36, 1)',
                         pointerEvents: isBack ? 'none' : 'auto',
                       }}
                       className={`rounded-3xl bg-emerald-stone border transition-all duration-500 flex flex-col justify-between overflow-hidden shadow-[0_16px_48px_rgba(8,38,31,0.18)] ${
@@ -336,10 +352,7 @@ export const SuccessStoriesSection: React.FC = () => {
             <div className="flex items-center gap-6 mt-6 z-20">
               {/* Prev Button */}
               <button
-                onClick={() => {
-                  triggerPause();
-                  handlePrev();
-                }}
+                onClick={handlePrev}
                 className="w-10 h-10 rounded-full bg-emerald-stone border border-gold/30 text-gold flex items-center justify-center hover:border-gold hover:bg-gold/10 transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-gold"
                 aria-label="Previous Success Story"
               >
@@ -353,10 +366,7 @@ export const SuccessStoriesSection: React.FC = () => {
                     key={s.slug}
                     role="tab"
                     aria-selected={activeIndex === dotIdx}
-                    onClick={() => {
-                      triggerPause();
-                      setActiveIndex(dotIdx);
-                    }}
+                    onClick={() => rotateToCard(dotIdx)}
                     className={`h-2 rounded-full transition-all duration-300 focus-visible:ring-2 focus-visible:ring-gold ${
                       activeIndex === dotIdx
                         ? 'w-7 bg-gold shadow-[0_0_8px_rgba(197,165,114,0.6)]'
@@ -369,10 +379,7 @@ export const SuccessStoriesSection: React.FC = () => {
 
               {/* Next Button */}
               <button
-                onClick={() => {
-                  triggerPause();
-                  handleNext();
-                }}
+                onClick={handleNext}
                 className="w-10 h-10 rounded-full bg-emerald-stone border border-gold/30 text-gold flex items-center justify-center hover:border-gold hover:bg-gold/10 transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-gold"
                 aria-label="Next Success Story"
               >
