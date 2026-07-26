@@ -264,9 +264,32 @@ button.bg-emerald-stone svg {
   100% { transform: translateX(240%) skewX(-12deg); opacity: 0; }
 }
 
+/* Old-Style Editorial Figures */
+.font-oldstyle {
+  font-feature-settings: "onum" 1, "pnum" 1;
+  font-variant-numeric: oldstyle-nums proportional-nums;
+}
+
+/* Comprehensive Keyboard Accessibility Focus Rings */
+:focus-visible {
+  outline: 2px solid var(--color-gold) !important;
+  outline-offset: 3px !important;
+  border-radius: 4px;
+}
+
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-gold) !important;
+  outline-offset: 3px !important;
+  border-radius: 9999px;
+}
+
 @media (prefers-reduced-motion) {
   .animate-light-sweep::after,
   .ambient-cta-shimmer::before {
     display: none !important;
   }
 }
+

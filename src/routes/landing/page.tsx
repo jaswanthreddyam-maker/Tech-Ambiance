@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Globe, Layers, Cpu, CheckCircle2, Menu, X } from "lucide-react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { ArrowRight, Globe, Layers, Cpu, CheckCircle2, Menu, X, Lock } from "lucide-react";
 import { Logo } from "../../components/atoms/Logo";
-import { MarbleVeins } from "../../components/ui/MarbleVeins";
 import { useCursorHover } from "../../hooks/useCursorHover";
 import { useSEO } from "../../providers/SEOProvider";
 import { useConsultationModal } from "../../providers/ConsultationModalProvider";
@@ -61,16 +60,25 @@ const PREVIEW_PROJECTS: PreviewProject[] = [
   }
 ];
 
+// Architectural Ease-out Easing curve
+const ARCHITECTURAL_EASE = [0.22, 1, 0.36, 1] as const;
+
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const { setSEO } = useSEO();
   const buttonHoverProps = useCursorHover("pointer");
   const { openConsultationModal } = useConsultationModal();
+  const shouldReduceMotion = useReducedMotion();
 
-  // State for interactive browser mockup
+  // Interactive browser mockup state
   const [activeProjectIdx, setActiveProjectIdx] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeHoverCard, setActiveHoverCard] = useState<number | null>(null);
+
+  // URL typing animation effect
+  const [displayedUrl, setDisplayedUrl] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
     setSEO({
@@ -79,14 +87,40 @@ export const LandingPage: React.FC = () => {
     });
   }, [setSEO]);
 
-  // Auto-cycle through Safari browser mockup projects every 4.5s
+  // Auto-cycle through Safari browser mockup projects every 5 seconds if not paused
   useEffect(() => {
     if (isPaused) return;
     const timer = setInterval(() => {
       setActiveProjectIdx((prev) => (prev + 1) % PREVIEW_PROJECTS.length);
-    }, 4500);
+    }, 5000);
     return () => clearInterval(timer);
   }, [isPaused]);
+
+  // Typing animation effect for URL bar
+  useEffect(() => {
+    const targetUrl = PREVIEW_PROJECTS[activeProjectIdx].url;
+    if (shouldReduceMotion) {
+      setDisplayedUrl(targetUrl);
+      return;
+    }
+
+    setIsTyping(true);
+    let currentText = "";
+    let charIdx = 0;
+
+    const interval = setInterval(() => {
+      if (charIdx < targetUrl.length) {
+        currentText += targetUrl[charIdx];
+        setDisplayedUrl(currentText);
+        charIdx++;
+      } else {
+        setIsTyping(false);
+        clearInterval(interval);
+      }
+    }, 30);
+
+    return () => clearInterval(interval);
+  }, [activeProjectIdx, shouldReduceMotion]);
 
   const activeProject = PREVIEW_PROJECTS[activeProjectIdx];
 
@@ -94,51 +128,75 @@ export const LandingPage: React.FC = () => {
     <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-8 md:px-12 pt-6 pb-24 text-forest select-none">
       
       {/* ========================================================
-          1. TOP EDITORIAL NAVBAR (LOGO | SERVICES | WORK | PROCESS | PORTAL | LET'S TALK)
+          1. TOP EDITORIAL NAVBAR (LOGO | SERVICES | WORK | PROCESS | PORTAL | LOGIN & SIGN UP)
       ======================================================== */}
       <motion.header
-        initial={{ opacity: 0, y: -10 }}
+        initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.0, ease: [0.19, 1, 0.22, 1] }}
-        className="flex items-center justify-between border-b border-forest/[0.1] pb-5 mb-14 md:mb-20"
+        transition={{ duration: 0.8, ease: ARCHITECTURAL_EASE }}
+        className="flex items-center justify-between border-b border-forest/[0.12] pb-5 mb-14 md:mb-20"
       >
         {/* Left Logo */}
-        <div className="flex items-center gap-4 cursor-pointer" onClick={() => navigate("/landing")}>
+        <div 
+          className="flex items-center gap-4 cursor-pointer focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-4 rounded-lg p-1 transition-all"
+          onClick={() => navigate("/landing")}
+          tabIndex={0}
+          role="button"
+          aria-label="Tech Ambiance Home"
+        >
           <Logo size="md" />
         </div>
 
-        {/* Center Navigation Links (Minimal Luxury Agency) */}
-        <nav className="hidden md:flex items-center gap-9 text-[11px] uppercase tracking-[0.24em] font-bold text-forest/70">
-          <a href="#services" className="hover:text-gold transition-colors">Services</a>
-          <a href="#work" className="hover:text-gold transition-colors">Work</a>
-          <a href="#process" className="hover:text-gold transition-colors">Process</a>
-          <button onClick={() => navigate("/auth")} className="hover:text-gold transition-colors">Portal</button>
+        {/* Center Navigation Links */}
+        <nav className="hidden md:flex items-center gap-9 text-[11px] uppercase tracking-[0.24em] font-bold text-forest/70" aria-label="Main Navigation">
+          <a 
+            href="#services" 
+            className="hover:text-gold transition-colors focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 rounded-full px-2 py-1"
+          >
+            Disciplines
+          </a>
+          <a 
+            href="#work" 
+            className="hover:text-gold transition-colors focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 rounded-full px-2 py-1"
+          >
+            Live Preview
+          </a>
+          <a 
+            href="#process" 
+            className="hover:text-gold transition-colors focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 rounded-full px-2 py-1"
+          >
+            Standard
+          </a>
+          <button 
+            onClick={() => navigate("/auth")} 
+            className="hover:text-gold transition-colors focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 rounded-full px-2 py-1"
+          >
+            Portal
+          </button>
         </nav>
 
-        {/* Right Action: Desktop Authentication Actions OR Mobile Sign Up + Hamburger */}
+        {/* Right Action Buttons */}
         <div className="flex items-center gap-3.5 md:gap-4">
-          {/* Desktop Login Button */}
           <button
             onClick={() => navigate("/auth?mode=login")}
-            className="hidden md:inline-flex bg-transparent text-[#0B3027] hover:text-[#C9A56A] hover:opacity-90 font-medium text-[10px] uppercase tracking-[0.18em] px-3.5 py-1.5 transition-all duration-300 no-underline rounded-full select-none"
+            className="hidden md:inline-flex bg-transparent text-[#0B3027] hover:text-[#C9A56A] font-medium text-[10px] uppercase tracking-[0.18em] px-3.5 py-1.5 transition-all rounded-full focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
           >
             Login
           </button>
 
-          {/* Sign Up Primary Luxury CTA (Desktop + Mobile) */}
           <button
             onClick={() => navigate("/auth?mode=signup")}
-            className="inline-flex px-5 py-2.5 rounded-full bg-forest text-[#C5A572] border border-gold/30 hover:border-gold text-[10px] uppercase tracking-[0.22em] font-bold transition-all shadow-sm items-center gap-2 group"
+            className="inline-flex px-5 py-2.5 rounded-full bg-forest text-[#C5A572] border border-gold/35 hover:border-gold text-[10px] uppercase tracking-[0.22em] font-bold transition-all shadow-sm items-center gap-2 group focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
             {...buttonHoverProps}
           >
             <span>Sign Up</span>
-            <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform duration-300" />
+            <ArrowRight className="w-3 h-3 group-hover:translate-x-1.5 transition-transform duration-300" />
           </button>
 
           {/* Mobile Hamburger Button */}
           <button
             onClick={() => setIsMobileMenuOpen(true)}
-            className="md:hidden w-10 h-10 rounded-full bg-forest text-gold flex items-center justify-center shadow-sm hover:scale-105 active:scale-95 transition-all"
+            className="md:hidden w-10 h-10 rounded-full bg-forest text-gold flex items-center justify-center shadow-sm hover:scale-105 active:scale-95 transition-all focus-visible:ring-2 focus-visible:ring-gold"
             aria-label="Open mobile navigation"
           >
             <Menu className="w-4 h-4" />
@@ -146,21 +204,21 @@ export const LandingPage: React.FC = () => {
         </div>
       </motion.header>
 
-      {/* Mobile Full-Screen Luxury Menu Drawer for LandingPage */}
+      {/* Mobile Drawer */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.35, ease: ARCHITECTURAL_EASE }}
             className="fixed inset-0 z-[9999] bg-[#FAF7F0] flex flex-col justify-between p-7 select-none md:hidden"
           >
             <div className="flex items-center justify-between">
               <Logo size="md" />
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="w-10 h-10 rounded-full bg-forest text-gold flex items-center justify-center shadow-sm"
+                className="w-10 h-10 rounded-full bg-forest text-gold flex items-center justify-center shadow-sm focus-visible:ring-2 focus-visible:ring-gold"
                 aria-label="Close mobile navigation"
               >
                 <X className="w-4 h-4" />
@@ -173,21 +231,21 @@ export const LandingPage: React.FC = () => {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="text-2xl font-heading font-bold uppercase tracking-[0.2em] text-forest/80 hover:text-gold transition-colors"
               >
-                Services
+                Disciplines
               </a>
               <a
                 href="#work"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="text-2xl font-heading font-bold uppercase tracking-[0.2em] text-forest/80 hover:text-gold transition-colors"
               >
-                Work
+                Live Preview
               </a>
               <a
                 href="#process"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="text-2xl font-heading font-bold uppercase tracking-[0.2em] text-forest/80 hover:text-gold transition-colors"
               >
-                Process
+                Standard
               </a>
               <button
                 onClick={() => {
@@ -227,39 +285,43 @@ export const LandingPage: React.FC = () => {
       </AnimatePresence>
 
       {/* ========================================================
-          2. HERO SECTION (B2B DIGITAL EXPERIENCE STUDIO)
+          2. HERO SECTION (FOCAL PATH: EYEBROW → HEADLINE → STAT & SUBTEXT → CTAS)
       ======================================================== */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mb-20 md:mb-28">
-        {/* Left Editorial Copy (Spans 7 cols) */}
+        
+        {/* Left Primary Focal Column (Spans 7 cols) */}
         <div className="lg:col-span-7 flex flex-col items-start text-left">
-          {/* Subtitle Badge */}
+          
+          {/* Eyebrow — Solely content label, no double section numbering */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.0, ease: [0.19, 1, 0.22, 1], delay: 0.15 }}
+            transition={{ duration: 0.6, ease: ARCHITECTURAL_EASE, delay: 0.1 }}
             className="flex items-center gap-3 text-[10px] sm:text-xs uppercase tracking-[0.32em] font-bold text-gold mb-6"
           >
             <span>B2B Digital Experience Studio</span>
             <span className="w-8 h-px bg-gold/50" />
           </motion.div>
 
-          {/* Huge Architectural Headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.15, ease: [0.19, 1, 0.22, 1], delay: 0.3 }}
-            className="font-heading font-bold text-4xl sm:text-5xl md:text-6xl lg:text-[4.25rem] text-forest leading-[1.08] tracking-tight mb-8"
-          >
-            Crafting Digital Experiences <br />
-            Businesses <br />
-            <span className="font-serif italic text-gold font-normal">Remember.</span>
-          </motion.h1>
+          {/* Headline with deliberate line break rhythm and clip mask sweep */}
+          <div className="overflow-hidden mb-8">
+            <motion.h1
+              initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, ease: ARCHITECTURAL_EASE, delay: 0.2 }}
+              className="font-heading font-bold text-4xl sm:text-5xl md:text-6xl lg:text-[4.25rem] text-forest leading-[1.08] tracking-tight"
+            >
+              Crafting Digital Experiences <br />
+              Businesses <br />
+              <span className="font-serif italic text-gold font-normal">Remember.</span>
+            </motion.h1>
+          </div>
 
           {/* Supporting Copy */}
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.1, ease: [0.19, 1, 0.22, 1], delay: 0.45 }}
+            transition={{ duration: 0.8, ease: ARCHITECTURAL_EASE, delay: 0.35 }}
             className="text-text-secondary text-sm sm:text-base font-light leading-relaxed max-w-xl tracking-wide mb-10"
           >
             We partner with ambitious enterprises and luxury brands to architect high-performance digital flagships, mission-critical web software, and bespoke AI telemetry interfaces.
@@ -267,25 +329,22 @@ export const LandingPage: React.FC = () => {
 
           {/* Action CTA Buttons */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.1, ease: [0.19, 1, 0.22, 1], delay: 0.6 }}
-            className="flex flex-wrap items-center gap-5"
+            transition={{ duration: 0.8, ease: ARCHITECTURAL_EASE, delay: 0.5 }}
+            className="flex flex-wrap items-center gap-4 sm:gap-5"
           >
-            {/* Primary Emerald Stone CTA */}
+            {/* Primary Restrained Emerald CTA (Flat surface, no marble, gold border, arrow nudge) */}
             <button
               onClick={() => navigate("/auth")}
-              className="group relative inline-flex items-center justify-center gap-3.5 px-8 py-4 rounded-full bg-forest text-ivory border border-gold/35 shadow-[0_12px_32px_rgba(6,41,30,0.22)] hover:border-gold hover:shadow-[0_16px_40px_rgba(6,41,30,0.32)] transition-all overflow-hidden font-heading text-xs font-bold uppercase tracking-[0.22em]"
+              className="group relative inline-flex items-center justify-center gap-3.5 px-8 py-4 rounded-full bg-forest text-[#C5A572] border border-gold/35 hover:border-gold shadow-md hover:shadow-xl transition-all font-heading text-xs font-bold uppercase tracking-[0.22em] focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
               {...buttonHoverProps}
             >
-              <div className="absolute inset-0 opacity-25 group-hover:opacity-40 transition-opacity duration-700 pointer-events-none">
-                <MarbleVeins />
-              </div>
-              <span className="relative z-10">Enter Studio Portal</span>
-              <ArrowRight className="relative z-10 w-3.5 h-3.5 text-gold group-hover:translate-x-1 transition-transform" />
+              <span>Enter Studio Portal</span>
+              <ArrowRight className="w-3.5 h-3.5 text-gold group-hover:translate-x-1.5 transition-transform duration-300" />
             </button>
 
-            {/* Secondary Gold Ghost CTA */}
+            {/* Secondary Ghost CTA */}
             <button
               onClick={() => {
                 if (window.innerWidth < 768) {
@@ -294,58 +353,63 @@ export const LandingPage: React.FC = () => {
                   navigate("/intro");
                 }
               }}
-              className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full bg-transparent text-forest border border-forest/20 hover:border-gold text-xs font-bold uppercase tracking-[0.2em] transition-all"
+              className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full bg-transparent text-forest border border-forest/20 hover:border-gold text-xs font-bold uppercase tracking-[0.2em] transition-all focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
               {...buttonHoverProps}
             >
-              <span>Explore Full Website</span>
+              <span>Explore Website</span>
             </button>
 
-            {/* Book Free Strategy Consultation CTA */}
+            {/* Strategy Consultation CTA */}
             <button
               onClick={openConsultationModal}
-              className="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full bg-forest text-[#C5A572] border border-gold/40 hover:border-gold shadow-lg hover:shadow-xl text-xs font-bold uppercase tracking-[0.22em] transition-all"
+              className="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full bg-forest text-[#C5A572] border border-gold/40 hover:border-gold shadow-md text-xs font-bold uppercase tracking-[0.22em] transition-all focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
               {...buttonHoverProps}
             >
-              <span>Book Free Consultation</span>
+              <span>Book Consultation</span>
               <ArrowRight className="w-3.5 h-3.5 text-gold" />
             </button>
           </motion.div>
         </div>
 
-        {/* Right Column Brief Editorial Stats (Spans 5 cols) */}
+        {/* Right Secondary Column — Engineering Discipline Evidence Panel */}
         <motion.div
-          initial={{ opacity: 0, x: 20 }}
+          initial={shouldReduceMotion ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1.2, ease: [0.19, 1, 0.22, 1], delay: 0.5 }}
-          className="lg:col-span-5 flex flex-col justify-between h-full pt-4 lg:pt-12 border-t lg:border-t-0 lg:border-l border-forest/10 lg:pl-12"
+          transition={{ duration: 0.9, ease: ARCHITECTURAL_EASE, delay: 0.4 }}
+          className="lg:col-span-5 flex flex-col justify-between h-full pt-4 lg:pt-8 border-t lg:border-t-0 lg:border-l border-forest/15 lg:pl-10"
         >
-          <div className="flex flex-col gap-10">
+          <div className="flex flex-col gap-8">
             <div>
               <span className="text-[10px] uppercase tracking-[0.28em] font-bold text-text-secondary block mb-2">
                 Engineering Discipline
               </span>
-              <p className="font-heading text-2xl font-bold text-forest leading-snug">
+              <p className="font-heading text-xl sm:text-2xl font-bold text-forest leading-snug">
                 Strict performance SLAs combined with stone-inspired editorial art direction.
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-8 border-t border-forest/10 pt-8">
+            {/* Old-Style Figures Editorial Numeral Layout */}
+            <div className="grid grid-cols-2 gap-8 border-t border-forest/10 pt-6">
               <div>
-                <span className="font-heading font-black text-4xl text-gold block mb-1">0.4s</span>
-                <span className="text-[11px] uppercase tracking-wider text-text-secondary font-medium">
+                <span className="font-heading font-black text-3xl sm:text-4xl text-gold block mb-1 font-oldstyle">
+                  0.4s
+                </span>
+                <span className="text-[10px] uppercase tracking-wider text-text-secondary font-medium">
                   Average Edge LCP
                 </span>
               </div>
               <div>
-                <span className="font-heading font-black text-4xl text-gold block mb-1">100</span>
-                <span className="text-[11px] uppercase tracking-wider text-text-secondary font-medium">
+                <span className="font-heading font-black text-3xl sm:text-4xl text-gold block mb-1 font-oldstyle">
+                  100
+                </span>
+                <span className="text-[10px] uppercase tracking-wider text-text-secondary font-medium">
                   Lighthouse Core Vitals
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="mt-10 lg:mt-0 pt-6 border-t border-forest/10 flex items-center justify-between text-[10px] uppercase tracking-[0.24em] font-semibold text-forest/60">
+          <div className="mt-8 pt-6 border-t border-forest/10 flex items-center justify-between text-[10px] uppercase tracking-[0.24em] font-semibold text-forest/60">
             <span>Bespoke Architecture</span>
             <span>•</span>
             <span>Zero Layout Shift</span>
@@ -358,9 +422,10 @@ export const LandingPage: React.FC = () => {
       ======================================================== */}
       <motion.section
         id="work"
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.25, ease: [0.19, 1, 0.22, 1], delay: 0.75 }}
+        initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: 0.8, ease: ARCHITECTURAL_EASE }}
         className="mb-28"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
@@ -375,12 +440,22 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* Project Switcher Pills */}
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label="Flagship project previews">
             {PREVIEW_PROJECTS.map((proj, idx) => (
               <button
                 key={proj.id}
+                role="tab"
+                aria-selected={activeProjectIdx === idx}
+                aria-controls={`preview-panel-${proj.id}`}
                 onClick={() => setActiveProjectIdx(idx)}
-                className={`px-4 py-1.5 rounded-full text-[11px] uppercase tracking-wider font-bold transition-all ${
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowRight") {
+                    setActiveProjectIdx((idx + 1) % PREVIEW_PROJECTS.length);
+                  } else if (e.key === "ArrowLeft") {
+                    setActiveProjectIdx((idx - 1 + PREVIEW_PROJECTS.length) % PREVIEW_PROJECTS.length);
+                  }
+                }}
+                className={`px-4 py-1.5 rounded-full text-[11px] uppercase tracking-wider font-bold transition-all focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 ${
                   activeProjectIdx === idx
                     ? "bg-forest text-ivory shadow-sm border border-gold/40"
                     : "bg-white/60 text-text-secondary hover:text-forest border border-forest/10"
@@ -395,43 +470,46 @@ export const LandingPage: React.FC = () => {
 
         {/* macOS Safari Browser Frame */}
         <div className="rounded-3xl border border-forest/[0.14] bg-white/90 shadow-premium overflow-hidden">
-          {/* Top Chrome Safari Window Bar */}
+          
+          {/* Top macOS Chrome Safari Bar */}
           <div className="bg-[#FAF7F0] border-b border-forest/10 px-6 py-3.5 flex items-center justify-between">
-            {/* macOS Traffic Light Dots */}
+            {/* macOS Skeuomorphic Traffic Lights */}
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-[#FF5F56] border border-black/10 inline-block" />
               <span className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-black/10 inline-block" />
               <span className="w-3 h-3 rounded-full bg-[#27C93F] border border-black/10 inline-block" />
             </div>
 
-            {/* Address Bar */}
-            <div className="flex items-center justify-center gap-2 max-w-md w-full bg-white border border-forest/15 rounded-lg py-1.5 px-4 text-xs font-mono text-forest/70 truncate">
-              <span className="text-gold">🔒</span>
-              <span>{activeProject.url}</span>
+            {/* Address Bar with Typing Blink Cursor */}
+            <div className="flex items-center justify-center gap-2 max-w-md w-full bg-white border border-forest/15 rounded-lg py-1.5 px-4 text-xs font-mono text-forest/80 truncate">
+              <Lock className="w-3 h-3 text-gold shrink-0" />
+              <span className="truncate">{displayedUrl}</span>
+              {isTyping && <span className="w-1.5 h-3.5 bg-gold inline-block animate-pulse shrink-0" />}
             </div>
 
             {/* Studio Live Indicator */}
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-600 animate-ping" />
               <span className="text-[10px] uppercase tracking-widest font-bold text-forest/70 hidden md:inline">
-                Live Preview
+                Live Browser
               </span>
             </div>
           </div>
 
-          {/* Interactive Browser Canvas Content Area */}
-          <div className="relative min-h-[460px] md:min-h-[520px] p-8 md:p-14 flex flex-col justify-between overflow-hidden">
+          {/* Interactive Canvas Content Area with Crossfade + Vertical Settle */}
+          <div className="relative min-h-[460px] md:min-h-[500px] p-8 md:p-14 flex flex-col justify-between overflow-hidden">
             {/* Ambient Back Glow */}
             <div className={`absolute inset-0 bg-gradient-to-br ${activeProject.accent} opacity-40 pointer-events-none transition-all duration-700`} />
 
-            {/* Top Project Category Badge */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeProject.id}
-                initial={{ opacity: 0, y: 10 }}
+                id={`preview-panel-${activeProject.id}`}
+                role="tabpanel"
+                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.5 }}
+                exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
+                transition={{ duration: 0.35, ease: ARCHITECTURAL_EASE }}
                 className="relative z-10 flex flex-col justify-between h-full"
               >
                 <div>
@@ -448,11 +526,10 @@ export const LandingPage: React.FC = () => {
                   </p>
                 </div>
 
-                {/* Bottom Card Footer inside Safari Canvas */}
+                {/* Bottom Canvas Metric & Tags */}
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 border-t border-forest/15 pt-6 mt-8">
-                  {/* Metric Display */}
                   <div>
-                    <span className="font-heading font-black text-4xl sm:text-5xl text-gold block leading-none mb-1">
+                    <span className="font-heading font-black text-4xl sm:text-5xl text-gold block leading-none mb-1 font-oldstyle">
                       {activeProject.metric}
                     </span>
                     <span className="text-[11px] uppercase tracking-wider font-semibold text-forest/80">
@@ -460,7 +537,6 @@ export const LandingPage: React.FC = () => {
                     </span>
                   </div>
 
-                  {/* Tags */}
                   <div className="flex flex-wrap items-center gap-2">
                     {activeProject.tags.map((tag) => (
                       <span
@@ -481,7 +557,14 @@ export const LandingPage: React.FC = () => {
       {/* ========================================================
           4. EDITORIAL NUMBERED DISCIPLINE CARDS (01 / 02 / 03)
       ======================================================== */}
-      <section id="services" className="mb-28">
+      <motion.section
+        id="services"
+        initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: 0.8, ease: ARCHITECTURAL_EASE }}
+        className="mb-28"
+      >
         <div className="border-b border-forest/15 pb-4 mb-12 flex items-center justify-between">
           <h2 className="font-heading font-bold text-3xl md:text-4xl text-forest tracking-tight">
             Core Disciplines
@@ -492,14 +575,43 @@ export const LandingPage: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          
           {/* Card 01 */}
-          <div className="group relative bg-white/80 border border-forest/10 hover:border-gold p-8 md:p-10 rounded-3xl shadow-sm hover:shadow-premium transition-all duration-500 flex flex-col justify-between">
+          <div
+            tabIndex={0}
+            role="region"
+            aria-label="Core Discipline 01: Digital Products"
+            onMouseEnter={() => setActiveHoverCard(1)}
+            onMouseLeave={() => setActiveHoverCard(null)}
+            onFocus={() => setActiveHoverCard(1)}
+            onBlur={() => setActiveHoverCard(null)}
+            className={`group relative bg-white/80 border transition-all duration-300 p-8 md:p-10 rounded-3xl shadow-sm hover:shadow-premium flex flex-col justify-between focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 ${
+              activeHoverCard === 1 ? "border-gold -translate-y-1.5" : "border-forest/10"
+            }`}
+          >
+            {/* GPU-Safe Border Trace Overlay */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none rounded-3xl" overflow="visible">
+              <rect
+                x="0"
+                y="0"
+                width="100%"
+                height="100%"
+                rx="24"
+                fill="none"
+                stroke="#C5A572"
+                strokeWidth="1.5"
+                strokeDasharray="400 1200"
+                strokeDashoffset={activeHoverCard === 1 ? "0" : "1600"}
+                className="transition-all duration-700 ease-out opacity-0 group-hover:opacity-100"
+              />
+            </svg>
+
             <div>
               <div className="flex items-center justify-between mb-8">
-                <span className="font-heading font-black text-5xl text-gold/40 group-hover:text-gold transition-colors">
+                <span className="font-heading font-black text-5xl text-gold/40 group-hover:text-gold transition-colors font-oldstyle">
                   01
                 </span>
-                <Layers className="w-6 h-6 text-forest/40 group-hover:text-gold transition-colors" />
+                <Layers className="w-6 h-6 text-forest/40 group-hover:text-gold group-hover:scale-110 group-hover:rotate-6 transition-all duration-300" />
               </div>
 
               <h3 className="font-heading font-bold text-2xl text-forest mb-4 tracking-tight">
@@ -513,18 +625,45 @@ export const LandingPage: React.FC = () => {
 
             <div className="border-t border-forest/10 pt-4 flex items-center justify-between text-[10px] uppercase tracking-widest font-bold text-forest">
               <span>Full-Stack Engineering</span>
-              <ArrowRight className="w-3.5 h-3.5 text-gold group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-3.5 h-3.5 text-gold group-hover:translate-x-1.5 transition-transform" />
             </div>
           </div>
 
           {/* Card 02 */}
-          <div className="group relative bg-white/80 border border-forest/10 hover:border-gold p-8 md:p-10 rounded-3xl shadow-sm hover:shadow-premium transition-all duration-500 flex flex-col justify-between">
+          <div
+            tabIndex={0}
+            role="region"
+            aria-label="Core Discipline 02: Brand Websites"
+            onMouseEnter={() => setActiveHoverCard(2)}
+            onMouseLeave={() => setActiveHoverCard(null)}
+            onFocus={() => setActiveHoverCard(2)}
+            onBlur={() => setActiveHoverCard(null)}
+            className={`group relative bg-white/80 border transition-all duration-300 p-8 md:p-10 rounded-3xl shadow-sm hover:shadow-premium flex flex-col justify-between focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 ${
+              activeHoverCard === 2 ? "border-gold -translate-y-1.5" : "border-forest/10"
+            }`}
+          >
+            <svg className="absolute inset-0 w-full h-full pointer-events-none rounded-3xl" overflow="visible">
+              <rect
+                x="0"
+                y="0"
+                width="100%"
+                height="100%"
+                rx="24"
+                fill="none"
+                stroke="#C5A572"
+                strokeWidth="1.5"
+                strokeDasharray="400 1200"
+                strokeDashoffset={activeHoverCard === 2 ? "0" : "1600"}
+                className="transition-all duration-700 ease-out opacity-0 group-hover:opacity-100"
+              />
+            </svg>
+
             <div>
               <div className="flex items-center justify-between mb-8">
-                <span className="font-heading font-black text-5xl text-gold/40 group-hover:text-gold transition-colors">
+                <span className="font-heading font-black text-5xl text-gold/40 group-hover:text-gold transition-colors font-oldstyle">
                   02
                 </span>
-                <Globe className="w-6 h-6 text-forest/40 group-hover:text-gold transition-colors" />
+                <Globe className="w-6 h-6 text-forest/40 group-hover:text-gold group-hover:scale-110 group-hover:rotate-45 transition-all duration-300" />
               </div>
 
               <h3 className="font-heading font-bold text-2xl text-forest mb-4 tracking-tight">
@@ -538,18 +677,45 @@ export const LandingPage: React.FC = () => {
 
             <div className="border-t border-forest/10 pt-4 flex items-center justify-between text-[10px] uppercase tracking-widest font-bold text-forest">
               <span>Editorial Flagships</span>
-              <ArrowRight className="w-3.5 h-3.5 text-gold group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-3.5 h-3.5 text-gold group-hover:translate-x-1.5 transition-transform" />
             </div>
           </div>
 
           {/* Card 03 */}
-          <div className="group relative bg-white/80 border border-forest/10 hover:border-gold p-8 md:p-10 rounded-3xl shadow-sm hover:shadow-premium transition-all duration-500 flex flex-col justify-between">
+          <div
+            tabIndex={0}
+            role="region"
+            aria-label="Core Discipline 03: AI Systems"
+            onMouseEnter={() => setActiveHoverCard(3)}
+            onMouseLeave={() => setActiveHoverCard(null)}
+            onFocus={() => setActiveHoverCard(3)}
+            onBlur={() => setActiveHoverCard(null)}
+            className={`group relative bg-white/80 border transition-all duration-300 p-8 md:p-10 rounded-3xl shadow-sm hover:shadow-premium flex flex-col justify-between focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 ${
+              activeHoverCard === 3 ? "border-gold -translate-y-1.5" : "border-forest/10"
+            }`}
+          >
+            <svg className="absolute inset-0 w-full h-full pointer-events-none rounded-3xl" overflow="visible">
+              <rect
+                x="0"
+                y="0"
+                width="100%"
+                height="100%"
+                rx="24"
+                fill="none"
+                stroke="#C5A572"
+                strokeWidth="1.5"
+                strokeDasharray="400 1200"
+                strokeDashoffset={activeHoverCard === 3 ? "0" : "1600"}
+                className="transition-all duration-700 ease-out opacity-0 group-hover:opacity-100"
+              />
+            </svg>
+
             <div>
               <div className="flex items-center justify-between mb-8">
-                <span className="font-heading font-black text-5xl text-gold/40 group-hover:text-gold transition-colors">
+                <span className="font-heading font-black text-5xl text-gold/40 group-hover:text-gold transition-colors font-oldstyle">
                   03
                 </span>
-                <Cpu className="w-6 h-6 text-forest/40 group-hover:text-gold transition-colors" />
+                <Cpu className="w-6 h-6 text-forest/40 group-hover:text-gold group-hover:scale-110 transition-all duration-300" />
               </div>
 
               <h3 className="font-heading font-bold text-2xl text-forest mb-4 tracking-tight">
@@ -563,19 +729,41 @@ export const LandingPage: React.FC = () => {
 
             <div className="border-t border-forest/10 pt-4 flex items-center justify-between text-[10px] uppercase tracking-widest font-bold text-forest">
               <span>Autonomous Intelligence</span>
-              <ArrowRight className="w-3.5 h-3.5 text-gold group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-3.5 h-3.5 text-gold group-hover:translate-x-1.5 transition-transform" />
             </div>
           </div>
+
         </div>
-      </section>
+      </motion.section>
 
       {/* ========================================================
-          5. PROCESS & DIFFERENCE SNAPSHOT
+          5. CLOSING CONTINUOUS CTA BAND (ARRIVAL TONAL SHIFT)
       ======================================================== */}
-      <section id="process" className="mb-24 bg-forest text-ivory rounded-3xl p-8 sm:p-12 md:p-16 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-15 pointer-events-none">
-          <MarbleVeins />
-        </div>
+      <motion.section
+        id="process"
+        initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: 0.8, ease: ARCHITECTURAL_EASE }}
+        className="mb-24 bg-forest text-ivory rounded-3xl p-8 sm:p-12 md:p-16 relative overflow-hidden shadow-2xl border border-gold/30"
+      >
+        {/* Continuous Grid Pattern Overlay carrying through background grid */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-20"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, rgba(197, 165, 114, 0.2) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(197, 165, 114, 0.2) 1px, transparent 1px)
+            `,
+            backgroundSize: "64px 64px"
+          }}
+        />
+
+        {/* Bookending Gold Corner Brackets matching opening frame */}
+        <div className="absolute top-6 left-6 w-5 h-5 border-l-2 border-t-2 border-gold/50 pointer-events-none" />
+        <div className="absolute top-6 right-6 w-5 h-5 border-r-2 border-t-2 border-gold/50 pointer-events-none" />
+        <div className="absolute bottom-6 left-6 w-5 h-5 border-l-2 border-b-2 border-gold/50 pointer-events-none" />
+        <div className="absolute bottom-6 right-6 w-5 h-5 border-r-2 border-b-2 border-gold/50 pointer-events-none" />
 
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           <div className="lg:col-span-7">
@@ -609,30 +797,32 @@ export const LandingPage: React.FC = () => {
           <div className="lg:col-span-5 flex flex-col items-start lg:items-end justify-center">
             <button
               onClick={() => navigate("/auth")}
-              className="px-9 py-4.5 rounded-full bg-gold text-forest font-heading font-bold text-xs uppercase tracking-[0.24em] hover:bg-ivory transition-colors shadow-lg"
+              className="group px-9 py-4.5 rounded-full bg-gold text-forest font-heading font-bold text-xs uppercase tracking-[0.24em] hover:bg-ivory transition-all shadow-lg flex items-center gap-2.5 focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
               {...buttonHoverProps}
             >
-              Enter Client Workspace
+              <span>Enter Client Workspace</span>
+              <ArrowRight className="w-3.5 h-3.5 text-forest group-hover:translate-x-1.5 transition-transform" />
             </button>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* ========================================================
-          6. EDITORIAL FOOTER
+          6. EDITORIAL FOOTER WITH ROMAN NUMERAL STAMP
       ======================================================== */}
-      <footer className="border-t border-forest/15 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] uppercase tracking-[0.28em] font-bold text-forest/60">
+      <footer className="border-t border-forest/15 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] uppercase tracking-[0.28em] font-bold text-forest/70">
         <div className="flex items-center gap-3">
           <span>Tech Ambiance Studio</span>
           <span className="text-gold">•</span>
           <span>B2B Digital Flagships</span>
         </div>
         <div>
-          <span>Crafted in India  •  MMXXVI</span>
+          <span>Crafted in India  •  <span className="font-oldstyle tracking-widest text-gold font-bold">MMXXVI</span></span>
         </div>
       </footer>
 
     </div>
   );
 };
+
 export default LandingPage;
