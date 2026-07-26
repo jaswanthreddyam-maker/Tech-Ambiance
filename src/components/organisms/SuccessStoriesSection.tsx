@@ -264,7 +264,7 @@ export const SuccessStoriesSection: React.FC = () => {
                       </div>
 
                       {/* Card Preview Image */}
-                      <div className="relative h-56 w-full overflow-hidden rounded-t-3xl bg-[#08261F]">
+                      <div className="relative h-64 sm:h-72 w-full overflow-hidden rounded-t-3xl bg-[#08261F]">
                         <div
                           className="absolute inset-0 transition-transform duration-700 ease-out"
                           style={{ background: story.thumbnail }}
@@ -288,14 +288,11 @@ export const SuccessStoriesSection: React.FC = () => {
                       </div>
 
                       {/* Card Body & Metrics */}
-                      <div className="p-7 flex-1 flex flex-col justify-between space-y-5 relative z-10">
-                        <div className="space-y-2">
+                      <div className="p-7 flex-1 flex flex-col justify-between space-y-4 relative z-10">
+                        <div>
                           <h3 className="font-serif text-2xl font-bold text-gold">
                             {story.title}
                           </h3>
-                          <p className="text-xs text-gold/80 leading-relaxed line-clamp-2">
-                            {story.summary}
-                          </p>
                         </div>
 
                         {/* Metrics Row with Old-Style Figures */}
@@ -409,7 +406,7 @@ export const SuccessStoriesSection: React.FC = () => {
                     <MarbleVeins />
                   </div>
 
-                  <div className="relative h-44 w-full overflow-hidden rounded-2xl bg-[#08261F]">
+                  <div className="relative h-52 w-full overflow-hidden rounded-2xl bg-[#08261F]">
                     <img
                       src={story.featuredImage}
                       alt={story.title}
@@ -426,9 +423,6 @@ export const SuccessStoriesSection: React.FC = () => {
                     <h3 className="font-serif text-2xl font-bold text-gold">
                       {story.title}
                     </h3>
-                    <p className="text-xs text-gold/80 leading-relaxed line-clamp-3">
-                      {story.summary}
-                    </p>
 
                     <div className="grid grid-cols-3 gap-2 pt-4 border-t border-gold/15">
                       {story.metrics.map((metric, metricIdx) => (
