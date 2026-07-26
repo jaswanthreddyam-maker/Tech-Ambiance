@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Section } from '../layout/Section';
 import { Container } from '../layout/Container';
 import { Heading, Text } from '../ui/Typography';
-import { SUCCESS_STORIES, SuccessStory } from '../../content/successStories';
+import { SUCCESS_STORIES, type SuccessStory } from '../../content/successStories';
 import { MarbleVeins } from '../ui/MarbleVeins';
 import { RevealHeading } from '../motion';
 
