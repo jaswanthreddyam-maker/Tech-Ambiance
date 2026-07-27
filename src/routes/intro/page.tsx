@@ -84,10 +84,16 @@ export const IntroPage: React.FC = () => {
           }
         }}
         onEnded={handleTransition}
-        className="w-full h-full object-contain md:object-cover select-none scale-[1.08] origin-center"
+        className="w-full h-full object-contain md:object-cover select-none"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1.2, ease: "easeOut" }}
+      />
+
+      {/* Watermark Background Blend Patch */}
+      <div
+        className="pointer-events-none absolute bottom-24 right-12 sm:bottom-28 sm:right-16 w-28 h-28 rounded-full bg-[radial-gradient(circle_at_center,_#E6E6E6_0%,_#E6E6E6_60%,_transparent_100%)] blur-md z-10"
+        aria-hidden="true"
       />
 
       {/* Skip Button (Appears after 2 seconds) positioned at Bottom Right exactly as shown */}
