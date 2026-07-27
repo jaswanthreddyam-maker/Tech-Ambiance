@@ -183,7 +183,7 @@ export const SuccessStoriesSection: React.FC = () => {
           >
             {/* 3D Perspective Stage Container */}
             <div
-              className="relative w-full h-[540px] flex items-center justify-center cursor-grab active:cursor-grabbing touch-none"
+              className="relative w-full h-[280px] flex items-center justify-center cursor-grab active:cursor-grabbing touch-none"
               style={{
                 perspective: '1200px',
                 perspectiveOrigin: '50% 50%',
@@ -233,7 +233,7 @@ export const SuccessStoriesSection: React.FC = () => {
                       style={{
                         position: 'absolute',
                         width: '380px',
-                        height: '480px',
+                        height: '240px',
                         transformStyle: 'preserve-3d',
                         transform: `rotateY(${cardBaseAngle}deg) translateZ(${radius}px) scale(${scale})`,
                         opacity,
@@ -313,7 +313,7 @@ export const SuccessStoriesSection: React.FC = () => {
                       navigate(`/experience/case-studies/${story.slug}`);
                     }
                   }}
-                  className="min-w-[85%] max-w-[85%] sm:min-w-[340px] sm:max-w-[340px] h-[440px] w-full shrink-0 snap-center rounded-3xl border border-gold/30 shadow-md overflow-hidden cursor-pointer"
+                  className="min-w-[85%] max-w-[85%] sm:min-w-[340px] sm:max-w-[340px] h-[220px] w-full shrink-0 snap-center rounded-3xl border border-gold/30 shadow-md overflow-hidden cursor-pointer"
                 >
                   <img
                     src={story.featuredImage}
