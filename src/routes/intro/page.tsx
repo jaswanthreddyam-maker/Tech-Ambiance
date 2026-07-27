@@ -54,7 +54,7 @@ export const IntroPage: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black flex items-center justify-center overflow-hidden z-50">
+    <div className="fixed inset-0 bg-[#E6E6E6] flex items-center justify-center overflow-hidden z-50">
       {/* Dynamic SEO Meta is injected via Provider */}
 
       {/* Transition Out Black Screen */}
