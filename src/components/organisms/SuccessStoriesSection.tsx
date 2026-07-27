@@ -33,8 +33,6 @@ export const SuccessStoriesSection: React.FC = () => {
   const pauseTimerRef = useRef<NodeJS.Timeout | null>(null);
   const animationFrameRef = useRef<number | null>(null);
 
-  // Compute active card index dynamically from rotation angle
-  const activeIndex = (Math.round((-rotationAngle % 360 + 360) % 360 / stepAngle)) % N;
   const currentRotation = rotationAngle + dragOffset;
 
   // Slow continuous rotation loop (~3.5° / second)
@@ -255,6 +253,7 @@ export const SuccessStoriesSection: React.FC = () => {
                     </div>
                   );
                 })}
+              </div>
             </div>
           </div>
 
