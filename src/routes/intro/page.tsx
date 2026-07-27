@@ -84,7 +84,7 @@ export const IntroPage: React.FC = () => {
           }
         }}
         onEnded={handleTransition}
-        className="w-full h-full object-contain md:object-cover select-none"
+        className="w-full h-full object-contain md:object-cover select-none scale-[1.08] origin-center"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1.2, ease: "easeOut" }}
