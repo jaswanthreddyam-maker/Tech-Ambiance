@@ -169,19 +169,19 @@ export const GoldenLightningVeins: React.FC<GoldenLightningVeinsProps> = ({
     let timeoutId: ReturnType<typeof setTimeout>;
 
     const scheduleNextPulse = () => {
-      // Random interval between 2.5 and 5.5 seconds for frequent elegant electrical blinks
-      const delay = Math.floor(Math.random() * 3000) + 2500;
+      // Frequent electrical blinks: random interval between 0.8s and 2.0s
+      const delay = Math.floor(Math.random() * 1200) + 800;
 
       timeoutId = setTimeout(() => {
-        // Pick one random vein from the current variant
+        // Pick a random vein from the current variant
         const randomVein = paths[Math.floor(Math.random() * paths.length)];
         setPulsingId(randomVein.id);
 
-        // Blink lasts 780ms
+        // Blink duration: 550ms
         setTimeout(() => {
           setPulsingId(null);
           scheduleNextPulse();
-        }, 780);
+        }, 550);
       }, delay);
     };
 
@@ -269,12 +269,12 @@ export const GoldenLightningVeins: React.FC<GoldenLightningVeinsProps> = ({
               transition={
                 isPulsing
                   ? {
-                      duration: 0.78,
+                      duration: 0.55,
                       times: [0, 0.2, 0.45, 0.7, 1],
                       ease: "easeInOut",
                     }
                   : {
-                      duration: 4.5,
+                      duration: 2.2,
                       repeat: Infinity,
                       ease: "easeInOut",
                     }
