@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { m, useReducedMotion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Section } from '../layout/Section';
 import { Container } from '../layout/Container';
@@ -255,46 +255,6 @@ export const SuccessStoriesSection: React.FC = () => {
                     </div>
                   );
                 })}
-              </div>
-            </div>
-
-            {/* Manual Controls & Plain Dot Pagination (No Numerals) */}
-            <div className="flex items-center gap-6 mt-6 z-20">
-              {/* Prev Button */}
-              <button
-                onClick={handlePrev}
-                className="w-10 h-10 rounded-full bg-emerald-stone border border-gold/30 text-gold flex items-center justify-center hover:border-gold hover:bg-gold/10 transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-gold"
-                aria-label="Previous Success Story"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-
-              {/* Plain Gold Dots Pagination */}
-              <div className="flex items-center gap-2" role="tablist" aria-label="Story position indicators">
-                {stories.map((s, dotIdx) => (
-                  <button
-                    key={s.slug}
-                    role="tab"
-                    aria-selected={activeIndex === dotIdx}
-                    onClick={() => rotateToCard(dotIdx)}
-                    className={`h-2 rounded-full transition-all duration-300 focus-visible:ring-2 focus-visible:ring-gold ${
-                      activeIndex === dotIdx
-                        ? 'w-7 bg-gold shadow-[0_0_8px_rgba(197,165,114,0.6)]'
-                        : 'w-2 bg-gold/30 hover:bg-gold/60'
-                    }`}
-                    aria-label={`Go to story ${dotIdx + 1}`}
-                  />
-                ))}
-              </div>
-
-              {/* Next Button */}
-              <button
-                onClick={handleNext}
-                className="w-10 h-10 rounded-full bg-emerald-stone border border-gold/30 text-gold flex items-center justify-center hover:border-gold hover:bg-gold/10 transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-gold"
-                aria-label="Next Success Story"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
             </div>
           </div>
 
@@ -321,18 +281,6 @@ export const SuccessStoriesSection: React.FC = () => {
                     className="w-full h-full object-cover object-top rounded-3xl"
                   />
                 </article>
-              ))}
-            </div>
-
-            {/* Mobile Pagination Indicator Dots */}
-            <div className="flex items-center justify-center gap-2">
-              {stories.map((s, dotIdx) => (
-                <span
-                  key={s.slug}
-                  className={`h-1.5 rounded-full transition-all ${
-                    activeIndex === dotIdx ? 'w-5 bg-gold' : 'w-1.5 bg-gold/30'
-                  }`}
-                />
               ))}
             </div>
           </div>
