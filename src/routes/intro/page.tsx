@@ -65,7 +65,7 @@ export const IntroPage: React.FC = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.8 }}
-            className="fixed inset-0 bg-white z-[9999] pointer-events-none"
+            className="fixed inset-0 bg-black z-[9999] pointer-events-none"
           />
         )}
       </AnimatePresence>
@@ -85,6 +85,7 @@ export const IntroPage: React.FC = () => {
         }}
         onEnded={handleTransition}
         className="w-full h-full object-contain md:object-cover select-none"
+        style={{ filter: "invert(1) hue-rotate(180deg)" }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1.2, ease: "easeOut" }}
