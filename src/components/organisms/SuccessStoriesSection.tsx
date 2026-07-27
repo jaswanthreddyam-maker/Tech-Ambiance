@@ -246,21 +246,12 @@ export const SuccessStoriesSection: React.FC = () => {
                           : 'border-gold/25 hover:border-gold/50 cursor-pointer'
                       }`}
                     >
-                      {/* Card Preview Image */}
-                      <div className="relative w-full h-full overflow-hidden rounded-3xl bg-[#08261F]">
-                        <div
-                          className="absolute inset-0 transition-transform duration-700 ease-out"
-                          style={{ background: story.thumbnail }}
-                        />
-                        <img
-                          src={story.featuredImage}
-                          alt={story.title}
-                          loading="lazy"
-                          className={`w-full h-full object-center transition-all duration-700 ease-out ${
-                            story.imageFit === 'contain' ? 'object-contain' : 'object-cover'
-                          }`}
-                        />
-                      </div>
+                      <img
+                        src={story.featuredImage}
+                        alt={story.title}
+                        loading="lazy"
+                        className="w-full h-full object-cover object-top rounded-3xl"
+                      />
                     </div>
                   );
                 })}
@@ -322,19 +313,13 @@ export const SuccessStoriesSection: React.FC = () => {
                       navigate(`/experience/case-studies/${story.slug}`);
                     }
                   }}
-                  className="min-w-[85%] max-w-[85%] sm:min-w-[340px] sm:max-w-[340px] h-[440px] w-full shrink-0 snap-center rounded-3xl border border-gold/30 shadow-md relative overflow-hidden cursor-pointer"
+                  className="min-w-[85%] max-w-[85%] sm:min-w-[340px] sm:max-w-[340px] h-[440px] w-full shrink-0 snap-center rounded-3xl border border-gold/30 shadow-md overflow-hidden cursor-pointer"
                 >
-                  <div className="relative w-full h-full overflow-hidden rounded-3xl bg-[#08261F]">
-                    <div
-                      className="absolute inset-0 transition-transform duration-700 ease-out"
-                      style={{ background: story.thumbnail }}
-                    />
-                    <img
-                      src={story.featuredImage}
-                      alt={story.title}
-                      className="w-full h-full object-cover object-center"
-                    />
-                  </div>
+                  <img
+                    src={story.featuredImage}
+                    alt={story.title}
+                    className="w-full h-full object-cover object-top rounded-3xl"
+                  />
                 </article>
               ))}
             </div>
